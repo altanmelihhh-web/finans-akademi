@@ -1,0 +1,205 @@
+/* ===================================
+   Theme System - Multiple Color Schemes
+   =================================== */
+
+/* Default Theme (Dark Blue) - Already in style.css */
+:root {
+    --theme-name: 'dark-blue';
+}
+
+/* Light Theme */
+[data-theme="light"] {
+    --primary-color: #2563eb;
+    --primary-dark: #1e40af;
+    --secondary-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --dark-bg: #f8fafc;
+    --card-bg: #ffffff;
+    --card-hover: #f1f5f9;
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --success: #10b981;
+    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme (Pure Black - OLED) */
+[data-theme="dark-oled"] {
+    --primary-color: #3b82f6;
+    --primary-dark: #2563eb;
+    --secondary-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --dark-bg: #000000;
+    --card-bg: #0a0a0a;
+    --card-hover: #1a1a1a;
+    --text-primary: #f8fafc;
+    --text-secondary: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border-color: #1e293b;
+    --success: #10b981;
+    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Dark Purple Theme */
+[data-theme="dark-purple"] {
+    --primary-color: #a78bfa;
+    --primary-dark: #8b5cf6;
+    --secondary-color: #10b981;
+    --danger-color: #f87171;
+    --warning-color: #fbbf24;
+    --dark-bg: #1a0f2e;
+    --card-bg: #2d1b4e;
+    --card-hover: #3d2563;
+    --text-primary: #f3e8ff;
+    --text-secondary: #ddd6fe;
+    --text-muted: #a78bfa;
+    --border-color: #4c1d95;
+    --success: #34d399;
+    --gradient-1: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+    --gradient-2: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
+    --gradient-3: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(139, 92, 246, 0.2);
+    --shadow-md: 0 4px 6px -1px rgba(139, 92, 246, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(139, 92, 246, 0.3);
+    --shadow-xl: 0 20px 25px -5px rgba(139, 92, 246, 0.3);
+}
+
+/* Green Forest Theme */
+[data-theme="dark-green"] {
+    --primary-color: #10b981;
+    --primary-dark: #059669;
+    --secondary-color: #34d399;
+    --danger-color: #f87171;
+    --warning-color: #fbbf24;
+    --dark-bg: #0a1f1a;
+    --card-bg: #1a3a2e;
+    --card-hover: #2a4a3e;
+    --text-primary: #d1fae5;
+    --text-secondary: #a7f3d0;
+    --text-muted: #6ee7b7;
+    --border-color: #134e3a;
+    --success: #34d399;
+    --gradient-1: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --gradient-2: linear-gradient(135deg, #6ee7b7 0%, #10b981 100%);
+    --gradient-3: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(16, 185, 129, 0.2);
+    --shadow-md: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+    --shadow-xl: 0 20px 25px -5px rgba(16, 185, 129, 0.3);
+}
+
+/* Red/Orange Theme (Sunset) */
+[data-theme="dark-sunset"] {
+    --primary-color: #f97316;
+    --primary-dark: #ea580c;
+    --secondary-color: #fbbf24;
+    --danger-color: #dc2626;
+    --warning-color: #f59e0b;
+    --dark-bg: #1a0f0a;
+    --card-bg: #2d1810;
+    --card-hover: #3d2218;
+    --text-primary: #fed7aa;
+    --text-secondary: #fdba74;
+    --text-muted: #fb923c;
+    --border-color: #7c2d12;
+    --success: #84cc16;
+    --gradient-1: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+    --gradient-2: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+    --gradient-3: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(249, 115, 22, 0.2);
+    --shadow-md: 0 4px 6px -1px rgba(249, 115, 22, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(249, 115, 22, 0.3);
+    --shadow-xl: 0 20px 25px -5px rgba(249, 115, 22, 0.3);
+}
+
+/* Cyberpunk Theme (Neon) */
+[data-theme="cyberpunk"] {
+    --primary-color: #06b6d4;
+    --primary-dark: #0891b2;
+    --secondary-color: #ec4899;
+    --danger-color: #f43f5e;
+    --warning-color: #fbbf24;
+    --dark-bg: #0f0f23;
+    --card-bg: #1a1a3e;
+    --card-hover: #252550;
+    --text-primary: #06b6d4;
+    --text-secondary: #22d3ee;
+    --text-muted: #67e8f9;
+    --border-color: #164e63;
+    --success: #10b981;
+    --gradient-1: linear-gradient(135deg, #06b6d4 0%, #ec4899 100%);
+    --gradient-2: linear-gradient(135deg, #f0abfc 0%, #a78bfa 100%);
+    --gradient-3: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(6, 182, 212, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(6, 182, 212, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(6, 182, 212, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(6, 182, 212, 0.5);
+}
+
+/* Nord Theme (Cool Blues) */
+[data-theme="nord"] {
+    --primary-color: #88c0d0;
+    --primary-dark: #5e81ac;
+    --secondary-color: #a3be8c;
+    --danger-color: #bf616a;
+    --warning-color: #ebcb8b;
+    --dark-bg: #2e3440;
+    --card-bg: #3b4252;
+    --card-hover: #434c5e;
+    --text-primary: #eceff4;
+    --text-secondary: #e5e9f0;
+    --text-muted: #d8dee9;
+    --border-color: #4c566a;
+    --success: #a3be8c;
+    --gradient-1: linear-gradient(135deg, #88c0d0 0%, #5e81ac 100%);
+    --gradient-2: linear-gradient(135deg, #81a1c1 0%, #88c0d0 100%);
+    --gradient-3: linear-gradient(135deg, #b48ead 0%, #5e81ac 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(46, 52, 64, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(46, 52, 64, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(46, 52, 64, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(46, 52, 64, 0.5);
+}
+
+/* Dracula Theme */
+[data-theme="dracula"] {
+    --primary-color: #bd93f9;
+    --primary-dark: #9580ff;
+    --secondary-color: #50fa7b;
+    --danger-color: #ff5555;
+    --warning-color: #f1fa8c;
+    --dark-bg: #282a36;
+    --card-bg: #44475a;
+    --card-hover: #565869;
+    --text-primary: #f8f8f2;
+    --text-secondary: #e6e6e6;
+    --text-muted: #6272a4;
+    --border-color: #6272a4;
+    --success: #50fa7b;
+    --gradient-1: linear-gradient(135deg, #bd93f9 0%, #ff79c6 100%);
+    --gradient-2: linear-gradient(135deg, #ff79c6 0%, #ff5555 100%);
+    --gradient-3: linear-gradient(135deg, #8be9fd 0%, #bd93f9 100%);
+    --shadow-sm: 0 1px 2px 0 rgba(40, 42, 54, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(40, 42, 54, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(40, 42, 54, 0.4);
+    --shadow-xl: 0 20px 25px -5px rgba(40, 42, 54, 0.5);
+}
+
+/* Theme transition */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
