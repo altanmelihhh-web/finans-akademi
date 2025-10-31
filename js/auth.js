@@ -6,8 +6,11 @@ import {
     getAuth,
     signInWithPopup,
     GoogleAuthProvider,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    updateProfile
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import {
     getFirestore,
@@ -91,12 +94,18 @@ function showLoginButton() {
     if (!authContainer) return;
 
     authContainer.innerHTML = `
-        <button id="loginBtn" class="login-btn">
-            <i class="fab fa-google"></i> Google ile Giriş Yap
-        </button>
+        <div class="auth-buttons">
+            <button id="loginBtn" class="login-btn google-btn">
+                <i class="fab fa-google"></i> Google ile Giriş
+            </button>
+            <button id="emailLoginBtn" class="login-btn email-btn">
+                <i class="fas fa-envelope"></i> Email ile Giriş
+            </button>
+        </div>
     `;
 
-    document.getElementById('loginBtn').addEventListener('click', handleLogin);
+    document.getElementById('loginBtn').addEventListener('click', handleGoogleLogin);
+    document.getElementById('emailLoginBtn').addEventListener('click', showEmailLoginModal);
 }
 
 // Show localStorage mode notification
@@ -112,8 +121,66 @@ function showLocalStorageMode() {
     `;
 }
 
+// Show email login modal
+function showEmailLoginModal() {
+    const modal = document.createElement('div');
+    modal.className = 'auth-modal';
+    modal.id = 'authModal';
+    modal.innerHTML = `
+        <div class="auth-modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Giriş Yap / Kayıt Ol</h2>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Giriş Yap</button>
+                <button class="auth-tab" data-tab="register">Kayıt Ol</button>
+            </div>
+
+            <div id="loginForm" class="auth-form active">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Şifre" required>
+                <button onclick="handleEmailLogin()" class="submit-btn">Giriş Yap</button>
+            </div>
+
+            <div id="registerForm" class="auth-form">
+                <input type="text" id="registerName" placeholder="Ad Soyad" required>
+                <input type="email" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Şifre (min 6 karakter)" required>
+                <button onclick="handleEmailRegister()" class="submit-btn">Kayıt Ol</button>
+            </div>
+
+            <div class="auth-divider">
+                <span>veya</span>
+            </div>
+
+            <button onclick="handleGoogleLogin()" class="google-login-btn">
+                <i class="fab fa-google"></i> Google ile devam et
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Close modal handlers
+    modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+
+    // Tab switching
+    modal.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetTab = this.dataset.tab;
+            modal.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            modal.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById(targetTab === 'login' ? 'loginForm' : 'registerForm').classList.add('active');
+        });
+    });
+}
+
 // Handle Google login
-async function handleLogin() {
+async function handleGoogleLogin() {
     if (!auth) {
         alert('Firebase yapılandırılmamış. Lütfen firebase-config.js dosyasını oluşturun.');
         return;
@@ -122,12 +189,16 @@ async function handleLogin() {
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        console.log('✅ Login successful:', user.email);
+        console.log('✅ Google login successful:', user.email);
+
+        // Close modal if exists
+        const modal = document.getElementById('authModal');
+        if (modal) modal.remove();
 
         // Migrate localStorage data to Firestore
         await migrateLocalStorageToFirestore(user.uid);
     } catch (error) {
-        console.error('❌ Login error:', error);
+        console.error('❌ Google login error:', error);
         if (error.code === 'auth/popup-closed-by-user') {
             alert('Giriş penceresi kapatıldı. Lütfen tekrar deneyin.');
         } else {
@@ -135,6 +206,99 @@ async function handleLogin() {
         }
     }
 }
+
+// Handle email/password login
+async function handleEmailLogin() {
+    if (!auth) {
+        alert('Firebase yapılandırılmamış.');
+        return;
+    }
+
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+        alert('Lütfen email ve şifrenizi girin.');
+        return;
+    }
+
+    try {
+        const result = await signInWithEmailAndPassword(auth, email, password);
+        const user = result.user;
+        console.log('✅ Email login successful:', user.email);
+
+        // Close modal
+        document.getElementById('authModal').remove();
+
+        // Migrate localStorage data to Firestore
+        await migrateLocalStorageToFirestore(user.uid);
+    } catch (error) {
+        console.error('❌ Email login error:', error);
+        if (error.code === 'auth/user-not-found') {
+            alert('Kullanıcı bulunamadı. Lütfen kayıt olun.');
+        } else if (error.code === 'auth/wrong-password') {
+            alert('Yanlış şifre.');
+        } else {
+            alert('Giriş yapılamadı: ' + error.message);
+        }
+    }
+}
+
+// Handle email/password registration
+async function handleEmailRegister() {
+    if (!auth) {
+        alert('Firebase yapılandırılmamış.');
+        return;
+    }
+
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+
+    if (!name || !email || !password) {
+        alert('Lütfen tüm alanları doldurun.');
+        return;
+    }
+
+    if (password.length < 6) {
+        alert('Şifre en az 6 karakter olmalıdır.');
+        return;
+    }
+
+    try {
+        const result = await createUserWithEmailAndPassword(auth, email, password);
+        const user = result.user;
+
+        // Update profile with name
+        await updateProfile(user, {
+            displayName: name
+        });
+
+        console.log('✅ Registration successful:', user.email);
+
+        // Close modal
+        document.getElementById('authModal').remove();
+
+        // Create user document in Firestore
+        await createUserDocument(user.uid);
+    } catch (error) {
+        console.error('❌ Registration error:', error);
+        if (error.code === 'auth/email-already-in-use') {
+            alert('Bu email zaten kullanımda. Giriş yapmayı deneyin.');
+        } else if (error.code === 'auth/invalid-email') {
+            alert('Geçersiz email adresi.');
+        } else if (error.code === 'auth/weak-password') {
+            alert('Şifre çok zayıf. Daha güçlü bir şifre seçin.');
+        } else {
+            alert('Kayıt olunamadı: ' + error.message);
+        }
+    }
+}
+
+// Make functions globally available
+window.handleGoogleLogin = handleGoogleLogin;
+window.handleEmailLogin = handleEmailLogin;
+window.handleEmailRegister = handleEmailRegister;
 
 // Handle logout
 async function handleLogout() {
