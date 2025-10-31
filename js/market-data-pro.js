@@ -82,7 +82,8 @@ class MarketDataPro {
         this.cache = {
             memory: new Map(),
             timeout: 300000, // 5 minutes
-            storageKey: 'finans_akademi_pro_cache_v2'
+            storageKey: 'finans_akademi_pro_cache_v3', // v3: Yahoo Finance update!
+            version: 3 // Increment this on breaking changes to invalidate old cache
         };
 
         // State Management
@@ -813,6 +814,16 @@ class MarketDataPro {
             if (stored) {
                 const parsed = JSON.parse(stored);
 
+                // Check cache version - invalidate if old version
+                if (parsed.version !== this.cache.version) {
+                    console.log(`🔄 Cache version mismatch (${parsed.version || 'old'} → ${this.cache.version}), invalidating...`);
+                    localStorage.removeItem(this.cache.storageKey);
+                    // Also clear old version keys
+                    localStorage.removeItem('finans_akademi_pro_cache_v2');
+                    localStorage.removeItem('finans_akademi_pro_cache_v1');
+                    return false;
+                }
+
                 // Restore dashboard cache
                 if (parsed.dashboard) {
                     this.cache.memory.set('dashboard', parsed.dashboard);
@@ -825,7 +836,7 @@ class MarketDataPro {
                     this.state.lastMarketsUpdate = parsed.marketsTime || 0;
                 }
 
-                console.log('💾 Cache loaded from localStorage');
+                console.log('💾 Cache loaded from localStorage (v' + this.cache.version + ')');
                 return true;
             }
         } catch (error) {
@@ -837,6 +848,7 @@ class MarketDataPro {
     saveCache() {
         try {
             const cacheData = {
+                version: this.cache.version, // Include version for validation
                 dashboard: this.cache.memory.get('dashboard'),
                 markets: this.cache.memory.get('markets'),
                 dashboardTime: this.state.lastDashboardUpdate,
