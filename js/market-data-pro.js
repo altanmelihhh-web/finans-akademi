@@ -847,16 +847,33 @@ class MarketDataPro {
 
     saveCache() {
         try {
+            const dashboardData = this.cache.memory.get('dashboard');
+            const marketsData = this.cache.memory.get('markets');
+
+            // Validate data before saving - don't save if empty!
+            const isDashboardValid = dashboardData && (
+                (dashboardData.forex && dashboardData.forex.USDTRY > 0) ||
+                (dashboardData.aapl && dashboardData.aapl.price > 0)
+            );
+
+            const isMarketsValid = marketsData && Object.keys(marketsData).length > 0;
+
+            if (!isDashboardValid && !isMarketsValid) {
+                console.warn('⚠️ Cache data is empty, skipping save to prevent ₺0.00 cache');
+                return;
+            }
+
             const cacheData = {
                 version: this.cache.version, // Include version for validation
-                dashboard: this.cache.memory.get('dashboard'),
-                markets: this.cache.memory.get('markets'),
+                dashboard: dashboardData,
+                markets: marketsData,
                 dashboardTime: this.state.lastDashboardUpdate,
                 marketsTime: this.state.lastMarketsUpdate,
                 timestamp: Date.now()
             };
 
             localStorage.setItem(this.cache.storageKey, JSON.stringify(cacheData));
+            console.log('💾 Cache saved (validated)');
         } catch (error) {
             console.error('❌ Cache save error:', error);
         }
@@ -954,7 +971,26 @@ class MarketDataPro {
         console.log('🔄 Manual refresh initiated...');
         this.cache.memory.clear();
         localStorage.removeItem(this.cache.storageKey);
+        // Clear all old versions too
+        localStorage.removeItem('finans_akademi_pro_cache_v2');
+        localStorage.removeItem('finans_akademi_pro_cache_v1');
+        localStorage.removeItem('simple_market_cache');
+
+        // Reset state
+        this.state.lastDashboardUpdate = 0;
+        this.state.lastMarketsUpdate = 0;
+
+        console.log('✅ Cache cleared! Fetching fresh data...');
         await this.init();
+    }
+
+    /**
+     * Force clear cache and reload page
+     */
+    clearCacheAndReload() {
+        console.log('🗑️ Clearing all cache and reloading...');
+        localStorage.clear();
+        location.reload();
     }
 
     /**
