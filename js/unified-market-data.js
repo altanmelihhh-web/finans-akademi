@@ -16,11 +16,11 @@ class UnifiedMarketData {
             // Finnhub - US stocks (CORS-friendly)
             finnhub: 'd42gjvpr01qorler9mm0d42gjvpr01qorler9mmg',
 
-            // Twelve Data - Global + BIST (ücretsiz: https://twelvedata.com/)
-            twelvedata: 'demo', // KULLANICI: https://twelvedata.com/apikey adresinden ücretsiz key alın
+            // Twelve Data - Global + BIST (800 req/day)
+            twelvedata: 'fdac468065d2400da3b17abc0ca59d13',
 
-            // Financial Modeling Prep - Backup API
-            fmp: 'demo' // KULLANICI: https://financialmodelingprep.com/developer/docs/ adresinden key alın
+            // Financial Modeling Prep - Backup API (250 req/day)
+            fmp: 'zg8u1jbHsWNW7Bp0FRjvz0CL7byPAA0C'
         };
 
         // Multi-level cache
