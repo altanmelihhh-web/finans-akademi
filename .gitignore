@@ -1,5 +1,5 @@
-# Firebase config (will be added later with environment variables)
-firebase-config.js
+# Firebase config - commented out to deploy to production
+# firebase-config.js
 
 # Node modules
 node_modules/
