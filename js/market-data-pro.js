@@ -334,30 +334,48 @@ class MarketDataPro {
      * Apply cached markets data
      */
     applyMarketsCache(marketsCache) {
-        if (!window.STOCKS_DATA || !marketsCache) return;
+        if (!window.STOCKS_DATA || !marketsCache) {
+            console.warn('⚠️ Cannot apply cache: STOCKS_DATA or marketsCache missing');
+            return;
+        }
 
         console.log('📦 Applying markets cache...');
+        let updatedCount = 0;
 
         Object.entries(marketsCache).forEach(([symbol, quote]) => {
             const stock = window.STOCKS_DATA.us_stocks.find(s => s.symbol === symbol);
-            if (stock) {
+            if (stock && quote && quote.price > 0) {
                 stock.price = quote.price;
                 stock.change = quote.changePercent;
                 stock.volume = quote.volume || 1000000;
+                updatedCount++;
+
+                if (updatedCount <= 3) {
+                    // Log first 3 for debugging
+                    console.log(`  ✓ Updated ${symbol}: $${stock.price.toFixed(2)} (${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)}%)`);
+                }
             }
         });
 
-        // Render
-        if (window.marketsManager) {
-            if (typeof window.marketsManager.renderStocks === 'function') {
-                window.marketsManager.renderStocks();
-            }
-            if (typeof window.marketsManager.updateStats === 'function') {
-                window.marketsManager.updateStats();
-            }
-        }
+        console.log(`✓ Markets cache applied: ${updatedCount} stocks updated`);
 
-        console.log('✓ Markets cache applied');
+        // IMPORTANT: Force re-render after data update!
+        if (window.marketsManager) {
+            // Reload stocks from updated STOCKS_DATA
+            if (typeof window.marketsManager.loadStocks === 'function') {
+                window.marketsManager.loadStocks();
+            } else {
+                // Fallback: just render
+                if (typeof window.marketsManager.renderStocks === 'function') {
+                    window.marketsManager.renderStocks();
+                }
+                if (typeof window.marketsManager.updateStats === 'function') {
+                    window.marketsManager.updateStats();
+                }
+            }
+        } else {
+            console.warn('⚠️ marketsManager not found, will render when it initializes');
+        }
     }
 
     /**
