@@ -4461,15 +4461,27 @@ ak istiyorsun. Hangi emri kullanırsın?</li>
     <script>
         // Initialize additional modules after DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize markets page
-            if (typeof marketsManager !== 'undefined' && marketsManager) {
-                marketsManager.init();
+            // Initialize markets page (safely)
+            try {
+                if (typeof marketsManager !== 'undefined' && marketsManager && typeof marketsManager.init === 'function') {
+                    marketsManager.init();
+                    console.log('✅ Markets manager initialized');
+                }
+            } catch (error) {
+                console.warn('⚠️ Markets manager initialization failed:', error);
             }
 
-            // Initialize simulator
-            if (typeof TradingSimulator !== 'undefined') {
-                window.simulator = new TradingSimulator();
-                simulator.init();
+            // Initialize simulator (safely)
+            try {
+                if (typeof TradingSimulator !== 'undefined') {
+                    window.simulator = new TradingSimulator();
+                    if (typeof simulator.init === 'function') {
+                        simulator.init();
+                        console.log('✅ Simulator initialized');
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ Simulator initialization failed:', error);
             }
         });
     </script>

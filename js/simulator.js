@@ -569,6 +569,23 @@ class TradingSimulator {
             modal.style.display = 'block';
         }
     }
+
+    // Load simulator data from localStorage (called by auth.js)
+    loadFromStorage() {
+        try {
+            const savedData = localStorage.getItem('finans_simulator_data');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                this.cash = data.cash || this.initialBalance;
+                this.portfolio = data.portfolio || [];
+                this.transactions = data.transactions || [];
+                this.updateUI();
+                console.log('✅ Simulator data loaded from localStorage');
+            }
+        } catch (error) {
+            console.error('Failed to load simulator data:', error);
+        }
+    }
 }
 
 // Initialize simulator
