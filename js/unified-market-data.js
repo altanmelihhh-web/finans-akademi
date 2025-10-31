@@ -576,29 +576,12 @@ class UnifiedMarketData {
     }
 
     /**
-     * Update US Indices - FIX: Use Finnhub index symbols
+     * Update US Indices - TEMPORARILY DISABLED (Finnhub doesn't support indices in free tier)
      */
     async updateUSIndices() {
-        const indices = [
-            { symbol: '.SPX', id: 'sp500', name: 'S&P 500' },  // Finnhub format
-            { symbol: '.IXIC', id: 'nasdaq', name: 'NASDAQ' },
-            { symbol: '.DJI', id: 'dow', name: 'DOW JONES' }
-        ];
-
-        for (const index of indices) {
-            const quote = await this.getFinnhubQuote(index.symbol);
-            if (quote) {
-                this.updateElement(
-                    index.id,
-                    quote.price.toLocaleString('en-US', {minimumFractionDigits: 2}),
-                    quote.changePercent
-                );
-                console.log(`📊 ${index.name}: ${quote.price.toFixed(2)} (${quote.source})`);
-            } else {
-                console.warn(`⚠️ ${index.name} veri alınamadı`);
-            }
-            await this.delay(200);
-        }
+        console.log('📊 US Endeksler: Finnhub free tier desteklemiyor, şimdilik devre dışı');
+        // TODO: Paid API or alternative source needed for US indices
+        return;
     }
 
     /**
@@ -659,13 +642,13 @@ class UnifiedMarketData {
 
         console.log('📊 Markets sayfası güncelleniyor...');
 
-        // US Stocks - İlk 30 hisse
+        // US Stocks - TÜM 50 hisse (rate limit-safe)
         if (window.STOCKS_DATA.us_stocks) {
-            const usStocksToUpdate = window.STOCKS_DATA.us_stocks.slice(0, 30);
+            const usStocksToUpdate = window.STOCKS_DATA.us_stocks; // TÜM hisseler
 
             for (let i = 0; i < usStocksToUpdate.length; i++) {
                 const stock = usStocksToUpdate[i];
-                const quote = await this.getSmartQuote(stock.symbol);
+                const quote = await this.getFinnhubQuote(stock.symbol); // Direkt Finnhub
 
                 if (quote) {
                     stock.price = quote.price;
@@ -673,48 +656,22 @@ class UnifiedMarketData {
                     stock.volume = quote.volume || 1000000;
                     console.log(`  📈 ${stock.symbol}: $${quote.price.toFixed(2)} (${quote.source})`);
                 } else {
-                    console.warn(`  ⚠️ ${stock.symbol}: Veri alınamadı`);
+                    console.warn(`  ⚠️ ${stock.symbol}: Finnhub veri alamadı`);
                 }
 
-                // Smart delay - her 10 hissede uzun delay
-                if ((i + 1) % 10 === 0) {
-                    await this.delay(1000);
-                } else {
-                    await this.delay(300);
-                }
+                // Conservative delay - Finnhub 60/min limit
+                await this.delay(1100); // 1.1 saniye = ~54 req/min (SAFE!)
             }
         }
 
-        // BIST Stocks - 3-TIER CASCADE: EODHD → Twelve Data → BigPara
+        // BIST Stocks - TEMPORARILY DISABLED (all APIs failing)
         if (window.STOCKS_DATA.bist_stocks) {
-            console.log('  📊 BIST hisseleri güncelleniyor (3-tier cascade: EODHD → Twelve Data → BigPara)...');
-
-            const bistStocksToUpdate = window.STOCKS_DATA.bist_stocks.slice(0, 20);
-
-            for (let i = 0; i < bistStocksToUpdate.length; i++) {
-                const stock = bistStocksToUpdate[i];
-                // BIST sembolleri - .IS suffix ekle
-                const symbol = `${stock.symbol}.IS`; // Örn: THYAO.IS
-
-                // 3-tier cascade kullan
-                const quote = await this.getSmartQuote(symbol);
-
-                if (quote) {
-                    stock.price = quote.price;
-                    stock.change = quote.changePercent;
-                    stock.volume = quote.volume || 1000000;
-                    console.log(`  📈 ${stock.symbol}: ₺${quote.price.toFixed(2)} (${quote.source})`);
-                } else {
-                    console.warn(`  ⚠️ ${stock.symbol}: TÜM BIST API'leri başarısız`);
-                }
-
-                // Smart delay based on source
-                if (quote && quote.source === 'bigpara-scraping') {
-                    await this.delay(2000); // Scraping için uzun delay
-                } else {
-                    await this.delay(500); // Normal API delay
-                }
-            }
+            console.log('  📊 BIST hisseleri: Şimdilik devre dışı (API sorunları)');
+            console.log('  ⚠️ EODHD: CORS error');
+            console.log('  ⚠️ Twelve Data: Invalid symbol + rate limit');
+            console.log('  ⚠️ BigPara scraping: CORS proxy başarısız');
+            console.log('  💡 Çözüm: Sunucu taraflı proxy gerekli veya ücretli API');
+            // TODO: Implement server-side proxy for BIST data
         }
 
         // Markets manager'ı güncelle - loadStocks ÇAĞIRMA!
