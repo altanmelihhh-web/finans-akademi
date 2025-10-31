@@ -4469,20 +4469,30 @@ ak istiyorsun. Hangi emri kullanırsın?</li>
                 }
             } catch (error) {
                 console.warn('⚠️ Markets manager initialization failed:', error);
+                // Continue anyway - don't let errors stop other scripts
             }
 
             // Initialize simulator (safely)
             try {
                 if (typeof TradingSimulator !== 'undefined') {
                     window.simulator = new TradingSimulator();
-                    if (typeof simulator.init === 'function') {
-                        simulator.init();
+                    if (window.simulator && typeof window.simulator.init === 'function') {
+                        window.simulator.init();
                         console.log('✅ Simulator initialized');
                     }
                 }
             } catch (error) {
                 console.warn('⚠️ Simulator initialization failed:', error);
+                // Continue anyway
             }
+
+            // Force chatbot initialization if not already done
+            setTimeout(() => {
+                if (typeof initChatbot === 'function' && !window.finansChatbot) {
+                    console.log('🔄 Re-initializing chatbot...');
+                    initChatbot();
+                }
+            }, 1000);
         });
     </script>
 
