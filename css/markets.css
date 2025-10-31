@@ -257,6 +257,20 @@
     grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 1rem;
     margin-bottom: 1rem;
+    width: 100%;
+    max-width: 100%;
+}
+
+@media (max-width: 1200px) {
+    .search-filter-bar {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-filter-bar {
+        grid-template-columns: 1fr;
+    }
 }
 
 .search-input {

@@ -1,0 +1,134 @@
+/**
+ * Viewport & Overflow Fix
+ * Sayfanın %100 zoom'da düzgün görünmesini sağlar
+ */
+
+/* Global overflow control */
+html {
+    overflow-x: hidden !important;
+    width: 100%;
+    max-width: 100vw;
+}
+
+body {
+    overflow-x: hidden !important;
+    max-width: 100vw;
+    position: relative;
+}
+
+/* Prevent all children from causing horizontal scroll */
+* {
+    max-width: 100%;
+}
+
+/* Fix for containers that might overflow */
+.main-content,
+.container,
+.nav-container,
+section,
+.page {
+    max-width: 100% !important;
+    overflow-x: hidden;
+}
+
+/* Table responsiveness */
+table {
+    max-width: 100%;
+    table-layout: auto;
+}
+
+/* Fix for elements with min-width */
+@media (max-width: 1200px) {
+    [style*="min-width"] {
+        min-width: auto !important;
+    }
+}
+
+/* Grid containers should wrap */
+[class*="grid"] {
+    max-width: 100%;
+}
+
+/* Images and media */
+img,
+video,
+iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Fix for absolute positioned elements */
+.absolute-element {
+    max-width: calc(100vw - 40px);
+}
+
+/* Ensure modals don't overflow */
+[class*="modal"],
+[class*="dialog"],
+[class*="popup"] {
+    max-width: 95vw;
+}
+
+/* Fix for cards and content blocks */
+.card,
+.content-block,
+.widget {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Navigation fix */
+.navbar,
+.nav-menu {
+    max-width: 100vw;
+}
+
+/* Footer fix */
+footer {
+    max-width: 100vw;
+}
+
+/* Specific fix for market tables */
+.market-table-container,
+.table-container,
+.table-wrapper {
+    overflow-x: auto;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+.market-table-container table {
+    min-width: 600px;
+}
+
+/* Fix for wide elements in mobile */
+@media (max-width: 768px) {
+    /* Force all wide elements to fit */
+    * {
+        max-width: 100vw !important;
+    }
+
+    /* Allow tables to scroll horizontally instead of breaking layout */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    /* Grid becomes single column */
+    [class*="grid"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Flex wrap on small screens */
+    [class*="flex"] {
+        flex-wrap: wrap;
+    }
+}
+
+/* Debug helper - uncomment to see overflowing elements */
+/*
+* {
+    outline: 1px solid rgba(255, 0, 0, 0.1);
+}
+*/

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Test</title>
+    <link rel="stylesheet" href="css/chatbot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🤖 Chatbot Test Sayfası</h1>
+
+        <div class="info">
+            <strong>ℹ️ Test Talimatları:</strong>
+            <ol>
+                <li>Sağ alt köşede chatbot butonu görünmeli</li>
+                <li>Butona tıklayınca chat penceresi açılmalı</li>
+                <li>Browser console'u açın (F12) ve hataları kontrol edin</li>
+            </ol>
+        </div>
+
+        <h2>Chatbot Durumu:</h2>
+        <div id="status-info">
+            <p>Yükleniyor...</p>
+        </div>
+
+        <h2>Test Mesajları:</h2>
+        <button onclick="testChatbot()" style="padding: 10px 20px; margin: 5px; cursor: pointer;">
+            Chatbot'u Test Et
+        </button>
+        <button onclick="checkFiles()" style="padding: 10px 20px; margin: 5px; cursor: pointer;">
+            Dosyaları Kontrol Et
+        </button>
+    </div>
+
+    <script src="js/chatbot.js"></script>
+    <script>
+        // Status checker
+        setTimeout(() => {
+            const statusDiv = document.getElementById('status-info');
+            let html = '';
+
+            // Check if chatbot object exists
+            if (typeof FinansChatbot !== 'undefined') {
+                html += '<p style="color: green;">✅ FinansChatbot class yüklendi</p>';
+            } else {
+                html += '<p style="color: red;">❌ FinansChatbot class yüklenemedi</p>';
+            }
+
+            // Check if widget was created
+            const chatToggle = document.getElementById('chat-toggle');
+            if (chatToggle) {
+                html += '<p style="color: green;">✅ Chat toggle butonu oluşturuldu</p>';
+            } else {
+                html += '<p style="color: red;">❌ Chat toggle butonu bulunamadı</p>';
+            }
+
+            const chatWindow = document.getElementById('chat-window');
+            if (chatWindow) {
+                html += '<p style="color: green;">✅ Chat penceresi oluşturuldu</p>';
+            } else {
+                html += '<p style="color: red;">❌ Chat penceresi bulunamadı</p>';
+            }
+
+            // Check if instance exists
+            if (window.finansChatbot) {
+                html += '<p style="color: green;">✅ Chatbot instance oluşturuldu</p>';
+                html += `<p>Session ID: ${window.finansChatbot.sessionId}</p>`;
+            } else {
+                html += '<p style="color: red;">❌ Chatbot instance oluşturulamadı</p>';
+            }
+
+            statusDiv.innerHTML = html;
+        }, 1000);
+
+        function testChatbot() {
+            if (window.finansChatbot) {
+                alert('Chatbot çalışıyor! Sağ alttaki butona tıklayarak test edebilirsiniz.');
+                if (!window.finansChatbot.isOpen) {
+                    window.finansChatbot.toggleChat();
+                }
+            } else {
+                alert('❌ Chatbot yüklenemedi! Console\'da hata mesajlarını kontrol edin.');
+            }
+        }
+
+        function checkFiles() {
+            const files = [
+                'js/chatbot.js',
+                'css/chatbot.css',
+                'api/chat-api.php'
+            ];
+
+            console.log('=== Dosya Kontrolü ===');
+            files.forEach(file => {
+                fetch(file, { method: 'HEAD' })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`✅ ${file} - OK`);
+                        } else {
+                            console.log(`❌ ${file} - Bulunamadı (${response.status})`);
+                        }
+                    })
+                    .catch(err => {
+                        console.log(`❌ ${file} - Hata: ${err.message}`);
+                    });
+            });
+            alert('Console\'da dosya durumlarını kontrol edin (F12)');
+        }
+
+        // Log any errors
+        window.addEventListener('error', (e) => {
+            console.error('Global Error:', e.message, e.filename, e.lineno);
+        });
+    </script>
+</body>
+</html>

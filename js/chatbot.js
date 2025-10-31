@@ -400,8 +400,23 @@ class FinansChatbot {
 }
 
 // Initialize chatbot when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    window.finansChatbot = new FinansChatbot({
-        apiUrl: 'api/chat-api.php'
-    });
-});
+function initChatbot() {
+    if (!window.finansChatbot) {
+        try {
+            window.finansChatbot = new FinansChatbot({
+                apiUrl: 'api/chat-api.php'
+            });
+            console.log('✅ Finans Chatbot initialized');
+        } catch (error) {
+            console.error('❌ Chatbot initialization failed:', error);
+        }
+    }
+}
+
+// Try to initialize immediately if DOM is already loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChatbot);
+} else {
+    // DOM already loaded, initialize immediately
+    initChatbot();
+}
