@@ -282,17 +282,12 @@ class MarketDataPro {
 
                 console.log(`📦 Batch ${batchNum}/${batches}: ${batchStocks.map(s => s.symbol).join(', ')}`);
 
-                // Parallel within batch
-                const batchResults = await Promise.allSettled(
-                    batchStocks.map(stock => this.getStockQuote(stock.symbol))
-                );
+                // SEQUENTIAL within batch to avoid rate limit!
+                // Parallel was causing: 10 requests × 5 batches = 50 parallel = 429!
+                for (const stock of batchStocks) {
+                    const quote = await this.getStockQuote(stock.symbol);
 
-                // Apply results
-                batchResults.forEach((result, idx) => {
-                    const stock = batchStocks[idx];
-
-                    if (result.status === 'fulfilled' && result.value) {
-                        const quote = result.value;
+                    if (quote) {
                         stock.price = quote.price;
                         stock.change = quote.changePercent;
                         stock.volume = quote.volume || 1000000;
@@ -304,7 +299,10 @@ class MarketDataPro {
                     } else {
                         console.warn(`  ⚠ ${stock.symbol}: Failed to fetch`);
                     }
-                });
+
+                    // Small delay between each stock (rate limit: 60/min = 1 per second)
+                    await this.delay(1100); // 1.1 second = safe!
+                }
 
                 // Update UI progressively
                 if (window.marketsManager && typeof window.marketsManager.renderStocks === 'function') {
@@ -314,10 +312,7 @@ class MarketDataPro {
 
                 console.log(`✓ Batch ${batchNum}/${batches} complete (${Math.round((batchNum / batches) * 100)}%)`);
 
-                // Wait before next batch (rate limiting)
-                if (i < batches - 1) {
-                    await this.delay(this.batch.delay);
-                }
+                // No batch delay needed - we delay within each stock fetch
             }
 
             // Save to cache
