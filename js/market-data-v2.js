@@ -7,8 +7,10 @@ class MarketDataSystem {
     constructor() {
         // API Keys
         this.apiKeys = {
-            // Finnhub free tier: 60 calls/min (1 call/second)
-            finnhub: 'd42gjvpr01qorler9mm0d42gjvpr01qorler9mmg'
+            // Finnhub free tier: 60 calls/min (US stocks only)
+            finnhub: 'd42gjvpr01qorler9mm0d42gjvpr01qorler9mmg',
+            // Alpha Vantage: 25 calls/day (BIST için)
+            alphavantage: 'demo' // Ücretsiz key al: https://www.alphavantage.co/support/#api-key
         };
 
         this.cache = new Map();
@@ -248,12 +250,9 @@ class MarketDataSystem {
             await this.delay(500);
         }
 
-        // BIST 100 Endeksi (Finnhub'da XU100.IS olarak)
-        const bist100 = await this.getFinnhubQuote('XU100.IS');
-        if (bist100) {
-            this.updateElement('bist100', bist100.price.toLocaleString('tr-TR', {minimumFractionDigits: 2}), bist100.changePercent);
-            console.log(`📊 BIST 100: ${bist100.price.toFixed(2)}`);
-        }
+        // BIST 100 Endeksi - Finnhub FREE tier desteklemiyor
+        // Static veri kullanılıyor (stocks-data.js)
+        console.log('📊 BIST 100: Static veri (Finnhub premium gerekli)');
     }
 
     /**
@@ -299,33 +298,24 @@ class MarketDataSystem {
             }
         }
 
-        // BIST Stocks - Finnhub'da .IS suffix gerekir
+        // BIST Stocks - Finnhub FREE tier desteklemiyor (403 Forbidden)
+        // Static veri kullanılıyor - gerçek API için ücretli plan gerekli
         if (window.STOCKS_DATA.bist_stocks) {
-            const bistStocksToUpdate = window.STOCKS_DATA.bist_stocks.slice(0, 15); // İlk 15 BIST hissesi
-
-            for (const stock of bistStocksToUpdate) {
-                // Finnhub için .IS suffix ekle
-                const finnhubSymbol = `${stock.symbol}.IS`;
-                const quote = await this.getFinnhubQuote(finnhubSymbol);
-
-                if (quote) {
-                    stock.price = quote.price;
-                    stock.change = quote.changePercent;
-                    stock.volume = quote.volume || 1000000;
-                    console.log(`  📊 ${stock.symbol}: ₺${quote.price.toFixed(2)}`);
-                } else {
-                    // Finnhub'da bulunamadıysa static veriyi koru
-                    console.log(`  ⚠️ ${stock.symbol}: Veri alınamadı (static veri korundu)`);
-                }
-                await this.delay(300);
-            }
+            console.log('  📊 BIST hisseleri: Static veri (Finnhub premium gerekli)');
+            // BIST verileri stocks-data.js'den geliyor (static)
+            // Alternatif: Alpha Vantage, TCMB, veya web scraping (BigPara)
         }
 
-        // MarketsManager'ı yeniden render et
-        if (window.marketsManager && typeof window.marketsManager.loadStocks === 'function') {
-            window.marketsManager.loadStocks();
-            window.marketsManager.renderStocks();
-            window.marketsManager.updateStats();
+        // MarketsManager'ı yeniden render et (loadStocks ÇAĞIRMA - üzerine yazar!)
+        if (window.marketsManager) {
+            // loadStocks() çağırmıyoruz çünkü stocks-data.js'den eski verileri yükler
+            // Sadece render et - STOCKS_DATA zaten güncel
+            if (typeof window.marketsManager.renderStocks === 'function') {
+                window.marketsManager.renderStocks();
+            }
+            if (typeof window.marketsManager.updateStats === 'function') {
+                window.marketsManager.updateStats();
+            }
             console.log('✅ Markets sayfası güncellendi (US + BIST)');
         }
     }
