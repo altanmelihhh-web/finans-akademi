@@ -23,53 +23,113 @@ class UnifiedMarketData {
             fmp: 'zg8u1jbHsWNW7Bp0FRjvz0CL7byPAA0C'
         };
 
-        // Multi-level cache
+        // Multi-level cache (Memory + localStorage)
         this.cache = new Map();
         this.cacheTimeout = 300000; // 5 dakika
+        this.localStorageKey = 'finans_akademi_market_cache';
 
-        // Rate limiting
+        // Rate limiting - CONSERVATIVE
         this.lastUpdateTime = 0;
-        this.minUpdateInterval = 60000; // Minimum 1 dakika aralık
+        this.minUpdateInterval = 300000; // 5 dakika (değiştirildi: 1 dakika → 5 dakika)
         this.isUpdating = false;
 
-        // API call tracking
+        // API call tracking - Per API limits
         this.apiCalls = {
-            finnhub: { count: 0, resetTime: Date.now() + 60000 },
-            twelvedata: { count: 0, resetTime: Date.now() + 86400000 },
-            fmp: { count: 0, resetTime: Date.now() + 86400000 }
+            finnhub: { count: 0, resetTime: Date.now() + 60000, limit: 50 }, // 60/min → 50 güvenli
+            twelvedata: { count: 0, resetTime: Date.now() + 86400000, limit: 700 }, // 800/day → 700 güvenli
+            fmp: { count: 0, resetTime: Date.now() + 86400000, limit: 200 } // 250/day → 200 güvenli
         };
+
+        // Load cache from localStorage on init
+        this.loadCacheFromStorage();
     }
 
     /**
-     * Initialize system
+     * Load cache from localStorage (persistent across page reloads)
+     */
+    loadCacheFromStorage() {
+        try {
+            const stored = localStorage.getItem(this.localStorageKey);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+
+                // Check if cache is still valid
+                if (parsed.timestamp && Date.now() - parsed.timestamp < this.cacheTimeout) {
+                    // Restore cache
+                    for (const [key, value] of Object.entries(parsed.data)) {
+                        this.cache.set(key, value);
+                    }
+                    this.lastUpdateTime = parsed.timestamp;
+                    console.log('💾 localStorage cache yüklendi:', this.cache.size, 'item');
+                    return true;
+                } else {
+                    console.log('⚠️ localStorage cache expired (5 dakikadan eski)');
+                    localStorage.removeItem(this.localStorageKey);
+                }
+            }
+        } catch (error) {
+            console.error('❌ localStorage cache load error:', error);
+        }
+        return false;
+    }
+
+    /**
+     * Save cache to localStorage (survives page refresh)
+     */
+    saveCacheToStorage() {
+        try {
+            const cacheObj = {
+                timestamp: Date.now(),
+                data: Object.fromEntries(this.cache)
+            };
+            localStorage.setItem(this.localStorageKey, JSON.stringify(cacheObj));
+            console.log('💾 Cache localStorage\'a kaydedildi');
+        } catch (error) {
+            console.error('❌ localStorage save error:', error);
+        }
+    }
+
+    /**
+     * Initialize system - SMART: No API call on refresh if cache valid!
      */
     async init() {
         console.log('🚀 Unified Market Data System başlatılıyor...');
         console.log('📊 API Providers: Finnhub + Twelve Data + CoinGecko + Exchange Rate');
 
-        // İlk yükleme - cache varsa kullan
+        // Check localStorage cache first
         const hasCachedData = this.cache.size > 0;
+        const cacheAge = Date.now() - this.lastUpdateTime;
+        const cacheValid = hasCachedData && cacheAge < this.cacheTimeout;
 
-        if (!hasCachedData) {
-            console.log('📥 İlk veri yükleniyor (API çağrıları başlatılıyor)...');
-            await this.updateAll();
-        } else {
-            console.log('⚡ Cache\'den veri yüklendi (API tasarrufu)');
+        if (cacheValid) {
+            // PERFECT! Cache valid - NO API CALL!
+            console.log(`⚡ CACHE HIT! API çağrısı YOK (cache yaşı: ${Math.floor(cacheAge / 1000)}s)`);
+            console.log(`📊 ${this.cache.size} item cache\'den yüklendi`);
             this.renderCachedData();
+
+            // Sonraki güncelleme zamanını göster
+            const nextUpdate = new Date(this.lastUpdateTime + this.minUpdateInterval);
+            console.log(`⏰ Sonraki güncelleme: ${nextUpdate.toLocaleTimeString('tr-TR')}`);
+        } else {
+            // Cache yok veya expired - API çağrısı gerekli
+            console.log('📥 Cache YOK veya EXPIRED - API\'den veri çekiliyor...');
+            await this.updateAll();
         }
 
-        // Akıllı güncelleme - sadece gerektiğinde
+        // Periyodik güncelleme - Arka planda, kullanıcı görmez
         setInterval(() => {
             const timeSinceUpdate = Date.now() - this.lastUpdateTime;
+
             if (timeSinceUpdate >= this.minUpdateInterval && !this.isUpdating) {
-                console.log('🔄 Periyodik güncelleme başlatılıyor...');
+                console.log('🔄 Arka plan güncelleme (5 dakika geçti)...');
                 this.updateAll();
             }
         }, this.minUpdateInterval);
 
         console.log('✅ Unified Market Data System hazır!');
-        console.log('⏱️  Güncelleme aralığı: 1 dakika');
-        console.log('💾 Cache süresi: 5 dakika');
+        console.log('⏱️  Güncelleme aralığı: 5 dakika');
+        console.log('💾 Cache süresi: 5 dakika (localStorage persistent)');
+        console.log('🔄 Refresh davranışı: Cache varsa API çağrısı YOK!');
     }
 
     /**
@@ -314,7 +374,7 @@ class UnifiedMarketData {
     }
 
     /**
-     * UPDATE ALL DATA
+     * UPDATE ALL DATA - With localStorage persistence
      */
     async updateAll() {
         if (this.isUpdating) {
@@ -326,26 +386,30 @@ class UnifiedMarketData {
         console.log('🔄 Tüm piyasa verileri güncelleniyor...');
 
         try {
-            // 1. Döviz kurları
+            // 1. Döviz kurları (Sınırsız - hızlı)
             await this.updateCurrencies();
 
-            // 2. US Indices
+            // 2. US Indices (3 request)
             await this.updateUSIndices();
 
-            // 3. US Stocks (Dashboard)
+            // 3. US Stocks Dashboard (3 request)
             await this.updateUSStocks();
 
-            // 4. Crypto
+            // 4. Crypto (Sınırsız - hızlı)
             await this.updateCrypto();
 
-            // 5. Markets sayfası için STOCKS_DATA güncelle
+            // 5. Markets sayfası için STOCKS_DATA güncelle (30 US + 20 BIST = 50 request)
             await this.updateStocksData();
 
+            // Update timestamp
             this.lastUpdateTime = Date.now();
+
+            // CRITICAL: Save to localStorage for persistence
+            this.saveCacheToStorage();
 
             console.log('✅ Tüm veriler güncellendi!');
             console.log(`⏰ Sonraki güncelleme: ${new Date(this.lastUpdateTime + this.minUpdateInterval).toLocaleTimeString('tr-TR')}`);
-            console.log(`📊 API Kullanımı: Finnhub=${this.apiCalls.finnhub.count}, TwelveData=${this.apiCalls.twelvedata.count}, FMP=${this.apiCalls.fmp.count}`);
+            console.log(`📊 API Kullanımı: Finnhub=${this.apiCalls.finnhub.count}/${this.apiCalls.finnhub.limit}, TwelveData=${this.apiCalls.twelvedata.count}/${this.apiCalls.twelvedata.limit}, FMP=${this.apiCalls.fmp.count}/${this.apiCalls.fmp.limit}`);
         } catch (error) {
             console.error('❌ Güncelleme hatası:', error);
         } finally {
@@ -535,23 +599,75 @@ class UnifiedMarketData {
     }
 
     renderCachedData() {
-        console.log('⚡ Cache\'den veriler yükleniyor...');
-        // Cache'deki verileri UI'a render et
-        for (const [key, value] of this.cache.entries()) {
-            // İlgili elementleri güncelle
+        console.log('⚡ Cache\'den veriler UI\'a render ediliyor...');
+
+        // Dashboard elementlerini cache'den doldur
+        const dashboardElements = ['sp500', 'nasdaq', 'dow', 'aapl', 'msft', 'tsla', 'usdtry', 'eurtry'];
+
+        for (const elemId of dashboardElements) {
+            const cacheKey = Object.keys(Object.fromEntries(this.cache)).find(k => k.includes(elemId.toUpperCase()) || k.includes(elemId));
+
+            if (cacheKey) {
+                const cached = this.cache.get(cacheKey);
+                if (cached && cached.data) {
+                    const quote = cached.data;
+
+                    // Update UI element
+                    if (elemId === 'usdtry' || elemId === 'eurtry') {
+                        // Forex
+                        this.updateElement(elemId, `₺${quote.USDTRY?.toFixed(4) || quote.EURTRY?.toFixed(4)}`);
+                    } else if (elemId === 'sp500' || elemId === 'nasdaq' || elemId === 'dow') {
+                        // Indices
+                        this.updateElement(elemId, quote.price?.toLocaleString('en-US', {minimumFractionDigits: 2}), quote.changePercent);
+                    } else {
+                        // Stocks
+                        this.updateElement(elemId, `$${quote.price?.toFixed(2)}`, quote.changePercent);
+                    }
+                }
+            }
         }
+
+        // STOCKS_DATA'yı cache'den güncelle
+        if (window.STOCKS_DATA) {
+            for (const [key, value] of this.cache.entries()) {
+                if (key.startsWith('finnhub_') || key.startsWith('twelve_') || key.startsWith('fmp_')) {
+                    const quote = value.data;
+
+                    // US stocks
+                    const usStock = window.STOCKS_DATA.us_stocks.find(s => s.symbol === quote.symbol);
+                    if (usStock) {
+                        usStock.price = quote.price;
+                        usStock.change = quote.changePercent;
+                    }
+
+                    // BIST stocks
+                    const bistSymbol = quote.symbol?.replace('.IS', '');
+                    const bistStock = window.STOCKS_DATA.bist_stocks.find(s => s.symbol === bistSymbol);
+                    if (bistStock) {
+                        bistStock.price = quote.price;
+                        bistStock.change = quote.changePercent;
+                    }
+                }
+            }
+
+            // Re-render markets page if active
+            if (window.marketsManager) {
+                if (typeof window.marketsManager.renderStocks === 'function') {
+                    window.marketsManager.renderStocks();
+                }
+                if (typeof window.marketsManager.updateStats === 'function') {
+                    window.marketsManager.updateStats();
+                }
+            }
+        }
+
+        console.log('✅ Cache\'den UI render tamamlandı');
     }
 
     /**
-     * Rate Limiting
+     * Rate Limiting - STRICT enforcement
      */
     canMakeAPICall(provider) {
-        const limits = {
-            finnhub: 60,      // 60 per minute
-            twelvedata: 800,  // 800 per day
-            fmp: 250          // 250 per day
-        };
-
         const api = this.apiCalls[provider];
 
         // Reset counter if time window passed
@@ -560,13 +676,26 @@ class UnifiedMarketData {
             api.resetTime = provider === 'finnhub'
                 ? Date.now() + 60000    // 1 minute
                 : Date.now() + 86400000; // 24 hours
+
+            console.log(`🔄 ${provider} rate limit reset (count: 0/${api.limit})`);
         }
 
-        return api.count < limits[provider];
+        // Check if we're approaching limit
+        const remaining = api.limit - api.count;
+        if (remaining <= 10) {
+            console.warn(`⚠️ ${provider} rate limit yaklaşıyor! Kalan: ${remaining}/${api.limit}`);
+        }
+
+        return api.count < api.limit;
     }
 
     trackAPICall(provider) {
         this.apiCalls[provider].count++;
+
+        // Log every 10 calls
+        if (this.apiCalls[provider].count % 10 === 0) {
+            console.log(`📊 ${provider} API kullanım: ${this.apiCalls[provider].count}/${this.apiCalls[provider].limit}`);
+        }
     }
 
     /**
