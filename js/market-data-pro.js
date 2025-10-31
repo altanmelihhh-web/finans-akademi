@@ -238,13 +238,26 @@ class MarketDataPro {
 
         console.log('🔧 Markets worker starting...');
 
-        // Check cache first
+        // Debug cache state
+        const hasMarketsCache = this.cache.memory.has('markets');
         const cacheAge = Date.now() - this.state.lastMarketsUpdate;
-        if (this.cache.memory.has('markets') && cacheAge < this.cache.timeout) {
+        const cacheTimeout = this.cache.timeout;
+        console.log(`   🔍 Cache check: has='${hasMarketsCache}', age=${Math.floor(cacheAge/1000)}s, timeout=${Math.floor(cacheTimeout/1000)}s`);
+
+        if (hasMarketsCache) {
+            const marketsCache = this.cache.memory.get('markets');
+            const cacheSize = marketsCache ? Object.keys(marketsCache).length : 0;
+            console.log(`   📦 Markets cache size: ${cacheSize} stocks`);
+        }
+
+        // Check cache first
+        if (hasMarketsCache && cacheAge < cacheTimeout) {
             console.log(`⚡ CACHE HIT! Markets loaded from cache (${Math.floor(cacheAge / 1000)}s old)`);
             this.applyMarketsCache(this.cache.memory.get('markets'));
             return;
         }
+
+        console.log(`   ❌ Cache MISS! Reason: hasCache=${hasMarketsCache}, isExpired=${cacheAge >= cacheTimeout}`);
 
         // Start background update
         setTimeout(() => {
