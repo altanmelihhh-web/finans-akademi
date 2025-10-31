@@ -278,11 +278,14 @@ class MarketDataPro {
         console.log('🔄 Markets background update starting...');
 
         try {
+            // Combine US and BIST stocks
             const usStocks = window.STOCKS_DATA.us_stocks;
-            const totalStocks = usStocks.length;
+            const bistStocks = window.STOCKS_DATA.bist_stocks;
+            const allStocks = [...usStocks, ...bistStocks];
+            const totalStocks = allStocks.length;
             const batches = Math.ceil(totalStocks / this.batch.size);
 
-            console.log(`📦 Processing ${totalStocks} stocks in ${batches} batches (${this.batch.size} per batch)`);
+            console.log(`📦 Processing ${totalStocks} stocks (${usStocks.length} US + ${bistStocks.length} BIST) in ${batches} batches`);
 
             const marketsCache = {};
 
@@ -291,7 +294,7 @@ class MarketDataPro {
                 const batchNum = i + 1;
                 const start = i * this.batch.size;
                 const end = Math.min(start + this.batch.size, totalStocks);
-                const batchStocks = usStocks.slice(start, end);
+                const batchStocks = allStocks.slice(start, end);
 
                 console.log(`📦 Batch ${batchNum}/${batches}: ${batchStocks.map(s => s.symbol).join(', ')}`);
 
@@ -308,7 +311,10 @@ class MarketDataPro {
                         // Save to cache
                         marketsCache[stock.symbol] = quote;
 
-                        console.log(`  ✓ ${stock.symbol}: $${quote.price.toFixed(2)} (${quote.changePercent >= 0 ? '+' : ''}${quote.changePercent.toFixed(2)}%)`);
+                        // Show correct currency
+                        const isBIST = this.isBISTStock(stock.symbol);
+                        const currency = isBIST ? '₺' : '$';
+                        console.log(`  ✓ ${stock.symbol}: ${currency}${quote.price.toFixed(2)} (${quote.changePercent >= 0 ? '+' : ''}${quote.changePercent.toFixed(2)}%)`);
                     } else {
                         console.warn(`  ⚠ ${stock.symbol}: Failed to fetch`);
                     }
@@ -359,37 +365,51 @@ class MarketDataPro {
         let skippedCount = 0;
 
         Object.entries(marketsCache).forEach(([symbol, quote]) => {
-            const stock = window.STOCKS_DATA.us_stocks.find(s => s.symbol === symbol);
+            try {
+                // Search in both US and BIST stocks
+                const stock = window.STOCKS_DATA.us_stocks.find(s => s.symbol === symbol) ||
+                             window.STOCKS_DATA.bist_stocks.find(s => s.symbol === symbol);
 
-            if (!stock) {
-                console.warn(`  ⚠️ Stock not found in STOCKS_DATA: ${symbol}`);
+                if (!stock) {
+                    console.warn(`  ⚠️ Stock not found: ${symbol}`);
+                    skippedCount++;
+                    return;
+                }
+
+                if (!quote || !quote.price || quote.price <= 0) {
+                    console.warn(`  ⚠️ Invalid quote for ${symbol}`);
+                    skippedCount++;
+                    return;
+                }
+
+                // Update the stock
+                stock.price = quote.price;
+                stock.change = quote.changePercent;
+                stock.volume = quote.volume || 1000000;
+                updatedCount++;
+
+                if (updatedCount <= 5) {
+                    // Log first 5 for debugging
+                    const isBIST = this.isBISTStock(symbol);
+                    const currency = isBIST ? '₺' : '$';
+                    console.log(`  ✓ ${symbol}: ${currency}${stock.price.toFixed(2)} → STOCKS_DATA updated`);
+                }
+            } catch (error) {
+                console.error(`  ❌ Error applying cache for ${symbol}:`, error);
                 skippedCount++;
-                return;
-            }
-
-            if (!quote || !quote.price || quote.price <= 0) {
-                console.warn(`  ⚠️ Invalid quote for ${symbol}:`, quote);
-                skippedCount++;
-                return;
-            }
-
-            // Update the stock
-            stock.price = quote.price;
-            stock.change = quote.changePercent;
-            stock.volume = quote.volume || 1000000;
-            updatedCount++;
-
-            if (updatedCount <= 5) {
-                // Log first 5 for debugging
-                console.log(`  ✓ ${symbol}: $${stock.price.toFixed(2)} → STOCKS_DATA.price = ${stock.price}`);
             }
         });
 
         console.log(`✓ Markets cache applied: ${updatedCount} updated, ${skippedCount} skipped`);
 
-        // Verify data before rendering
-        const firstStock = window.STOCKS_DATA.us_stocks[0];
-        console.log(`   Verification: STOCKS_DATA[0] = ${firstStock.symbol} price=$${firstStock.price}`);
+        // Verify data before rendering (with error handling)
+        try {
+            const firstUS = window.STOCKS_DATA.us_stocks[0];
+            const firstBIST = window.STOCKS_DATA.bist_stocks[0];
+            console.log(`   Verification: US=${firstUS.symbol} $${firstUS.price.toFixed(2)}, BIST=${firstBIST.symbol} ₺${firstBIST.price.toFixed(2)}`);
+        } catch (error) {
+            console.warn(`   Verification failed (non-critical):`, error.message);
+        }
 
         // IMPORTANT: Force re-render after data update!
         if (window.marketsManager) {
