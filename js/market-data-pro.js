@@ -278,14 +278,12 @@ class MarketDataPro {
         console.log('🔄 Markets background update starting...');
 
         try {
-            // Combine US and BIST stocks
+            // Only US stocks for now (BIST has CORS issues with Yahoo Finance)
             const usStocks = window.STOCKS_DATA.us_stocks;
-            const bistStocks = window.STOCKS_DATA.bist_stocks;
-            const allStocks = [...usStocks, ...bistStocks];
-            const totalStocks = allStocks.length;
+            const totalStocks = usStocks.length;
             const batches = Math.ceil(totalStocks / this.batch.size);
 
-            console.log(`📦 Processing ${totalStocks} stocks (${usStocks.length} US + ${bistStocks.length} BIST) in ${batches} batches`);
+            console.log(`📦 Processing ${totalStocks} US stocks in ${batches} batches (BIST disabled due to CORS)`);
 
             const marketsCache = {};
 
@@ -294,7 +292,7 @@ class MarketDataPro {
                 const batchNum = i + 1;
                 const start = i * this.batch.size;
                 const end = Math.min(start + this.batch.size, totalStocks);
-                const batchStocks = allStocks.slice(start, end);
+                const batchStocks = usStocks.slice(start, end);
 
                 console.log(`📦 Batch ${batchNum}/${batches}: ${batchStocks.map(s => s.symbol).join(', ')}`);
 
