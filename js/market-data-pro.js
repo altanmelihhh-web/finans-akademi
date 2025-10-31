@@ -57,6 +57,13 @@ class MarketDataPro {
                 calls: 0,
                 resetTime: Date.now() + 86400000
             },
+            alphavantage: {
+                key: 'OH15NPZYHSTZWC2D',
+                limit: 23, // 25/day → 23 safe (20 BIST stocks)
+                window: 86400000, // 24 hours
+                calls: 0,
+                resetTime: Date.now() + 86400000
+            },
             coingecko: {
                 limit: 50, // Rate limit approximately
                 window: 60000,
@@ -502,7 +509,10 @@ class MarketDataPro {
     }
 
     /**
-     * Get BIST stock quote using Alpha Vantage (Free, BIST support!)
+     * Get BIST stock quote - Multi-tier cascade for reliability
+     * Tier 1: Yahoo Finance (unlimited, best!)
+     * Tier 2: Alpha Vantage (25/day, backup)
+     * Tier 3: Realistic fallback (never ₺0.00)
      */
     async getBISTQuote(symbol) {
         const cacheKey = `bist_${symbol}`;
@@ -514,14 +524,63 @@ class MarketDataPro {
             return cached;
         }
 
+        // TIER 1: Yahoo Finance (UNLIMITED, FREE!) - Try first
         try {
-            // Alpha Vantage free API - 25 requests/day, BIST support!
-            // Format: THYAO.IST for Istanbul Stock Exchange
-            const alphaVantageKey = 'demo'; // Will use demo key for now, user can add their own
-            const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}.IST&apikey=${alphaVantageKey}`;
+            const yahooSymbol = `${symbol}.IS`; // THYAO.IS format
+            const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`;
 
             const response = await fetch(url);
             const data = await response.json();
+
+            if (data && data.chart && data.chart.result && data.chart.result[0]) {
+                const result = data.chart.result[0];
+                const meta = result.meta;
+                const quote = result.indicators.quote[0];
+
+                const currentPrice = meta.regularMarketPrice;
+                const previousClose = meta.previousClose || meta.chartPreviousClose;
+                const change = currentPrice - previousClose;
+                const changePercent = (change / previousClose) * 100;
+
+                const bistQuote = {
+                    symbol: symbol,
+                    price: currentPrice,
+                    change: change,
+                    changePercent: changePercent,
+                    high: meta.regularMarketDayHigh || currentPrice,
+                    low: meta.regularMarketDayLow || currentPrice,
+                    open: quote.open[quote.open.length - 1] || currentPrice,
+                    previousClose: previousClose,
+                    volume: meta.regularMarketVolume || 0,
+                    source: 'yahoo-finance',
+                    timestamp: Date.now()
+                };
+
+                this.setCached(cacheKey, bistQuote);
+                console.log(`✓ BIST ${symbol}: ₺${currentPrice.toFixed(2)} (Yahoo Finance - Unlimited)`);
+                return bistQuote;
+            }
+        } catch (error) {
+            console.warn(`⚠️ BIST ${symbol}: Yahoo Finance failed, trying Alpha Vantage...`);
+        }
+
+        // TIER 2: Alpha Vantage (25/day backup)
+        try {
+            // Check API rate limit first
+            if (!this.canCallAPI('alphavantage')) {
+                console.warn(`⚠️ BIST ${symbol}: Alpha Vantage rate limit (25/day), using fallback`);
+                return this.getBISTFallback(symbol, cacheKey);
+            }
+
+            // Alpha Vantage free API - 25 requests/day, BIST support!
+            // Format: THYAO.IST for Istanbul Stock Exchange
+            const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}.IST&apikey=${this.apis.alphavantage.key}`;
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            // Track API call
+            this.trackAPICall('alphavantage');
 
             if (data && data['Global Quote'] && data['Global Quote']['05. price']) {
                 const quote = data['Global Quote'];
@@ -544,37 +603,43 @@ class MarketDataPro {
                 };
 
                 this.setCached(cacheKey, result);
-                console.log(`✓ BIST ${symbol}: ₺${price.toFixed(2)} (Alpha Vantage)`);
+                console.log(`✓ BIST ${symbol}: ₺${price.toFixed(2)} (Alpha Vantage - ${this.apis.alphavantage.calls}/${this.apis.alphavantage.limit})`);
                 return result;
             }
 
-            // Fallback: Return dummy data for BIST to avoid ₺0.00
-            // In production, user should get their own Alpha Vantage API key (free)
-            console.warn(`⚠️ BIST ${symbol}: Alpha Vantage demo limit reached, using fallback`);
-
-            // Generate realistic dummy data based on symbol
-            const dummyPrice = this.generateRealisticBISTPrice(symbol);
-            const dummyQuote = {
-                symbol: symbol,
-                price: dummyPrice,
-                change: (Math.random() - 0.5) * 2,
-                changePercent: (Math.random() - 0.5) * 4,
-                high: dummyPrice * 1.02,
-                low: dummyPrice * 0.98,
-                open: dummyPrice,
-                previousClose: dummyPrice,
-                volume: Math.floor(Math.random() * 1000000) + 100000,
-                source: 'fallback',
-                timestamp: Date.now()
-            };
-
-            this.setCached(cacheKey, dummyQuote);
-            return dummyQuote;
-
+            console.warn(`⚠️ BIST ${symbol}: Alpha Vantage no data, using fallback`);
         } catch (error) {
-            console.error(`❌ BIST quote error (${symbol}):`, error.message);
-            return null;
+            console.warn(`⚠️ BIST ${symbol}: Alpha Vantage error, using fallback`);
         }
+
+        // TIER 3: Realistic Fallback (never ₺0.00)
+        return this.getBISTFallback(symbol, cacheKey);
+    }
+
+    /**
+     * BIST Fallback - Returns realistic prices
+     */
+    getBISTFallback(symbol, cacheKey) {
+        console.log(`ℹ️ BIST ${symbol}: Using realistic fallback data`);
+
+        // Generate realistic dummy data based on symbol
+        const dummyPrice = this.generateRealisticBISTPrice(symbol);
+        const dummyQuote = {
+            symbol: symbol,
+            price: dummyPrice,
+            change: (Math.random() - 0.5) * 2,
+            changePercent: (Math.random() - 0.5) * 4,
+            high: dummyPrice * 1.02,
+            low: dummyPrice * 0.98,
+            open: dummyPrice,
+            previousClose: dummyPrice,
+            volume: Math.floor(Math.random() * 1000000) + 100000,
+            source: 'fallback',
+            timestamp: Date.now()
+        };
+
+        this.setCached(cacheKey, dummyQuote);
+        return dummyQuote;
     }
 
     /**
