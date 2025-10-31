@@ -52,6 +52,10 @@ class MarketsManager {
             this.filteredStocks = [...this.stocks];
 
             console.log(`✅ Loaded ${this.stocks.length} stocks successfully`);
+
+            // Re-render UI after loading (important for cache updates!)
+            this.filterStocks(); // This calls renderStocks internally
+            this.updateStats();
         } catch (error) {
             console.error('Error loading stocks:', error);
             this.showError('Hisse verileri yüklenirken hata oluştu');
