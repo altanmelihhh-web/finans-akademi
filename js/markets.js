@@ -496,4 +496,6 @@ class MarketsManager {
 let marketsManager = null;
 document.addEventListener('DOMContentLoaded', () => {
     marketsManager = new MarketsManager();
+    window.marketsManager = marketsManager; // Export to window for market-data-pro.js
+    console.log('✅ marketsManager exported to window');
 });
