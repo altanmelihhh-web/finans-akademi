@@ -1,0 +1,2112 @@
+                            <h3><i class="fas fa-flag-usa"></i> ABD Piyasaları</h3>
+                            <span class="update-time">Canlı</span>
+                        </div>
+                        <div class="indices">
+                            <div class="index-item">
+                                <span class="index-name">S&P 500</span>
+                                <span class="index-value" id="sp500">-</span>
+                                <span class="index-change positive" id="sp500-change">-</span>
+                            </div>
+                            <div class="index-item">
+                                <span class="index-name">NASDAQ</span>
+                                <span class="index-value" id="nasdaq">-</span>
+                                <span class="index-change positive" id="nasdaq-change">-</span>
+                            </div>
+                            <div class="index-item">
+                                <span class="index-name">DOW JONES</span>
+                                <span class="index-value" id="dow">-</span>
+                                <span class="index-change positive" id="dow-change">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="market-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-flag"></i> Türkiye Piyasaları</h3>
+                            <span class="update-time">Canlı</span>
+                        </div>
+                        <div class="indices">
+                            <div class="index-item">
+                                <span class="index-name">BIST 100</span>
+                                <span class="index-value" id="bist100">-</span>
+                                <span class="index-change positive" id="bist100-change">-</span>
+                            </div>
+                            <div class="index-item">
+                                <span class="index-name">USD/TRY</span>
+                                <span class="index-value" id="usdtry">-</span>
+                                <span class="index-change positive" id="usdtry-change">-</span>
+                            </div>
+                            <div class="index-item">
+                                <span class="index-name">EUR/TRY</span>
+                                <span class="index-value" id="eurtry">-</span>
+                                <span class="index-change positive" id="eurtry-change">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="market-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-microchip"></i> Teknoloji Hisseleri</h3>
+                            <span class="update-time">Canlı</span>
+                        </div>
+                        <div class="indices">
+                            <div class="index-item">
+                                <span class="index-name">Apple (AAPL)</span>
+                                <span class="index-value" id="aapl">-</span>
+                                <span class="index-change positive" id="aapl-change">-</span>
+                            </div>
+                            <div class="index-item">
+                                <span class="index-name">Microsoft (MSFT)</span>
+                                <span class="index-value" id="msft">-</span>
+                                <span class="index-change positive" id="msft-change">-</span>
+                            </div>
+                            <div class="index-item">
+                                <span class="index-name">Tesla (TSLA)</span>
+                                <span class="index-value" id="tsla">-</span>
+                                <span class="index-change positive" id="tsla-change">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Section -->
+                <div class="chart-section">
+                    <div class="chart-card">
+                        <h3>Piyasa Trendi (Son 30 Gün)</h3>
+                        <canvas id="marketChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-arrow-trend-up"></i>
+                        <h4>Bugünkü Kazananlar</h4>
+                        <div id="winners" class="stat-list"></div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-arrow-trend-down"></i>
+                        <h4>Bugünkü Kaybedenler</h4>
+                        <div id="losers" class="stat-list"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terimler Page -->
+        <section id="terimler" class="page">
+            <div class="container">
+                <h1>Finans Terimleri Sözlüğü</h1>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="termSearch" placeholder="Terim ara...">
+                </div>
+
+                <div class="terms-container">
+                    <div class="term-category">
+                        <h2><i class="fas fa-star"></i> Temel Kavramlar</h2>
+                        <div class="term-list">
+                            <div class="term-item">
+                                <h3>Hisse Senedi (Stock / Equity)</h3>
+                                <p><strong>Tanım:</strong> Bir şirketin sahipliğinin küçük bir parçasını temsil eden finansal araç. Hisse senedi sahibi olmak, o şirketin ortağı olmak demektir ve şirketin varlıkları ve karları üzerinde hak sahibi olursunuz.</p>
+                                <p><strong>Örnek:</strong> Apple'ın 1 hissesini alırsanız, Apple şirketinin milyonlarca ortağından biri olursunuz. Apple kar ederse siz de kazanırsınız (temettü veya fiyat artışı yoluyla).</p>
+                                <p><strong>Türleri:</strong> Adi hisse senedi (common stock) ve imtiyazlı hisse senedi (preferred stock) olmak üzere iki ana türü vardır.</p>
+                                <p><strong>Pratik:</strong> Hisse senedi fiyatı yükselirse sermaye kazancı elde edersiniz, düşerse zarar edersiniz. Ayrıca şirket temettü dağıtırsa düzenli gelir elde edebilirsiniz.</p>
+                                <p><strong>Risk Faktörleri:</strong> Şirket iflas ederse hisseleriniz değersiz olabilir. Piyasa dalgalanmaları, ekonomik krizler, sektör problemleri fiyatları etkiler.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Endeks (Index)</h3>
+                                <p><strong>Tanım:</strong> Belirli hisse senetlerinin toplam performansını gösteren, piyasanın genel sağlığını ölçen gösterge. Endeksler, belirli kriterlere göre seçilmiş hisse senetlerinin ağırlıklı ortalamasıdır.</p>
+                                <p><strong>Örnekler:</strong></p>
+                                <ul>
+                                    <li><strong>BIST 100:</strong> Türkiye'deki en büyük 100 şirket</li>
+                                    <li><strong>S&P 500:</strong> ABD'nin en büyük 500 şirketi</li>
+                                    <li><strong>NASDAQ:</strong> Teknoloji ağırlıklı ABD şirketleri</li>
+                                    <li><strong>Dow Jones:</strong> ABD'nin en büyük 30 şirketi</li>
+                                </ul>
+                                <p><strong>Pratik Kullanım:</strong> Endeks yükseliyorsa genel piyasa iyi, düşüyorsa kötü demektir. Bireysel hisse performansınızı endeks ile karşılaştırabilirsiniz.</p>
+                                <p><strong>Yatırım:</strong> Endeks fonları (ETF) sayesinde tüm endeksi tek bir üründen alabilirsiniz (örn: SPY, QQQ).</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Boğa Piyasası (Bull Market)</h3>
+                                <p><strong>Tanım:</strong> Fiyatların sürekli yükseldiği, yatırımcıların iyimser olduğu, ekonominin güçlü olduğu dönem. Genellikle %20 veya daha fazla yükseliş boğa piyasası olarak kabul edilir.</p>
+                                <p><strong>Sembol:</strong> Boğa boynuzlarını aşağıdan yukarı savurarak saldırır → Fiyatlar yukarı gider.</p>
+                                <p><strong>Özellikler:</strong> Düşük işsizlik, artan kurumsal karlar, güçlü tüketici güveni, ekonomik büyüme.</p>
+                                <p><strong>Strateji:</strong> "Al ve tut" stratejisi uygulanır. Uzun vadeli yatırım yapın, düzeltmelerde ek alım yapın. Momentum hisselerine odaklanın.</p>
+                                <p><strong>Tarihsel Örnekler:</strong> 2009-2020 arası 11 yıllık boğa piyasası, 1990'lar dot-com boom'u.</p>
+                                <p><strong>Dikkat:</strong> Aşırı iyimserlik balonlara yol açabilir. Her boğa piyasası bir gün sona erer.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Ayı Piyasası (Bear Market)</h3>
+                                <p><strong>Tanım:</strong> Fiyatların sürekli düştüğü, yatırımcıların kötümser olduğu dönem. Genellikle %20 veya daha fazla düşüş ayı piyasası olarak kabul edilir.</p>
+                                <p><strong>Sembol:</strong> Ayı pençelerini yukarıdan aşağı indirir → Fiyatlar düşer.</p>
+                                <p><strong>Özellikler:</strong> Yüksek işsizlik, azalan kurumsal karlar, zayıf tüketici güveni, ekonomik durgunluk veya resesyon.</p>
+                                <p><strong>Strateji:</strong> Nakit bekleyin veya defensif sektörlere (sağlık, tüketim ürünleri) yatırım yapın. Düşük fiyatlardan kaliteli şirket toplayın (riskli ama karlı olabilir).</p>
+                                <p><strong>Tarihsel Örnekler:</strong> 2008 mali krizi (%57 düşüş), 2020 COVID-19 düşüşü (kısa ama sert), 2000-2002 dot-com çöküşü.</p>
+                                <p><strong>Psikoloji:</strong> Panik satış yapmayın. Warren Buffett: "Başkaları açgözlüyken korkun, başkaları korkarken açgözlü olun."</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Portföy (Portfolio)</h3>
+                                <p><strong>Tanım:</strong> Bir yatırımcının sahip olduğu tüm yatırım ürünlerinin (hisse, tahvil, nakit, altın, vb.) toplamı.</p>
+                                <p><strong>Çeşitlendirme:</strong> "Tüm yumurtalarınızı bir sepete koymayın." Farklı sektör, coğrafya ve varlık tiplerinde yatırım yapın.</p>
+                                <p><strong>Örnek Dağılım:</strong> %60 hisse senedi, %30 tahvil, %10 nakit (muhafazakar). Veya %80 hisse, %20 tahvil (agresif).</p>
+                                <p><strong>Yeniden Dengeleme:</strong> Yılda 1-2 kez portföyünüzü gözden geçirin, hedef dağılıma göre alım/satım yapın.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Piyasa Değeri (Market Cap)</h3>
+                                <p><strong>Tanım:</strong> Bir şirketin toplam değeri. Hisse fiyatı × Toplam hisse sayısı ile hesaplanır.</p>
+                                <p><strong>Kategoriler:</strong></p>
+                                <ul>
+                                    <li><strong>Mega Cap:</strong> >200 milyar $ (Apple, Microsoft)</li>
+                                    <li><strong>Large Cap:</strong> 10-200 milyar $ (istikrarlı, güvenli)</li>
+                                    <li><strong>Mid Cap:</strong> 2-10 milyar $ (büyüme potansiyeli)</li>
+                                    <li><strong>Small Cap:</strong> 300 milyon - 2 milyar $ (yüksek risk/getiri)</li>
+                                    <li><strong>Micro Cap:</strong> <300 milyon $ (çok riskli)</li>
+                                </ul>
+                                <p><strong>Önemli:</strong> Büyük şirketler daha güvenli ama yavaş büyür. Küçük şirketler riskli ama hızlı büyüyebilir.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Halka Arz (IPO - Initial Public Offering)</h3>
+                                <p><strong>Tanım:</strong> Özel bir şirketin hisselerini ilk kez halka açması, borsada işlem görmeye başlaması.</p>
+                                <p><strong>Neden Yapılır:</strong> Sermaye artırımı, büyüme için kaynak bulma, erken yatırımcıların çıkışı.</p>
+                                <p><strong>Örnek:</strong> Facebook 2012'de, Uber 2019'da, Airbnb 2020'de halka açıldı.</p>
+                                <p><strong>Risk:</strong> İlk gün genellikle yüksek volatilite olur. Hype nedeniyle aşırı fiyatlanabilir. Birkaç ay beklemek daha güvenli olabilir.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Sermaye Kazancı (Capital Gain)</h3>
+                                <p><strong>Tanım:</strong> Bir varlığı aldığınız fiyattan daha yüksek fiyata satarak elde ettiğiniz kar.</p>
+                                <p><strong>Örnek:</strong> 100 TL'ye hisse aldınız, 150 TL'ye sattınız → 50 TL sermaye kazancı.</p>
+                                <p><strong>Vergilendirme:</strong> Kısa vadeli (<1 yıl) ve uzun vadeli (>1 yıl) kazançlar farklı vergilendirilir. Türkiye'de hisse senedi kazançları genellikle vergiden muaf (belirli koşullarda).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="term-category">
+                        <h2><i class="fas fa-coins"></i> Alım-Satım Terimleri</h2>
+                        <div class="term-list">
+                            <div class="term-item">
+                                <h3>Piyasa Emri (Market Order)</h3>
+                                <p><strong>Tanım:</strong> Mevcut piyasa fiyatından anında alım veya satım yapmayı sağlayan emir türü. Emir verildiği anda sistemdeki en iyi fiyattan (alım için en düşük satış fiyatı, satım için en yüksek alış fiyatı) eşleşir.</p>
+                                <p><strong>Avantajlar:</strong></p>
+                                <ul>
+                                    <li>%99.9 garanti ile gerçekleşir (yeterli likidite varsa)</li>
+                                    <li>Hızlı işlem, saniyeler içinde tamamlanır</li>
+                                    <li>Piyasa kapanmadan önce mutlaka pozisyon almak/kapatmak için ideal</li>
+                                    <li>Likit hisselerde spread düşük olduğu için maliyet etkin</li>
+                                </ul>
+                                <p><strong>Dezavantajlar:</strong></p>
+                                <ul>
+                                    <li><strong>Slippage (Kayma):</strong> Gördüğünüz fiyat ile gerçekleşen fiyat farklı olabilir</li>
+                                    <li>Volatil piyasalarda beklenmedik fiyattan işlem olabilir</li>
+                                    <li>Düşük likidite durumlarında spread genişler, maliyetli olur</li>
+                                    <li>Gap (fiyat boşluğu) sırasında çok kötü fiyattan işlem görebilir</li>
+                                </ul>
+                                <p><strong>Ne Zaman Kullanılır:</strong> Acil işlem gerektiğinde, likit hisselerde, pozisyon kapatırken, stop loss tetiklendiğinde.</p>
+                                <p><strong>Örnek Senaryo:</strong> Apple $150.25'te. Market alım emri verdiniz. 1000 hisse $150.25'te, 500 hisse $150.26'da satışa sunulmuş. Sizin 1500 hisselik emriniz: 1000 adet $150.25, 500 adet $150.26'dan gerçekleşir. Ortalama $150.25'ın üstünde.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Limit Emri (Limit Order)</h3>
+                                <p><strong>Tanım:</strong> Belirlediğiniz fiyattan veya daha iyi fiyattan alım/satım yapılmasını sağlayan emir türü. Alımda belirlediğiniz fiyattan veya daha düşükten, satımda belirlediğiniz fiyattan veya daha yüksekten işlem yapar.</p>
+                                <p><strong>Avantajlar:</strong></p>
+                                <ul>
+                                    <li>Fiyat kontrolü: Belirlediğiniz fiyattan kötüsü olmaz</li>
+                                    <li>Slippage riski yok</li>
+                                    <li>Bekleyerek daha iyi fiyat yakalayabilirsiniz</li>
+                                    <li>Market maker gibi likidite sağlarsanız komisyon indirimi olabilir</li>
+                                </ul>
+                                <p><strong>Dezavantajlar:</strong></p>
+                                <ul>
+                                    <li><strong>Gerçekleşmeme riski:</strong> Fiyat hedefinize gelmezse işlem olmaz</li>
+                                    <li>Hisse fırlar, siz dışarıda kalırsınız (opportunity cost)</li>
+                                    <li>Kısmi gerçekleşme olabilir (2000 hisse istediniz, 500 geldi)</li>
+                                    <li>Zaman önceliği: Aynı fiyattan başkaları sizden önce sırada olabilir</li>
+                                </ul>
+                                <p><strong>Limit Emir Türleri:</strong></p>
+                                <ul>
+                                    <li><strong>GTC (Good Till Cancelled):</strong> İptal edilene kadar geçerli</li>
+                                    <li><strong>Day Order:</strong> Gün sonunda otomatik iptal</li>
+                                    <li><strong>IOC (Immediate or Cancel):</strong> Hemen gerçekleşmeyen kısım iptal</li>
+                                    <li><strong>FOK (Fill or Kill):</strong> Tamamı hemen gerçekleşmezse iptal</li>
+                                </ul>
+                                <p><strong>Strateji Örneği:</strong> Apple $150'de, siz $145'te almak istiyorsunuz (destek seviyesi). Limit emir $145 GTC ile veriyorsunuz. Fiyat $145'e gelirse alırsınız, gelmezse emiriniz bekler.</p>
+                                <p><strong>Pro İpucu:</strong> Limit emir verirken psikolojik seviyelerin (örn: $100.00) hemen üstüne/altına koyun ($99.97 gibi). Herkes $100'e emir verir, siz önce eşleşirsiniz.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Stop Loss (Zarar Durdur Emri)</h3>
+                                <p><strong>Tanım:</strong> Kayıpları sınırlamak için otomatik satış emri. Belirtilen fiyata ulaşıldığında otomatik olarak market veya limit emir olarak tetiklenir ve pozisyonu kapatır.</p>
+                                <p><strong>Çalışma Mekanizması:</strong> Normal zamanlarda beklemede kalır. Fiyat belirlediğiniz "stop fiyat"a ulaşınca aktif olur ve satış emri verir.</p>
+                                <p><strong>Stop Loss Türleri:</strong></p>
+                                <ul>
+                                    <li><strong>Stop Market:</strong> Tetiklenince market emri olur (hızlı ama slippage riski var)</li>
+                                    <li><strong>Stop Limit:</strong> Tetiklenince limit emri olur (fiyat kontrolü ama gerçekleşmeme riski)</li>
+                                    <li><strong>Trailing Stop:</strong> Fiyat yükseldikçe stop seviyesi de otomatik yükselir</li>
+                                    <li><strong>Guaranteed Stop:</strong> Bazı brokerlar garantili stop sunar (ek ücret karşılığı)</li>
+                                </ul>
+                                <p><strong>Stop Loss Hesaplama Yöntemleri:</strong></p>
+                                <ul>
+                                    <li><strong>Sabit Yüzde:</strong> Alış fiyatının %5-10 altı (örn: $100'den aldınız → $95 stop)</li>
+                                    <li><strong>ATR (Average True Range):</strong> Volatiliteye göre dinamik stop (örn: 2x ATR)</li>
+                                    <li><strong>Teknik Seviyeler:</strong> Son düşük nokta, destek seviyesi altı</li>
+                                    <li><strong>Risk-Reward Oranı:</strong> Hedef $120, giriş $100 ise stop $90 olabilir (1:2 oran)</li>
+                                </ul>
+                                <p><strong>Kritik Hatalar:</strong></p>
+                                <ul>
+                                    <li>❌ Stop koymazsanız küçük kayıp büyük felakete dönüşebilir</li>
+                                    <li>❌ Çok sıkı stop: Gürültüden kesilir, sonra hisse yükselir</li>
+                                    <li>❌ Çok geniş stop: Büyük kayıplar yaşarsınız</li>
+                                    <li>❌ Psikolojik stop: "Biraz daha bekleyeyim" deyip stop'u elle kapatmak</li>
+                                </ul>
+                                <p><strong>Trailing Stop Örneği:</strong> Apple $100'den aldınız, %10 trailing stop koydunuz. Fiyat $120'ye çıktı → stop otomatik $108'e yükseldi ($120 × 0.9). Fiyat $115'e düşse bile zarar etmezsiniz.</p>
+                                <p><strong>Pro İpucu:</strong> Stop loss seviyenizi başkalarının görebileceği psikolojik seviyelere (örn: $99.00) koymayın. Market maker'lar bu seviyeleri tetikleyip sonra fiyat geri yükselebilir. $98.75 gibi belirsiz seviyeler daha güvenli.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Hacim (Volume)</h3>
+                                <p><strong>Tanım:</strong> Belirli bir zaman diliminde (genellikle bir gün) bir hisse senedi için el değiştiren toplam hisse adedi. Hacim, piyasadaki ilgi ve likiditeyi ölçen en önemli göstergelerden biridir.</p>
+                                <p><strong>Hacim Analizi:</strong></p>
+                                <ul>
+                                    <li><strong>Yüksek Hacim + Fiyat Artışı:</strong> Güçlü alım, trend devam edebilir (bullish)</li>
+                                    <li><strong>Yüksek Hacim + Fiyat Düşüşü:</strong> Güçlü satım, düşüş devam edebilir (bearish)</li>
+                                    <li><strong>Düşük Hacim + Fiyat Hareketi:</strong> Zayıf hareket, güvenilmez, geri dönebilir</li>
+                                    <li><strong>Hacim Artışı + Konsolidasyon:</strong> Kırılım yaklaşıyor olabilir (breakout)</li>
+                                </ul>
+                                <p><strong>Ortalama Hacim (Average Volume):</strong> Genellikle 20-50 günlük ortalama hacim referans alınır. Günlük hacim ortalamanın 2-3 katı ise "anormal hacim" olarak değerlendirilir.</p>
+                                <p><strong>Hacim Göstergeleri:</strong></p>
+                                <ul>
+                                    <li><strong>OBV (On Balance Volume):</strong> Kümülatif hacim, trend doğrulaması için</li>
+                                    <li><strong>Volume Profile:</strong> Hangi fiyat seviyelerinde çok işlem olmuş</li>
+                                    <li><strong>VWAP (Volume Weighted Average Price):</strong> Hacim ağırlıklı ortalama fiyat</li>
+                                    <li><strong>Volume Spike:</strong> Anormal hacim artışları (haber, kazanç açıklaması)</li>
+                                </ul>
+                                <p><strong>Likidite ve Spread İlişkisi:</strong></p>
+                                <ul>
+                                    <li>Yüksek hacim → Yüksek likidite → Dar spread (örn: 0.01$) → Düşük işlem maliyeti</li>
+                                    <li>Düşük hacim → Düşük likidite → Geniş spread (örn: 0.50$) → Yüksek işlem maliyeti</li>
+                                </ul>
+                                <p><strong>Örnek:</strong> Apple'ın günlük ortalama hacmi 50M hisse. Bugün 150M hacim oldu (3x artış). Aynı zamanda fiyat %5 yükseldi → Bu güçlü bir alım sinyali, kurumsal yatırımcılar girebilir.</p>
+                                <p><strong>Uyarı:</strong> Penny stock'larda (çok ucuz hisseler) yapay hacim pompalanabilir. Sadece hacme bakıp karar vermeyin, diğer göstergelerle birlikte değerlendirin.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Bid-Ask Spread (Alış-Satış Farkı)</h3>
+                                <p><strong>Tanım:</strong> Alıcıların vermeye razı olduğu en yüksek fiyat (bid) ile satıcıların kabul edeceği en düşük fiyat (ask) arasındaki fark.</p>
+                                <p><strong>Örnek:</strong> Apple için Bid: $150.20, Ask: $150.22 → Spread: $0.02</p>
+                                <p><strong>Spread'in Anlamı:</strong></p>
+                                <ul>
+                                    <li><strong>Dar Spread (0.01-0.05$):</strong> Yüksek likidite, popüler hisse, düşük risk</li>
+                                    <li><strong>Geniş Spread (>0.50$):</strong> Düşük likidite, riskli hisse, yüksek maliyet</li>
+                                </ul>
+                                <p><strong>Spread Maliyeti:</strong> Her alış-satışta spread'i ödersiniz. Day trader için bu çok kritik. Örnek: 10 kez al-sat yapıyorsunuz, her seferinde $0.05 spread → $0.50 kayıp/hisse.</p>
+                                <p><strong>Pro İpucu:</strong> Market emri verdiğinizde ask'dan alır, bid'den satarsınız (spread kaybı). Limit emir verip spread ortasında fiyat belirlerseniz bu maliyetten kurtulabilirsiniz.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Kısa Satış (Short Selling)</h3>
+                                <p><strong>Tanım:</strong> Sahip olmadığınız bir hisseyi ödünç alıp satma, fiyat düştükten sonra geri alıp iade etme işlemi. Fiyat düşüşünden kar etme stratejisi.</p>
+                                <p><strong>Nasıl Çalışır:</strong></p>
+                                <ol>
+                                    <li>Broker'dan 100 Tesla hissesi ödünç alıyorsunuz ($200/hisse = $20,000)</li>
+                                    <li>Hemen $200'dan satıyorsunuz → Cebinizde $20,000 nakit</li>
+                                    <li>Fiyat $150'ye düşüyor</li>
+                                    <li>$150'den 100 hisse geri alıyorsunuz ($15,000)</li>
+                                    <li>Hisseleri broker'a iade ediyorsunuz</li>
+                                    <li>Kar: $20,000 - $15,000 = $5,000 (komisyon ve faiz hariç)</li>
+                                </ol>
+                                <p><strong>Riskler:</strong></p>
+                                <ul>
+                                    <li><strong>Sınırsız Kayıp Potansiyeli:</strong> Fiyat %1000 yükselebilir (normal alımda max %100 kaybedersiniz)</li>
+                                    <li><strong>Short Squeeze:</strong> Fiyat hızla yükselirse kısa satıcılar panik yapıp geri alır, fiyatı daha da yükseltir</li>
+                                    <li><strong>Ödünç Maliyeti:</strong> Günlük/yıllık faiz ödersiniz</li>
+                                    <li><strong>Margin Call:</strong> Kayıp büyürse broker ek teminat isteyebilir</li>
+                                    <li><strong>Forced Buy-back:</strong> Broker hisseleri geri istiyor, siz zorla kapatsanız bile</li>
+                                </ul>
+                                <p><strong>Tarihi Short Squeeze Örnekleri:</strong> GameStop (2021): Reddit/WallStreetBets topluluğu organize olup kısa satıcılara karşı hisse aldı. Fiyat $20'den $483'e fırladı, hedge fund'lar milyarlarca dolar kaybetti.</p>
+                                <p><strong>Uyarı:</strong> Kısa satış çok riskli bir stratejidir. Acemi yatırımcılar için önerilmez. Türkiye'de BIST'te kısa satış (açığa satış) sınırlıdır.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Margin Trading (Teminatlı İşlem / Kaldıraç)</h3>
+                                <p><strong>Tanım:</strong> Broker'dan borç alarak sermayenizden daha büyük pozisyonlar açma yöntemi. Kazançları ve kayıpları kaldıraç oranı kadar büyütür.</p>
+                                <p><strong>Örnek:</strong></p>
+                                <ul>
+                                    <li>Sermayeniz: $10,000</li>
+                                    <li>2x kaldıraç kullanıyorsunuz → $20,000 değerinde hisse alabilirsiniz</li>
+                                    <li>Hisse %10 yükseldi → Kazanç: $2,000 (%20 getiri sermayenize göre)</li>
+                                    <li>Hisse %10 düştü → Kayıp: $2,000 (%20 kayıp sermayenize göre)</li>
+                                </ul>
+                                <p><strong>Margin Call:</strong> Kayıplarınız belirli seviyeyi geçerse broker ek teminat ister. Ek teminat koyamazsanız pozisyonunuz zorla kapatılır (liquidation).</p>
+                                <p><strong>Maintenance Margin:</strong> Pozisyonunuzu açık tutabilmek için hesabınızda bulundurmanız gereken minimum sermaye oranı (genellikle %25-30).</p>
+                                <p><strong>Riskler:</strong></p>
+                                <ul>
+                                    <li>Kayıplar çok hızlı büyür</li>
+                                    <li>Faiz ödersiniz (günlük veya yıllık)</li>
+                                    <li>Margin call → Zorla pozisyon kapatma</li>
+                                    <li>Sermayenizden fazla kaybedebilirsiniz (negatif bakiye)</li>
+                                </ul>
+                                <p><strong>Kaldıraç Seviyeleri:</strong> Hisse senetlerinde genellikle 2x-4x. Forex'te 50x-500x (çok riskli). Kripto'da 10x-125x (son derece riskli).</p>
+                                <p><strong>Uyarı:</strong> Kaldıraç "finansal silah" gibidir. Yanlış kullanımda sermayenizi saatler içinde sıfırlayabilir. Deneyimsiz yatırımcılar asla kullanmamalı.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="term-category">
+                        <h2><i class="fas fa-chart-line"></i> Teknik Analiz Terimleri</h2>
+                        <div class="term-list">
+                            <div class="term-item">
+                                <h3>Destek (Support) ve Direnç (Resistance)</h3>
+                                <p><strong>Destek Tanımı:</strong> Fiyatın düşüşünü durduran, alıcı ilgisinin yoğunlaştığı fiyat seviyesi. Psikolojik olarak yatırımcıların "bu fiyat uygun, almalıyım" dedikleri bölge.</p>
+                                <p><strong>Direnç Tanımı:</strong> Fiyatın yükselişini durduran, satıcı ilgisinin yoğunlaştığı fiyat seviyesi. Yatırımcıların "bu fiyat yüksek, satmalıyım" dedikleri bölge.</p>
+                                <p><strong>Destek/Direnç Nasıl Oluşur:</strong></p>
+                                <ul>
+                                    <li><strong>Geçmiş Fiyat Hareketleri:</strong> Daha önce fiyatın durduğu seviyeler</li>
+                                    <li><strong>Psikolojik Seviyeler:</strong> Yuvarlak sayılar ($100, $50, ₺1000)</li>
+                                    <li><strong>Hareketli Ortalamalar:</strong> 50, 100, 200 günlük ortalamalar</li>
+                                    <li><strong>Fibonacci Seviyeleri:</strong> %38.2, %50, %61.8 düzeltme seviyeleri</li>
+                                    <li><strong>Trend Çizgileri:</strong> Yükselen/düşen trend çizgileri</li>
+                                </ul>
+                                <p><strong>Destek/Direnç Kırılması:</strong></p>
+                                <ul>
+                                    <li><strong>Breakout (Kırılım):</strong> Fiyat direnci yukarı kırar → Güçlü alım sinyali</li>
+                                    <li><strong>Breakdown (Çöküş):</strong> Fiyat desteği aşağı kırar → Güçlü satım sinyali</li>
+                                    <li><strong>Rol Değişimi:</strong> Kırılan direnç yeni destek olur, kırılan destek yeni direnç olur</li>
+                                    <li><strong>Sahte Kırılım (False Breakout):</strong> Fiyat seviyeyi kırar ama hemen geri döner (tuzak)</li>
+                                </ul>
+                                <p><strong>Trading Stratejisi:</strong></p>
+                                <ul>
+                                    <li>Destek seviyesinden AL, direnç seviyesinde SAT (range trading)</li>
+                                    <li>Direnci kırarsa AL ve devam et (breakout trading)</li>
+                                    <li>Desteği kırarsa SAT veya bekle (breakdown)</li>
+                                    <li>Hacim ile doğrulayın: Yüksek hacimli kırılım daha güvenilir</li>
+                                </ul>
+                                <p><strong>Örnek:</strong> Apple hissesi sürekli $150'de durdu, 3 kez test etti ama düşemedi → $150 güçlü destek. $150'ye yaklaştığında alım, $180 direncine yaklaştığında satış yapabilirsiniz.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>RSI (Relative Strength Index - Göreceli Güç Endeksi)</h3>
+                                <p><strong>Tanım:</strong> Fiyat hareketlerinin hızını ve değişimini ölçen 0-100 arası değer alan momentum osilatörü. J. Welles Wilder tarafından 1978'de geliştirildi.</p>
+                                <p><strong>Formül:</strong> RSI = 100 - (100 / (1 + RS)), RS = Ortalama Yükseliş / Ortalama Düşüş (genellikle 14 periyot)</p>
+                                <p><strong>RSI Seviyeleri ve Anlamları:</strong></p>
+                                <ul>
+                                    <li><strong>RSI > 70:</strong> Aşırı alım bölgesi (overbought) - Fiyat çok hızlı yükselmiş, düzeltme gelebilir</li>
+                                    <li><strong>50-70:</strong> Sağlıklı yükseliş trendi</li>
+                                    <li><strong>RSI = 50:</strong> Nötr bölge, yön belirsiz</li>
+                                    <li><strong>30-50:</strong> Sağlıklı düşüş trendi</li>
+                                    <li><strong>RSI < 30:</strong> Aşırı satım bölgesi (oversold) - Fiyat çok hızlı düşmüş, toparlanma gelebilir</li>
+                                </ul>
+                                <p><strong>İleri Seviye RSI Stratejileri:</strong></p>
+                                <ul>
+                                    <li><strong>Divergence (Uyumsuzluk):</strong> Fiyat yükseliyor ama RSI düşüyor → Zayıflama, satış sinyali</li>
+                                    <li><strong>Hidden Divergence:</strong> Trend devam sinyali</li>
+                                    <li><strong>RSI Swing Rejection:</strong> Aşırı bölgede V dönüşü → Güçlü sinyal</li>
+                                    <li><strong>50 Orta Çizgi:</strong> RSI 50'nin üstünde kalıyorsa trend yukarı, altındaysa aşağı</li>
+                                </ul>
+                                <p><strong>Yaygın Hatalar:</strong></p>
+                                <ul>
+                                    <li>❌ RSI > 70 görünce hemen satmak: Güçlü trendlerde RSI uzun süre 70'in üstünde kalabilir</li>
+                                    <li>❌ Sadece RSI'ya bakmak: Mutlaka fiyat hareketi ve hacim ile doğrulayın</li>
+                                    <li>❌ Zaman dilimini ihmal etmek: 1 saatlik RSI ile günlük RSI farklı sinyal verebilir</li>
+                                </ul>
+                                <p><strong>Örnek:</strong> Tesla RSI = 85 (aşırı alım). Ama hisse güçlü trend içinde. RSI 78'e geriledi (divergence yok), trend devam ediyor. RSI 65'e düşünce alım fırsatı olabilir.</p>
+                                <p><strong>Pro İpucu:</strong> RSI'yı destek/direnç ile kombine kullanın. Fiyat destekte VE RSI < 30 ise çok güçlü alım sinyali.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>MACD (Moving Average Convergence Divergence)</h3>
+                                <p><strong>Tanım:</strong> İki hareketli ortalama arasındaki ilişkiyi analiz eden, trend yönünü ve momentumu gösteren gösterge. Gerald Appel tarafından 1970'lerde geliştirildi.</p>
+                                <p><strong>Bileşenler:</strong></p>
+                                <ul>
+                                    <li><strong>MACD Çizgisi:</strong> 12 günlük EMA - 26 günlük EMA</li>
+                                    <li><strong>Sinyal Çizgisi:</strong> MACD'nin 9 günlük EMA'sı</li>
+                                    <li><strong>Histogram:</strong> MACD - Sinyal çizgisi farkı (görsel kolaylık)</li>
+                                </ul>
+                                <p><strong>MACD Sinyalleri:</strong></p>
+                                <ul>
+                                    <li><strong>Bullish Crossover (Yukarı Kesişim):</strong> MACD sinyal çizgisini aşağıdan yukarı keser → ALIM</li>
+                                    <li><strong>Bearish Crossover (Aşağı Kesişim):</strong> MACD sinyal çizgisini yukarıdan aşağı keser → SATIM</li>
+                                    <li><strong>Zero Line Crossover:</strong> MACD sıfır çizgisini geçer → Trend değişimi</li>
+                                    <li><strong>Histogram Büyümesi:</strong> Momentum artıyor → Trend güçleniyor</li>
+                                    <li><strong>Histogram Küçülmesi:</strong> Momentum azalıyor → Trend zayıflıyor</li>
+                                </ul>
+                                <p><strong>MACD Divergence (Uyumsuzluk):</strong></p>
+                                <ul>
+                                    <li><strong>Bullish Divergence:</strong> Fiyat düşüyor ama MACD yükseliyor → Düşüş trendi zayıflıyor, alım sinyali</li>
+                                    <li><strong>Bearish Divergence:</strong> Fiyat yükseliyor ama MACD düşüyor → Yükseliş trendi zayıflıyor, satım sinyali</li>
+                                </ul>
+                                <p><strong>MACD Trading Stratejisi:</strong></p>
+                                <ul>
+                                    <li>MACD yukarı kesişim + fiyat destek seviyesinde → Güçlü ALIM</li>
+                                    <li>MACD aşağı kesişim + fiyat direnç seviyesinde → Güçlü SATIM</li>
+                                    <li>MACD sıfırın üstünde → Uzun pozisyon al</li>
+                                    <li>MACD sıfırın altında → Kısa pozisyon veya dışarıda kal</li>
+                                </ul>
+                                <p><strong>Örnek:</strong> Apple fiyatı $175'te, MACD = -0.5, sinyal = -0.3. MACD yukarı doğru yaklaşıyor. MACD sinyal çizgisini kesti → ALIM sinyali. Hedef $185, stop $170.</p>
+                                <p><strong>Uyarı:</strong> MACD gecikmeli bir göstergedir (lagging indicator). Erken sinyal istiyorsanız RSI veya Stochastic kullanın.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Hareketli Ortalamalar (Moving Averages - MA)</h3>
+                                <p><strong>Tanım:</strong> Belirli bir zaman dilimindeki fiyatların ortalamasını alarak fiyat gürültüsünü azaltan ve trendi gösteren gösterge.</p>
+                                <p><strong>MA Türleri:</strong></p>
+                                <ul>
+                                    <li><strong>SMA (Simple Moving Average):</strong> Basit aritmetik ortalama, tüm fiyatlar eşit ağırlıklı</li>
+                                    <li><strong>EMA (Exponential Moving Average):</strong> Üstel ortalama, son fiyatlara daha fazla ağırlık verir, daha hassas</li>
+                                    <li><strong>WMA (Weighted Moving Average):</strong> Ağırlıklı ortalama</li>
+                                </ul>
+                                <p><strong>Popüler MA Periyotları:</strong></p>
+                                <ul>
+                                    <li><strong>9-12 EMA:</strong> Kısa vadeli trend, day trading için</li>
+                                    <li><strong>20-21 SMA:</strong> Orta vadeli trend, swing trading için</li>
+                                    <li><strong>50 SMA:</strong> Orta/uzun vadeli trend, kritik seviye</li>
+                                    <li><strong>200 SMA:</strong> Uzun vadeli trend, en önemli destek/direnç</li>
+                                </ul>
+                                <p><strong>MA Trading Stratejileri:</strong></p>
+                                <ul>
+                                    <li><strong>Golden Cross:</strong> 50 MA yukarı keser 200 MA'yı → Güçlü ALIM sinyali</li>
+                                    <li><strong>Death Cross:</strong> 50 MA aşağı keser 200 MA'yı → Güçlü SATIM sinyali</li>
+                                    <li><strong>Price Crossover:</strong> Fiyat MA'yı yukarı keser → ALIM, aşağı keser → SATIM</li>
+                                    <li><strong>MA as Support/Resistance:</strong> Fiyat 200 SMA'dan sekti → Destek işlevi görüyor</li>
+                                </ul>
+                                <p><strong>Örnek:</strong> S&P 500, 50 SMA ile 200 SMA kesişti (Golden Cross) → Bu güçlü boğa piyasası sinyali. Tarihsel olarak Golden Cross sonrası ortalama %15-20 yükseliş görülmüş.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Bollinger Bands (Bollinger Bantları)</h3>
+                                <p><strong>Tanım:</strong> Volatiliteye göre genişleyip daralan, fiyatın normal dağılım aralığını gösteren 3 çizgiden oluşan gösterge. John Bollinger tarafından 1980'lerde geliştirildi.</p>
+                                <p><strong>Bileşenler:</strong></p>
+                                <ul>
+                                    <li><strong>Orta Bant:</strong> 20 günlük SMA</li>
+                                    <li><strong>Üst Bant:</strong> SMA + (2 × Standart Sapma)</li>
+                                    <li><strong>Alt Bant:</strong> SMA - (2 × Standart Sapma)</li>
+                                </ul>
+                                <p><strong>Bollinger Bands Analizi:</strong></p>
+                                <ul>
+                                    <li><strong>Bantlar Daralıyor (Squeeze):</strong> Düşük volatilite, büyük hareket yaklaşıyor (sakin dönem)</li>
+                                    <li><strong>Bantlar Genişliyor:</strong> Yüksek volatilite, güçlü hareket var</li>
+                                    <li><strong>Fiyat Üst Bantta:</strong> Aşırı alım, düzeltme gelebilir</li>
+                                    <li><strong>Fiyat Alt Bantta:</strong> Aşırı satım, toparlanma gelebilir</li>
+                                    <li><strong>Bollinger Bounce:</strong> Fiyat banttan sekip orta banda dönme eğilimi</li>
+                                    <li><strong>Bollinger Breakout:</strong> Squeeze sonrası güçlü kırılım</li>
+                                </ul>
+                                <p><strong>Trading Stratejisi:</strong></p>
+                                <ul>
+                                    <li>Fiyat alt banda dokundu + RSI < 30 → ALIM fırsatı</li>
+                                    <li>Fiyat üst banda dokundu + RSI > 70 → SATIM fırsatı</li>
+                                    <li>Squeeze gördünüz → Kırılım yönünde pozisyon alın</li>
+                                </ul>
+                                <p><strong>Örnek:</strong> Bitcoin Bollinger Bantları 2 hafta dar kaldı (squeeze). Sonra fiyat üst bantı yukarı kırdı → $5000 yükseliş oldu.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Fibonacci Düzeltmeleri (Fibonacci Retracement)</h3>
+                                <p><strong>Tanım:</strong> Fibonacci sayı dizisine dayanan, fiyatın düzeltme (retracement) yapabileceği potansiyel destek/direnç seviyelerini gösteren analiz aracı.</p>
+                                <p><strong>Fibonacci Seviyeleri:</strong></p>
+                                <ul>
+                                    <li><strong>23.6%:</strong> Sığ düzeltme, güçlü trend</li>
+                                    <li><strong>38.2%:</strong> Orta düzeltme, yaygın seviye</li>
+                                    <li><strong>50%:</strong> Psikolojik seviye (teknik olarak Fibonacci değil)</li>
+                                    <li><strong>61.8%:</strong> "Altın oran", en önemli seviye, derin düzeltme</li>
+                                    <li><strong>78.6%:</strong> Çok derin düzeltme, trend zayıflıyor</li>
+                                </ul>
+                                <p><strong>Nasıl Kullanılır:</strong></p>
+                                <ol>
+                                    <li>Trend belirlenir (yükseliş veya düşüş)</li>
+                                    <li>En düşük ve en yüksek nokta işaretlenir</li>
+                                    <li>Fibonacci seviyeleri otomatik çizilir</li>
+                                    <li>Fiyat bu seviyelerde destek/direnç bulur</li>
+                                </ol>
+                                <p><strong>Trading Stratejisi:</strong></p>
+                                <ul>
+                                    <li>Yükseliş trendinde: Fiyat %61.8'e düştü → ALIM fırsatı</li>
+                                    <li>Düşüş trendinde: Fiyat %38.2'ye yükseldi → SATIM fırsatı</li>
+                                    <li>Fibonacci seviyesi + destek çizgisi → Çok güçlü bölge</li>
+                                </ul>
+                                <p><strong>Örnek:</strong> Tesla $100'den $200'e yükseldi. Düzeltme bekliyorsunuz. %61.8 Fibonacci = $138. Fiyat $138'e geldi ve durdu → ALIM yaptınız. Hedef $200.</p>
+                                <p><strong>Pro İpucu:</strong> Fibonacci Extensions (161.8%, 261.8%) ile kar hedefi belirleyebilirsiniz.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="term-category">
+                        <h2><i class="fas fa-landmark"></i> Temel & Fundamentalanaliz Terimleri</h2>
+                        <div class="term-list">
+                            <div class="term-item">
+                                <h3>P/E Oranı (Price to Earnings Ratio - Fiyat/Kazanç Oranı)</h3>
+                                <p><strong>Tanım:</strong> Bir hissenin fiyatının, şirketin hisse başına yıllık kazancına oranı. Hissenin "ucuz" veya "pahalı" olup olmadığını değerlendirmek için kullanılan en temel ölçüt.</p>
+                                <p><strong>Formül:</strong> P/E = Hisse Fiyatı ÷ Hisse Başına Kazanç (EPS - Earnings Per Share)</p>
+                                <p><strong>Örnek Hesaplama:</strong> Tesla hisse fiyatı = $250, EPS = $5 → P/E = 50. Bu, yatırımcıların Tesla'nın her $1 kazancı için $50 ödediği anlamına gelir.</p>
+                                <p><strong>P/E Değerlendirmesi:</strong></p>
+                                <ul>
+                                    <li><strong>Düşük P/E (5-15):</strong> Hisse düşük değerlenmiş olabilir (value stock). Ya gerçek bir fırsat ya da şirket sorunlu.</li>
+                                    <li><strong>Orta P/E (15-25):</strong> Sektör ortalaması, makul değerleme</li>
+                                    <li><strong>Yüksek P/E (>25):</strong> Hisse yüksek değerlenmiş (growth stock). Yatırımcılar güçlü büyüme bekliyor veya hisse balon oluşturmuş.</li>
+                                    <li><strong>Negatif P/E:</strong> Şirket zarar ediyor (örn: startup'lar)</li>
+                                </ul>
+                                <p><strong>Sektörel Karşılaştırma:</strong></p>
+                                <ul>
+                                    <li>Teknoloji: Ortalama P/E = 30-40 (yüksek büyüme beklentisi)</li>
+                                    <li>Bankacılık: Ortalama P/E = 8-12 (olgun sektör)</li>
+                                    <li>Tüketici ürünleri: Ortalama P/E = 15-20 (stabil)</li>
+                                </ul>
+                                <p><strong>P/E Tuzakları:</strong></p>
+                                <ul>
+                                    <li>❌ Sadece P/E'ye bakıp karar vermek: Amazon yıllarca yüksek P/E ile işlem gördü ama dev getiri sağladı</li>
+                                    <li>❌ Farklı sektörleri karşılaştırmak: Teknoloji şirketi ile banka P/E'si kıyaslanamaz</li>
+                                    <li>❌ Geçici kazançları görmemek: Şirket tek seferlik varlık satışıyla kar etmişse P/E yanıltıcı olur</li>
+                                </ul>
+                                <p><strong>İleri P/E (Forward P/E):</strong> Gelecek yıl beklenen kazançlara göre hesaplanır. Daha proaktif analiz sağlar.</p>
+                                <p><strong>Örnek Analiz:</strong> Apple P/E = 28, Microsoft P/E = 32, Sektör ortalaması = 30. Apple sektör ortalamasının altında, Microsoft üstünde. Ama Microsoft daha hızlı büyüyor, yüksek P/E haklı olabilir.</p>
+                                <p><strong>Warren Buffett Yaklaşımı:</strong> "Düşük P/E ama yüksek kaliteli şirketler arayın. Kötü şirketin düşük fiyatı fırsat değil, tuzaktır."</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Temettü (Dividend) ve Temettü Verimi (Dividend Yield)</h3>
+                                <p><strong>Tanım:</strong> Şirketin elde ettiği karın bir kısmını hissedarlara nakit olarak düzenli (genellikle çeyrek veya yıllık) dağıtmasıdır.</p>
+                                <p><strong>Temettü Verimi Formülü:</strong> (Yıllık Temettü / Hisse Fiyatı) × 100</p>
+                                <p><strong>Örnek:</strong> Coca-Cola hisse fiyatı $60, yıllık temettü $1.80 → Temettü verimi = %3. 100 hisseniz varsa yılda $180 gelir.</p>
+                                <p><strong>Temettü Stratejileri:</strong></p>
+                                <ul>
+                                    <li><strong>Dividend Growth Investing:</strong> Her yıl temettüsünü artıran şirketlere yatırım (örn: Coca-Cola 60+ yıldır artırıyor)</li>
+                                    <li><strong>High Yield Strategy:</strong> Yüksek temettü verimine odaklanma (örn: %5+ verimi olanlar)</li>
+                                    <li><strong>Dividend Aristocrats:</strong> S&P 500'de 25+ yıl üst üste temettü artıran şirketler (çok güvenilir)</li>
+                                </ul>
+                                <p><strong>Temettü Önemli Tarihler:</strong></p>
+                                <ul>
+                                    <li><strong>Announcement Date:</strong> Şirket temettü açıklar</li>
+                                    <li><strong>Ex-Dividend Date:</strong> Bu tarihten önce almak gerekir (kritik tarih)</li>
+                                    <li><strong>Record Date:</strong> Hissedar kayıt tarihi</li>
+                                    <li><strong>Payment Date:</strong> Temettü ödenme tarihi</li>
+                                </ul>
+                                <p><strong>Yüksek Temettü = Her Zaman İyi mi?</strong></p>
+                                <ul>
+                                    <li>✅ %3-5 temettü: Sağlıklı, sürdürülebilir</li>
+                                    <li>⚠️ %6-8 temettü: Dikkatli incelenmeli, şirket zorlanıyor olabilir</li>
+                                    <li>❌ %10+ temettü: "Value trap" olabilir, şirket batabilir, temettü kesilir</li>
+                                </ul>
+                                <p><strong>Temettü Kesme Riski:</strong> Şirket kar edemezse veya nakit sıkışırsa temettüyü kesebilir. Bu durumda hisse fiyatı çakılır.</p>
+                                <p><strong>Temettü Yeniden Yatırımı (DRIP):</strong> Aldığınız temettüyü otomatik olarak aynı hisseden satın alır. Bileşik faiz etkisi yaratır.</p>
+                                <p><strong>Vergilendirme:</strong> Türkiye'de yerli şirket temettüleri %10 stopaj. Yabancı şirketler için değişken (ABD %15-30).</p>
+                                <p><strong>Büyüme vs Temettü:</strong> Genç yatırımcılar büyüme hisselerini (Apple, Tesla), yaşlı yatırımcılar temettü hisselerini (AT&T, Altria) tercih eder.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>PEG Oranı (Price/Earnings to Growth Ratio)</h3>
+                                <p><strong>Tanım:</strong> P/E oranını şirketin büyüme hızıyla dengeleyen, daha kapsamlı değerleme ölçütü. Peter Lynch tarafından popülerleştirildi.</p>
+                                <p><strong>Formül:</strong> PEG = P/E Oranı ÷ Yıllık Kazanç Büyüme Oranı (%)</p>
+                                <p><strong>Örnek:</strong> Netflix P/E = 40, kazanç büyüme hızı = %20 → PEG = 40/20 = 2.0</p>
+                                <p><strong>PEG Değerlendirmesi:</strong></p>
+                                <ul>
+                                    <li><strong>PEG < 1:</strong> Hisse düşük değerlenmiş, büyüme potansiyeline göre ucuz (AL)</li>
+                                    <li><strong>PEG = 1:</strong> Adil değerleme, fiyat büyümeyle uyumlu</li>
+                                    <li><strong>PEG > 2:</strong> Hisse aşırı değerlenmiş, büyümeye göre pahalı (DİKKAT)</li>
+                                </ul>
+                                <p><strong>Örnek Karşılaştırma:</strong></p>
+                                <ul>
+                                    <li>Şirket A: P/E = 50, Büyüme = %50 → PEG = 1.0 (uygun)</li>
+                                    <li>Şirket B: P/E = 15, Büyüme = %5 → PEG = 3.0 (pahalı)</li>
+                                </ul>
+                                <p>Şirket A yüksek P/E'ye rağmen daha iyi yatırım olabilir çünkü hızlı büyüyor.</p>
+                                <p><strong>Peter Lynch Kuralı:</strong> "PEG 1'in altındaki hisseleri ara. PEG 0.5 bulursan çok güçlü fırsat olabilir."</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Volatilite (Volatility) ve VIX Endeksi</h3>
+                                <p><strong>Tanım:</strong> Fiyat hareketlerinin büyüklüğü ve hızı. Piyasanın ne kadar "çalkantılı" olduğunu ölçer. Yüksek volatilite = yüksek risk VE yüksek fırsat.</p>
+                                <p><strong>Volatilite Ölçümleri:</strong></p>
+                                <ul>
+                                    <li><strong>Historical Volatility:</strong> Geçmişteki fiyat dalgalanmaları (standart sapma)</li>
+                                    <li><strong>Implied Volatility (IV):</strong> Opsiyon fiyatlarından hesaplanan gelecek beklentisi</li>
+                                    <li><strong>Beta:</strong> Hissenin piyasaya göre volatilitesi (Beta=1: piyasa ile aynı, >1: daha volatil)</li>
+                                </ul>
+                                <p><strong>VIX (Volatility Index - Korku Endeksi):</strong></p>
+                                <ul>
+                                    <li><strong>VIX < 15:</strong> Düşük volatilite, piyasa sakin ve iyimser</li>
+                                    <li><strong>VIX 15-25:</strong> Normal volatilite</li>
+                                    <li><strong>VIX 25-35:</strong> Yüksek volatilite, belirsizlik artıyor</li>
+                                    <li><strong>VIX > 40:</strong> Ekstrem korku, panik satış, kriz dönemi</li>
+                                </ul>
+                                <p><strong>VIX Trading:</strong> "VIX yüksekken al, düşükken sat" stratejisi. VIX 40'ın üstünde piyasa dipte olabilir.</p>
+                                <p><strong>Tarihi VIX Zirveleri:</strong></p>
+                                <ul>
+                                    <li>2008 Mali Krizi: VIX = 89 (tüm zamanların rekoru)</li>
+                                    <li>2020 COVID-19: VIX = 82</li>
+                                    <li>2022 Rusya-Ukrayna: VIX = 36</li>
+                                </ul>
+                                <p><strong>Volatilite Stratejileri:</strong></p>
+                                <ul>
+                                    <li>Düşük volatilite dönemlerinde uzun vadeli pozisyon al</li>
+                                    <li>Yüksek volatilite dönemlerinde stop loss'ları genişlet (erken kesilmemek için)</li>
+                                    <li>Opsiyon ile volatilite oynanabilir (straddle, strangle stratejileri)</li>
+                                </ul>
+                                <p><strong>Örnek:</strong> Tesla'nın beta'sı = 2.0. S&P 500 %5 yükselirse Tesla %10 yükselir. Ama S&P %5 düşerse Tesla %10 düşer (çift taraflı risk).</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Likidite (Liquidity) ve Spread</h3>
+                                <p><strong>Tanım:</strong> Bir varlığın fiyatında önemli bir kayba uğramadan ne kadar hızlı ve kolay alınıp satılabildiğini gösteren ölçüt.</p>
+                                <p><strong>Likidite Göstergeleri:</strong></p>
+                                <ul>
+                                    <li><strong>Günlük İşlem Hacmi:</strong> Ne kadar hisse el değiştiriyor</li>
+                                    <li><strong>Bid-Ask Spread:</strong> Alış-satış farkı ne kadar dar</li>
+                                    <li><strong>Market Depth:</strong> Emir defterinde ne kadar alım/satım emri var</li>
+                                    <li><strong>Slippage:</strong> İstediğiniz fiyat ile gerçekleşen fiyat arasındaki fark</li>
+                                </ul>
+                                <p><strong>Likidite Seviyeleri:</strong></p>
+                                <ul>
+                                    <li><strong>Mega Liquid:</strong> Apple, Microsoft (günde 50M+ hisse, $0.01 spread)</li>
+                                    <li><strong>High Liquid:</strong> S&P 500 şirketleri (günde 1M+ hisse)</li>
+                                    <li><strong>Medium Liquid:</strong> Orta ölçekli şirketler (günde 100K-1M hisse)</li>
+                                    <li><strong>Low Liquid:</strong> Küçük şirketler, penny stocks (günde <10K hisse, geniş spread)</li>
+                                </ul>
+                                <p><strong>Likidite Krizi:</strong> 2008'de Lehman Brothers iflas etti, piyasa dondu, kimse alım yapmadı. Hisseler satılamaz hale geldi.</p>
+                                <p><strong>Likidite Riski:</strong> Düşük likidite hisselerinde:</p>
+                                <ul>
+                                    <li>Satmak istediğinizde alıcı bulamayabilirsiniz</li>
+                                    <li>Büyük emir verince fiyat sizin aleyhinize hareket eder</li>
+                                    <li>Spread geniştir, her alış-satışta para kaybedersiniz</li>
+                                </ul>
+                                <p><strong>Likidite vs Volatilite:</strong> Yüksek likidite genellikle düşük volatilite demektir (Apple). Düşük likidite yüksek volatilite yaratır (penny stocks).</p>
+                                <p><strong>Pro İpucu:</strong> Yatırım yaparken günlük hacmi kendinizin maksimum işlem büyüklüğünün en az 10 katı olan hisseleri seçin.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Market Cap vs Enterprise Value (Piyasa Değeri vs Şirket Değeri)</h3>
+                                <p><strong>Market Cap (Piyasa Değeri):</strong> Hisse fiyatı × Toplam hisse sayısı. Şirketin borsadaki toplam değeri.</p>
+                                <p><strong>Enterprise Value (EV - Şirket Değeri):</strong> Market Cap + Toplam Borç - Nakit. Şirketin gerçek ekonomik değeri.</p>
+                                <p><strong>Neden EV Önemli:</strong> İki şirket aynı market cap'e sahip olabilir ama biri borca batık, diğeri nakit dolu olabilir.</p>
+                                <p><strong>Örnek:</strong></p>
+                                <ul>
+                                    <li>Şirket A: Market Cap $10B, Borç $5B, Nakit $1B → EV = $14B</li>
+                                    <li>Şirket B: Market Cap $10B, Borç $1B, Nakit $3B → EV = $8B</li>
+                                </ul>
+                                <p>Şirket B daha değerli çünkü daha az borçlu ve daha çok nakitli.</p>
+                                <p><strong>EV/EBITDA Oranı:</strong> Şirket değerleme için kullanılır. EV/EBITDA < 10 genellikle uygun değerleme sayılır.</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>Defter Değeri (Book Value) ve P/B Oranı</h3>
+                                <p><strong>Tanım:</strong> Şirketin bilançosunda görünen net varlık değeri. Tüm varlıklar - Tüm borçlar.</p>
+                                <p><strong>P/B Oranı (Price to Book):</strong> Hisse fiyatı ÷ Hisse başına defter değeri</p>
+                                <p><strong>Değerlendirme:</strong></p>
+                                <ul>
+                                    <li><strong>P/B < 1:</strong> Hisse defter değerinin altında işlem görüyor (deep value, ama risk var)</li>
+                                    <li><strong>P/B = 1-3:</strong> Makul değerleme</li>
+                                    <li><strong>P/B > 5:</strong> Hisse varlıklarına göre çok pahalı (teknoloji şirketlerinde normal)</li>
+                                </ul>
+                                <p><strong>Örnek:</strong> Banka sektöründe P/B çok önemlidir. Bir banka P/B=0.8 ile işlem görüyorsa piyasa bankanın varlıklarına güvenmiyor demektir.</p>
+                                <p><strong>Benjamin Graham Yaklaşımı:</strong> "P/B < 1 ve P/E < 15 olan hisseler ara. Bu güvenlik marjı sağlar."</p>
+                            </div>
+
+                            <div class="term-item">
+                                <h3>ROE, ROA, ROI (Karlılık Oranları)</h3>
+                                <p><strong>ROE (Return on Equity - Özsermaye Karlılığı):</strong></p>
+                                <ul>
+                                    <li>Formül: Net Kar ÷ Özsermaye × 100</li>
+                                    <li>Şirket hissedarların parasıyla ne kadar verimli kar ediyor</li>
+                                    <li>ROE > %15: Mükemmel, ROE > %20: Olağanüstü</li>
+                                </ul>
+                                <p><strong>ROA (Return on Assets - Aktif Karlılığı):</strong></p>
+                                <ul>
+                                    <li>Formül: Net Kar ÷ Toplam Aktifler × 100</li>
+                                    <li>Şirket varlıklarını ne kadar verimli kullanıyor</li>
+                                    <li>ROA > %5: İyi, > %10: Çok iyi</li>
+                                </ul>
+                                <p><strong>ROI (Return on Investment - Yatırım Getirisi):</strong></p>
+                                <ul>
+                                    <li>Formül: (Kazanç - Maliyet) ÷ Maliyet × 100</li>
+                                    <li>Sizin yatırımınızın getirisi</li>
+                                    <li>Örnek: $1000 yatırdınız, $1500 oldu → ROI = %50</li>
+                                </ul>
+                                <p><strong>Warren Buffett'ın Favorisi - ROE:</strong> "Yüksek ROE ve düşük borç oranı olan şirketler ara. Bu kaliteli şirketin işaretidir."</p>
+                                <p><strong>Örnek:</strong> Apple ROE = %150 (olağanüstü), Amazon ROE = %25 (iyi), General Motors ROE = %10 (orta). Apple hissedar parasını en verimli kullanan şirket.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Grafikler Page -->
+        <section id="grafikler" class="page">
+            <div class="container">
+                <h1>Grafik Okuma ve Teknik Analiz</h1>
+
+                <div class="lesson-container">
+                    <div class="lesson-card">
+                        <h2><i class="fas fa-1"></i> Grafik Türleri</h2>
+
+                        <div class="chart-type">
+                            <h3>Çizgi Grafiği (Line Chart)</h3>
+                            <div class="chart-example">
+                                <canvas id="lineChartExample"></canvas>
+                            </div>
+                            <div class="explanation">
+                                <p><strong>Ne gösterir:</strong> Kapanış fiyatlarını birleştirerek genel trendi gösterir.</p>
+                                <p><strong>Ne zaman kullanılır:</strong> Uzun vadeli trend analizi için.</p>
+                                <p><strong>Avantajı:</strong> Basit ve anlaşılır.</p>
+                                <p><strong>Dezavantajı:</strong> Gün içi detayları göstermez.</p>
+                            </div>
+                        </div>
+
+                        <div class="chart-type">
+                            <h3>Mum Grafiği (Candlestick Chart) - En Önemli!</h3>
+                            <div class="candlestick-demo">
+                                <div class="candle-explanation">
+                                    <div class="candle green">
+                                        <div class="candle-body">
+                                            <span class="label top">Kapanış (Yüksek)</span>
+                                            <span class="label bottom">Açılış (Düşük)</span>
+                                        </div>
+                                        <p class="candle-label">Yeşil Mum = Yükseliş<br>Kapanış > Açılış</p>
+                                    </div>
+                                    <div class="candle red">
+                                        <div class="candle-body">
+                                            <span class="label top">Açılış (Yüksek)</span>
+                                            <span class="label bottom">Kapanış (Düşük)</span>
+                                        </div>
+                                        <p class="candle-label">Kırmızı Mum = Düşüş<br>Kapanış < Açılış</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="explanation">
+                                <p><strong>Mum Anatomisi:</strong></p>
+                                <ul>
+                                    <li><strong>Gövde (Body):</strong> Açılış ve kapanış fiyatı arasındaki alan</li>
+                                    <li><strong>Fitil/Gölge (Wick/Shadow):</strong> En yüksek ve en düşük fiyatları gösterir</li>
+                                    <li><strong>Yeşil/Beyaz:</strong> Kapanış fiyatı açılış fiyatından yüksek</li>
+                                    <li><strong>Kırmızı/Siyah:</strong> Kapanış fiyatı açılış fiyatından düşük</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lesson-card">
+                        <h2><i class="fas fa-2"></i> Önemli Mum Formasyonları</h2>
+
+                        <div class="pattern-grid">
+                            <div class="pattern-item">
+                                <h3>🟢 Doji</h3>
+                                <div class="pattern-visual">
+                                    <div class="mini-candle doji"></div>
+                                </div>
+                                <p><strong>Görünüm:</strong> Açılış = Kapanış (çok ince gövde)</p>
+                                <p><strong>Anlamı:</strong> Kararsızlık, trend değişimi olabilir</p>
+                                <p><strong>Strateji:</strong> Bekle ve gör, yön netleşene kadar işlem yapma</p>
+                            </div>
+
+                            <div class="pattern-item">
+                                <h3>🔴 Çekiç (Hammer)</h3>
+                                <div class="pattern-visual">
+                                    <div class="mini-candle hammer"></div>
+                                </div>
+                                <p><strong>Görünüm:</strong> Küçük gövde, uzun alt fitil</p>
+                                <p><strong>Anlamı:</strong> Düşüş sonrası alıcılar devreye girdi</p>
+                                <p><strong>Strateji:</strong> Alım sinyali (dipten dönüş)</p>
+                            </div>
+
+                            <div class="pattern-item">
+                                <h3>🔵 Ters Çekiç (Shooting Star)</h3>
+                                <div class="pattern-visual">
+                                    <div class="mini-candle shootingstar"></div>
+                                </div>
+                                <p><strong>Görünüm:</strong> Küçük gövde, uzun üst fitil</p>
+                                <p><strong>Anlamı:</strong> Yükseliş sonrası satıcılar devreye girdi</p>
+                                <p><strong>Strateji:</strong> Satım sinyali (tepeden dönüş)</p>
+                            </div>
+
+                            <div class="pattern-item">
+                                <h3>🟢 Engulfing (Yutan)</h3>
+                                <div class="pattern-visual">
+                                    <div class="mini-candle-group">
+                                        <div class="mini-candle small red"></div>
+                                        <div class="mini-candle large green"></div>
+                                    </div>
+                                </div>
+                                <p><strong>Görünüm:</strong> İkinci mum birincisini tamamen yutar</p>
+                                <p><strong>Anlamı:</strong> Güçlü trend değişimi</p>
+                                <p><strong>Strateji:</strong> Yeşil yutarsa AL, kırmızı yutarsa SAT</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lesson-card">
+                        <h2><i class="fas fa-3"></i> Trend Çizgileri</h2>
+                        <div class="trend-demo">
+                            <canvas id="trendLineDemo"></canvas>
+                        </div>
+                        <div class="explanation">
+                            <h3>Yükseliş Trendi (Uptrend)</h3>
+                            <ul>
+                                <li>Diplerden çizgi çizin (her dip bir öncekinden yüksek)</li>
+                                <li>Fiyat çizginin üstündeyse trend devam eder</li>
+                                <li>Çizgi kırılırsa trend bozulur, satış sinyali</li>
+                            </ul>
+                            <h3>Düşüş Trendi (Downtrend)</h3>
+                            <ul>
+                                <li>Tepelerden çizgi çizin (her tepe bir öncekinden düşük)</li>
+                                <li>Fiyat çizginin altındaysa trend devam eder</li>
+                                <li>Çizgi kırılırsa trend bozulur, alım sinyali</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="lesson-card">
+                        <h2><i class="fas fa-4"></i> Destek ve Direnç Seviyeleri</h2>
+                        <div class="support-resistance-demo">
+                            <canvas id="supportResistanceDemo"></canvas>
+                        </div>
+                        <div class="explanation">
+                            <h3>Nasıl Bulunur?</h3>
+                            <ul>
+                                <li><strong>Destek:</strong> Fiyatın birden fazla kez test edip geri döndüğü alt seviye</li>
+                                <li><strong>Direnç:</strong> Fiyatın birden fazla kez test edip geri döndüğü üst seviye</li>
+                            </ul>
+                            <h3>Trading Stratejisi</h3>
+                            <ul>
+                                <li>✅ Destekten AL (fiyat destek yakınına geldiğinde)</li>
+                                <li>✅ Dirençten SAT (fiyat direnç yakınına geldiğinde)</li>
+                                <li>⚠️ Destek kırılırsa SAT (yeni düşüş başlıyor)</li>
+                                <li>⚠️ Direnç kırılırsa AL (yeni yükseliş başlıyor)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="lesson-card">
+                        <h2><i class="fas fa-5"></i> Hareketli Ortalamalar (Moving Averages)</h2>
+                        <div class="ma-demo">
+                            <canvas id="movingAverageDemo"></canvas>
+                        </div>
+                        <div class="explanation">
+                            <h3>En Popüler Ortalamalar</h3>
+                            <ul>
+                                <li><strong>MA 50 (50 günlük):</strong> Orta vadeli trend</li>
+                                <li><strong>MA 200 (200 günlük):</strong> Uzun vadeli trend</li>
+                            </ul>
+                            <h3>Trading Sinyalleri</h3>
+                            <ul>
+                                <li>🟢 <strong>Golden Cross:</strong> MA 50, MA 200'ü yukarı keser → Güçlü ALIM sinyali</li>
+                                <li>🔴 <strong>Death Cross:</strong> MA 50, MA 200'ü aşağı keser → Güçlü SATIM sinyali</li>
+                                <li>📈 Fiyat, MA 50'nin üstündeyse → Yükseliş trendi</li>
+                                <li>📉 Fiyat, MA 50'nin altındaysa → Düşüş trendi</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="lesson-card">
+                        <h2><i class="fas fa-6"></i> Hacim Analizi</h2>
+                        <div class="volume-demo">
+                            <canvas id="volumeDemo"></canvas>
+                        </div>
+                        <div class="explanation">
+                            <h3>Hacim Ne Anlama Gelir?</h3>
+                            <ul>
+                                <li><strong>Yüksek Hacim + Yükseliş:</strong> Güçlü alım, trend sağlam</li>
+                                <li><strong>Yüksek Hacim + Düşüş:</strong> Güçlü satım, trend sağlam</li>
+                                <li><strong>Düşük Hacim:</strong> Zayıf hareket, trend güvenilmez</li>
+                                <li><strong>Hacim Patlaması:</strong> Önemli bir haber var, dikkat!</li>
+                            </ul>
+                            <h3>Pratik Kural</h3>
+                            <p>Hacim olmadan fiyat hareketi sürdürülemez. Her zaman hacmi kontrol edin!</p>
+                        </div>
+                    </div>
+
+                    <div class="lesson-card interactive-practice">
+                        <h2><i class="fas fa-gamepad"></i> İnteraktif Pratik</h2>
+                        <div class="practice-area">
+                            <h3>Grafik Senaryosu: Bu durumda ne yapardın?</h3>
+                            <div class="practice-chart" style="height: 400px; position: relative;">
+                                <canvas id="practiceChart"></canvas>
+                            </div>
+                            <div class="practice-question">
+                                <p id="scenarioQuestion">Yükleniyor...</p>
+                                <div class="practice-options">
+                                    <button class="practice-btn" data-answer="buy">📈 ALIM Yap</button>
+                                    <button class="practice-btn" data-answer="sell">📉 SATIM Yap</button>
+                                    <button class="practice-btn" data-answer="wait">⏳ BEKLE</button>
+                                </div>
+                                <div id="practiceResult" class="practice-result"></div>
+                            </div>
+                            <button id="nextScenario" class="next-scenario-btn">Yeni Senaryo</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Kaynaklar Page -->
+        <section id="kaynaklar" class="page">
+            <div class="container">
+                <h1><i class="fas fa-book-open"></i> Öğrenme Kaynakları</h1>
+                <p class="page-subtitle">Finans dünyasında başarılı olmak için ihtiyacınız olan tüm kaynaklar burada</p>
+
+                <div class="news-guide">
+                    <div class="guide-card">
+                        <h2><i class="fas fa-lightbulb"></i> Haberleri Nasıl Yorumlayalım?</h2>
+                        <div class="guide-content">
+                            <div class="guide-item">
+                                <h3>📊 Ekonomik Veriler</h3>
+                                <ul>
+                                    <li><strong>İşsizlik Oranı ↓:</strong> İyi haber → Hisseler yükselir</li>
+                                    <li><strong>Enflasyon ↑:</strong> Kötü haber → Merkez Bankası faiz artırabilir → Hisseler düşer</li>
+                                    <li><strong>GDP Büyümesi ↑:</strong> İyi haber → Ekonomi güçlü → Hisseler yükselir</li>
+                                    <li><strong>Faiz Artışı:</strong> Borçlanma pahalılaşır → Şirket karları düşer → Hisseler düşer</li>
+                                </ul>
+                            </div>
+
+                            <div class="guide-item">
+                                <h3>🏢 Şirket Haberleri</h3>
+                                <ul>
+                                    <li><strong>Kâr Açıklaması > Beklenti:</strong> Hisse yükselir</li>
+                                    <li><strong>Kâr Açıklaması < Beklenti:</strong> Hisse düşer</li>
+                                    <li><strong>Yeni Ürün Lansmanı:</strong> Genelde pozitif, hisse yükselir</li>
+                                    <li><strong>CEO Değişikliği:</strong> Belirsizlik yaratır, hisse dalgalanır</li>
+                                    <li><strong>Hisse Geri Alımı:</strong> Pozitif sinyal, hisse yükselir</li>
+                                </ul>
+                            </div>
+
+                            <div class="guide-item">
+                                <h3>🌍 Jeopolitik Olaylar</h3>
+                                <ul>
+                                    <li><strong>Savaş/Gerginlik:</strong> Belirsizlik → Altın yükselir, hisseler düşer</li>
+                                    <li><strong>Ticaret Anlaşması:</strong> Pozitif → İlgili ülkelerin hisseleri yükselir</li>
+                                    <li><strong>Seçimler:</strong> Belirsizlik dönemi → Piyasalar dalgalı</li>
+                                    <li><strong>Doğal Afet:</strong> Kısa vadeli düşüş, uzun vadede toparlanma</li>
+                                </ul>
+                            </div>
+
+                            <div class="guide-item">
+                                <h3>💡 Pratik İpuçları</h3>
+                                <ul>
+                                    <li>✅ Haberi gördükten sonra 10-15 dakika bekle (ilk panik geçsin)</li>
+                                    <li>✅ Birden fazla kaynaktan doğrula</li>
+                                    <li>✅ "Beklentilere göre" sonuçları değerlendir (sadece rakama değil)</li>
+                                    <li>❌ Her habere panik yapma</li>
+                                    <li>❌ Dedikodu ve spekülasyona inanma</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Comprehensive Learning Resources Section -->
+                    <div class="comprehensive-resources">
+                        <h2><i class="fas fa-book-open"></i> Kapsamlı Öğrenme Kaynakları</h2>
+                        <p class="resources-intro">Finans dünyasında başarılı olmak için sürekli öğrenmeniz gerekir. İşte size yardımcı olacak en iyi kaynaklar:</p>
+
+                        <!-- Books Section -->
+                        <div class="resource-category">
+                            <h3><i class="fas fa-book"></i> 📚 Temel Kitaplar (Must-Read)</h3>
+                            <div class="resource-grid">
+                                <div class="resource-item">
+                                    <h4>🏆 The Intelligent Investor - Benjamin Graham</h4>
+                                    <p><strong>Seviye:</strong> Başlangıç-Orta</p>
+                                    <p><strong>Neden Okumalı?</strong> Warren Buffett'ın hocası. Value investing'in İncil'i. Uzun vadeli yatırım felsefesi.</p>
+                                    <p><strong>Türkçe İsim:</strong> Akıllı Yatırımcı</p>
+                                </div>
+                                <div class="resource-item">
+                                    <h4>📊 A Random Walk Down Wall Street - Burton Malkiel</h4>
+                                    <p><strong>Seviye:</strong> Başlangıç</p>
+                                    <p><strong>Neden Okumalı?</strong> Piyasa teorileri, endeks fonlar, pasif yatırım. Modern portföy teorisi.</p>
+                                    <p><strong>Türkçe İsim:</strong> Wall Street'te Rastgele Yürüyüş</p>
+                                </div>
+                                <div class="resource-item">
+                                    <h4>🎯 One Up On Wall Street - Peter Lynch</h4>
+                                    <p><strong>Seviye:</strong> Başlangıç</p>
+                                    <p><strong>Neden Okumalı?</strong> Bireysel yatırımcı avantajları, şirket analizi, günlük hayattan yatırım fikirleri.</p>
+                                    <p><strong>Türkçe İsim:</strong> Wall Street'i Yenmek</p>
+                                </div>
+                                <div class="resource-item">
+                                    <h4>🔍 Security Analysis - Benjamin Graham & David Dodd</h4>
+                                    <p><strong>Seviye:</strong> İleri</p>
+                                    <p><strong>Neden Okumalı?</strong> Fundamental analiz klasiği. Detaylı finansal rapor okuma.</p>
+                                    <p><strong>Not:</strong> Ağır ve teknik, ancak en değerli kaynaklardan.</p>
+                                </div>
+                                <div class="resource-item">
+                                    <h4>📈 Technical Analysis of Financial Markets - John Murphy</h4>
+                                    <p><strong>Seviye:</strong> Orta-İleri</p>
+                                    <p><strong>Neden Okumalı?</strong> Teknik analiz İncil'i. Tüm chart pattern'ler, indikatörler detaylı.</p>
+                                    <p><strong>Not:</strong> Grafik analizi için #1 kaynak</p>
+                                </div>
+                                <div class="resource-item">
+                                    <h4>🧠 Thinking, Fast and Slow - Daniel Kahneman</h4>
+                                    <p><strong>Seviye:</strong> Orta</p>
+                                    <p><strong>Neden Okumalı?</strong> Behavioral finance (davranışsal finans). Yatırımcı psikolojisi ve yanılgılar.</p>
+                                    <p><strong>Türkçe İsim:</strong> Hızlı ve Yavaş Düşünme</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- YouTube Channels Section -->
+                        <div class="resource-category">
+                            <h3><i class="fab fa-youtube"></i> 🎥 YouTube Kanalları</h3>
+                            <div class="resource-grid">
+                                <div class="resource-item youtube-channel">
+                                    <h4>🔥 The Chart Guys</h4>
+                                    <p><strong>İçerik:</strong> Teknik analiz, günlük market review, canlı trading</p>
+                                    <p><strong>Dil:</strong> İngilizce | <strong>Abone:</strong> 600K+</p>
+                                    <p><strong>Link:</strong> <a href="https://www.youtube.com/@TheChartGuys" target="_blank">@TheChartGuys</a></p>
+                                </div>
+                                <div class="resource-item youtube-channel">
+                                    <h4>📊 Rayner Teo</h4>
+                                    <p><strong>İçerik:</strong> Price action, risk management, stratejiler</p>
+                                    <p><strong>Dil:</strong> İngilizce | <strong>Abone:</strong> 800K+</p>
+                                    <p><strong>Link:</strong> <a href="https://www.youtube.com/@TradingwithRayner" target="_blank">@TradingwithRayner</a></p>
+                                </div>
+                                <div class="resource-item youtube-channel">
+                                    <h4>💰 Graham Stephan</h4>
+                                    <p><strong>İçerik:</strong> Personal finance, real estate, yatırım stratejileri</p>
+                                    <p><strong>Dil:</strong> İngilizce | <strong>Abone:</strong> 4.5M+</p>
+                                    <p><strong>Link:</strong> <a href="https://www.youtube.com/@GrahamStephan" target="_blank">@GrahamStephan</a></p>
+                                </div>
+                                <div class="resource-item youtube-channel">
+                                    <h4>🇹🇷 Mert Başaran</h4>
+                                    <p><strong>İçerik:</strong> BIST analizi, Türkiye piyasaları, hisse yorumları</p>
+                                    <p><strong>Dil:</strong> Türkçe | <strong>Abone:</strong> 200K+</p>
+                                    <p><strong>Link:</strong> <a href="https://www.youtube.com/@MertBasaran" target="_blank">@MertBasaran</a></p>
+                                </div>
+                                <div class="resource-item youtube-channel">
+                                    <h4>🇹🇷 Para Analiz TV</h4>
+                                    <p><strong>İçerik:</strong> Teknik analiz eğitimleri, BIST, Forex</p>
+                                    <p><strong>Dil:</strong> Türkçe | <strong>Abone:</strong> 150K+</p>
+                                    <p><strong>Link:</strong> <a href="https://www.youtube.com/@ParaAnalizTV" target="_blank">@ParaAnalizTV</a></p>
+                                </div>
+                                <div class="resource-item youtube-channel">
+                                    <h4>📈 Patrick Boyle</h4>
+                                    <p><strong>İçerik:</strong> Makro ekonomi, finansal krizler, hedge fund stratejileri</p>
+                                    <p><strong>Dil:</strong> İngilizce | <strong>Abone:</strong> 600K+</p>
+                                    <p><strong>Link:</strong> <a href="https://www.youtube.com/@PBoyle" target="_blank">@PBoyle</a></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Online Courses Section -->
+                        <div class="resource-category">
+                            <h3><i class="fas fa-graduation-cap"></i> 🎓 Online Kurslar</h3>
+                            <div class="resource-grid">
+                                <div class="resource-item course">
+                                    <h4>🏆 Financial Markets - Yale University (Coursera)</h4>
+                                    <p><strong>Eğitmen:</strong> Prof. Robert Shiller (Nobel ödüllü)</p>
+                                    <p><strong>Ücret:</strong> ÜCRETSİZ (sertifika ücretli)</p>
+                                    <p><strong>İçerik:</strong> Hisse senetleri, tahviller, futures, options, behavioral finance</p>
+                                    <p><strong>Link:</strong> <a href="https://www.coursera.org/learn/financial-markets-global" target="_blank">Coursera - Financial Markets</a></p>
+                                </div>
+                                <div class="resource-item course">
+                                    <h4>📊 Trading & Investing Masterclass - Udemy</h4>
+                                    <p><strong>Eğitmen:</strong> Various top instructors</p>
+                                    <p><strong>Ücret:</strong> ~200 TL (indirim dönemlerinde)</p>
+                                    <p><strong>İçerik:</strong> Teknik analiz, stratejiler, risk yönetimi</p>
+                                    <p><strong>Link:</strong> <a href="https://www.udemy.com/topic/stock-trading/" target="_blank">Udemy - Trading Courses</a></p>
+                                </div>
+                                <div class="resource-item course">
+                                    <h4>🎯 BabyPips School of Pipsology</h4>
+                                    <p><strong>Ücret:</strong> %100 ÜCRETSİZ</p>
+                                    <p><strong>İçerik:</strong> Forex'ten başlıyor ama temel analiz teknikleri tüm piyasalar için geçerli</p>
+                                    <p><strong>Link:</strong> <a href="https://www.babypips.com/learn/forex" target="_blank">BabyPips School</a></p>
+                                </div>
+                                <div class="resource-item course">
+                                    <h4>💼 Investopedia Academy</h4>
+                                    <p><strong>Ücret:</strong> Ücretli kurslar ($199-$599)</p>
+                                    <p><strong>İçerik:</strong> Day trading, options, technical analysis, retirement planning</p>
+                                    <p><strong>Link:</strong> <a href="https://academy.investopedia.com/" target="_blank">Investopedia Academy</a></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Communities & Forums Section -->
+                        <div class="resource-category">
+                            <h3><i class="fas fa-users"></i> 👥 Topluluklar & Forumlar</h3>
+                            <div class="resource-grid">
+                                <div class="resource-item community">
+                                    <h4>💬 Reddit - r/stocks</h4>
+                                    <p><strong>Üye:</strong> 5M+ | <strong>Dil:</strong> İngilizce</p>
+                                    <p><strong>İçerik:</strong> Hisse analizleri, tartışmalar, DD (due diligence) paylaşımları</p>
+                                    <p><strong>Link:</strong> <a href="https://www.reddit.com/r/stocks" target="_blank">r/stocks</a></p>
+                                </div>
+                                <div class="resource-item community">
+                                    <h4>💎 Reddit - r/investing</h4>
+                                    <p><strong>Üye:</strong> 2.5M+ | <strong>Dil:</strong> İngilizce</p>
+                                    <p><strong>İçerik:</strong> Uzun vadeli yatırım, portföy stratejileri, makro görüşler</p>
+                                    <p><strong>Link:</strong> <a href="https://www.reddit.com/r/investing" target="_blank">r/investing</a></p>
+                                </div>
+                                <div class="resource-item community">
+                                    <h4>🇹🇷 Hisse Senedi Forum</h4>
+                                    <p><strong>Dil:</strong> Türkçe</p>
+                                    <p><strong>İçerik:</strong> BIST hisseleri, Türkiye piyasaları, teknik analiz tartışmaları</p>
+                                    <p><strong>Link:</strong> <a href="https://www.hissesenedforum.com" target="_blank">hissesenedforum.com</a></p>
+                                </div>
+                                <div class="resource-item community">
+                                    <h4>📈 TradingView Community</h4>
+                                    <p><strong>Üye:</strong> 50M+</p>
+                                    <p><strong>İçerik:</strong> Chart paylaşımı, fikir tartışması, script paylaşımı</p>
+                                    <p><strong>Link:</strong> <a href="https://www.tradingview.com/community/" target="_blank">TradingView Community</a></p>
+                                </div>
+                                <div class="resource-item community">
+                                    <h4>🇹🇷 Telegram - Borsa Grupları</h4>
+                                    <p><strong>Dil:</strong> Türkçe</p>
+                                    <p><strong>İçerik:</strong> Anlık piyasa haberleri, hızlı tartışmalar</p>
+                                    <p><strong>Not:</strong> DİKKAT: Pump & dump gruplarından uzak durun!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Apps Section -->
+                        <div class="resource-category">
+                            <h3><i class="fas fa-mobile-alt"></i> 📱 Mobil Uygulamalar</h3>
+                            <div class="resource-grid">
+                                <div class="resource-item app">
+                                    <h4>📊 TradingView (iOS/Android)</h4>
+                                    <p><strong>Ücret:</strong> Ücretsiz (Pro: $15/ay)</p>
+                                    <p><strong>Özellik:</strong> En iyi grafik platformu, tüm piyasalar, çizim araçları, sosyal ağ</p>
+                                    <p><strong>Rating:</strong> ⭐⭐⭐⭐⭐ 4.8/5</p>
+                                </div>
+                                <div class="resource-item app">
+                                    <h4>💹 Yahoo Finance (iOS/Android)</h4>
+                                    <p><strong>Ücret:</strong> %100 Ücretsiz</p>
+                                    <p><strong>Özellik:</strong> Real-time fiyatlar, portföy takibi, haberler, finansal raporlar</p>
+                                    <p><strong>Rating:</strong> ⭐⭐⭐⭐ 4.5/5</p>
+                                </div>
+                                <div class="resource-item app">
+                                    <h4>🇹🇷 Matriks (iOS/Android)</h4>
+                                    <p><strong>Ücret:</strong> Ücretsiz</p>
+                                    <p><strong>Özellik:</strong> BIST verileri, teknik analiz, Türkiye odaklı</p>
+                                    <p><strong>Rating:</strong> ⭐⭐⭐⭐ 4.2/5</p>
+                                </div>
+                                <div class="resource-item app">
+                                    <h4>📈 Investing.com (iOS/Android)</h4>
+                                    <p><strong>Ücret:</strong> Ücretsiz (Pro mevcut)</p>
+                                    <p><strong>Özellik:</strong> Ekonomik takvim, alertler, portföy takibi, tüm enstrümanlar</p>
+                                    <p><strong>Rating:</strong> ⭐⭐⭐⭐ 4.3/5</p>
+                                </div>
+                                <div class="resource-item app">
+                                    <h4>🏦 İş Yatırım / Garanti BBVA (iOS/Android)</h4>
+                                    <p><strong>Ücret:</strong> Ücretsiz (hesap gerekli)</p>
+                                    <p><strong>Özellik:</strong> Türkiye'deki bankaların trading uygulamaları - gerçek işlem yapabilirsiniz</p>
+                                    <p><strong>Not:</strong> Demo hesapları var, pratik için ideal</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Websites & Tools Section -->
+                        <div class="resource-category">
+                            <h3><i class="fas fa-globe"></i> 🌐 Web Siteleri & Araçlar</h3>
+                            <div class="resource-grid">
+                                <div class="resource-item website">
+                                    <h4>📚 Investopedia</h4>
+                                    <p><strong>Link:</strong> <a href="https://www.investopedia.com" target="_blank">investopedia.com</a></p>
+                                    <p><strong>İçerik:</strong> Her finansal terimin açıklaması, makaleler, simulator</p>
+                                    <p><strong>Özellik:</strong> EN DETAYLI finans ansiklopedisi. Her şey burada.</p>
+                                </div>
+                                <div class="resource-item website">
+                                    <h4>🗺️ Finviz</h4>
+                                    <p><strong>Link:</strong> <a href="https://finviz.com" target="_blank">finviz.com</a></p>
+                                    <p><strong>İçerik:</strong> Market map (heat map), screener, insider trading, korku göstergeleri</p>
+                                    <p><strong>Özellik:</strong> Görsel piyasa analizi için en iyi araç</p>
+                                </div>
+                                <div class="resource-item website">
+                                    <h4>📊 TradingView</h4>
+                                    <p><strong>Link:</strong> <a href="https://www.tradingview.com" target="_blank">tradingview.com</a></p>
+                                    <p><strong>İçerik:</strong> Profesyonel grafik platformu, script yazabilme (Pine Script)</p>
+                                    <p><strong>Özellik:</strong> Grafik analizi için #1 platform</p>
+                                </div>
+                                <div class="resource-item website">
+                                    <h4>📅 Investing.com - Ekonomik Takvim</h4>
+                                    <p><strong>Link:</strong> <a href="https://www.investing.com/economic-calendar/" target="_blank">investing.com/economic-calendar</a></p>
+                                    <p><strong>İçerik:</strong> Tüm önemli ekonomik verilerin açıklanma tarihleri</p>
+                                    <p><strong>Özellik:</strong> Fed kararı, NFP, enflasyon - hepsi burada</p>
+                                </div>
+                                <div class="resource-item website">
+                                    <h4>🇹🇷 Bloomberg HT</h4>
+                                    <p><strong>Link:</strong> <a href="https://www.bloomberght.com" target="_blank">bloomberght.com</a></p>
+                                    <p><strong>İçerik:</strong> Türkiye finans haberleri, BIST analizi, canlı yayın</p>
+                                    <p><strong>Özellik:</strong> Türkiye'nin en güvenilir finans haber kaynağı</p>
+                                </div>
+                                <div class="resource-item website">
+                                    <h4>💰 TIKR Terminal</h4>
+                                    <p><strong>Link:</strong> <a href="https://tikr.com" target="_blank">tikr.com</a></p>
+                                    <p><strong>İçerik:</strong> Ücretsiz fundamental analiz, DCF modelleri, finansal raporlar</p>
+                                    <p><strong>Özellik:</strong> Bloomberg terminaline benzer ama ÜCRETSİZ</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Podcasts Section -->
+                        <div class="resource-category">
+                            <h3><i class="fas fa-podcast"></i> 🎙️ Podcastler</h3>
+                            <div class="resource-grid">
+                                <div class="resource-item podcast">
+                                    <h4>🎧 Chat With Traders</h4>
+                                    <p><strong>Dil:</strong> İngilizce</p>
+                                    <p><strong>İçerik:</strong> Başarılı trader'larla röportajlar, stratejiler, gerçek deneyimler</p>
+                                    <p><strong>Platform:</strong> Spotify, Apple Podcasts</p>
+                                </div>
+                                <div class="resource-item podcast">
+                                    <h4>💼 The Investors Podcast</h4>
+                                    <p><strong>Dil:</strong> İngilizce</p>
+                                    <p><strong>İçerik:</strong> Value investing, Warren Buffett analizi, uzun vadeli stratejiler</p>
+                                    <p><strong>Platform:</strong> Spotify, Apple Podcasts</p>
+                                </div>
+                                <div class="resource-item podcast">
+                                    <h4>🇹🇷 Para Dedektifi</h4>
+                                    <p><strong>Dil:</strong> Türkçe</p>
+                                    <p><strong>İçerik:</strong> Türkiye ekonomisi, yatırım tavsiyeleri, sektör analizleri</p>
+                                    <p><strong>Platform:</strong> Spotify, YouTube</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Important Notes Section -->
+                        <div class="resource-notes">
+                            <h3>⚠️ ÖNEMLİ NOTLAR</h3>
+                            <div class="note-box warning">
+                                <h4>🚨 KAÇINILMASI GEREKENLER:</h4>
+                                <ul>
+                                    <li>❌ <strong>"Kesin kazanç"</strong> vaat eden kurslar/kanallar</li>
+                                    <li>❌ <strong>Pump & dump Telegram grupları</strong> (hisse manipülasyonu)</li>
+                                    <li>❌ <strong>Signal satanlar</strong> ("Al-sat sinyali 500 TL/ay")</li>
+                                    <li>❌ <strong>Forex "robot" satanlar</strong> (otomatik kazanç yalan)</li>
+                                    <li>❌ <strong>Garanti getiri</strong> vaat eden herhangi bir şey</li>
+                                </ul>
+                            </div>
+                            <div class="note-box success">
+                                <h4>✅ DOĞRU ÖĞRENME YOLU:</h4>
+                                <ul>
+                                    <li>✅ Önce <strong>temel kitapları</strong> okuyun (The Intelligent Investor, One Up On Wall Street)</li>
+                                    <li>✅ <strong>Ücretsiz kaynaklarla</strong> başlayın (YouTube, Investopedia, BabyPips)</li>
+                                    <li>✅ <strong>Demo hesapla</strong> pratik yapın (gerçek para kullanmadan)</li>
+                                    <li>✅ <strong>Toplulukları</strong> takip edin ama körü körüne inanmayın</li>
+                                    <li>✅ <strong>Kendi stratejinizi</strong> geliştirin (başkasının kopyası olmayın)</li>
+                                    <li>✅ <strong>Sabırlı</strong> olun - öğrenme 6-12 ay sürer</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Learning Path Recommendation -->
+                        <div class="learning-path">
+                            <h3>🗺️ ÖNERİLEN ÖĞRENME YOLU (6 AY)</h3>
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <span class="timeline-badge">AY 1-2</span>
+                                    <div class="timeline-content">
+                                        <h4>Temel Bilgiler</h4>
+                                        <ul>
+                                            <li>Investopedia'dan temel terimleri öğren</li>
+                                            <li>"The Intelligent Investor" kitabını oku</li>
+                                            <li>YouTube'da Graham Stephan izle</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <span class="timeline-badge">AY 3-4</span>
+                                    <div class="timeline-content">
+                                        <h4>Teknik & Fundamental Analiz</h4>
+                                        <ul>
+                                            <li>TradingView'de grafik çizmeyi öğren</li>
+                                            <li>BabyPips School'u tamamla</li>
+                                            <li>"One Up On Wall Street" oku</li>
+                                            <li>Demo hesapta pratik yap</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <span class="timeline-badge">AY 5-6</span>
+                                    <div class="timeline-content">
+                                        <h4>Strateji Geliştirme</h4>
+                                        <ul>
+                                            <li>Kendi trading stratejini oluştur</li>
+                                            <li>3 ay boyunca demo hesapta test et</li>
+                                            <li>r/stocks ve TradingView topluluğuna katıl</li>
+                                            <li>Gerçek parayla KÜÇÜK başla</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="news-sources">
+                        <h2><i class="fas fa-globe"></i> Önerilen Haber Kaynakları</h2>
+
+                        <div class="sources-grid">
+                            <div class="source-card global">
+                                <h3>🌍 Global Kaynaklar</h3>
+                                <ul>
+                                    <li><a href="https://www.bloomberg.com" target="_blank">📰 Bloomberg</a> - Finansal haberler ve analiz</li>
+                                    <li><a href="https://www.reuters.com" target="_blank">📰 Reuters</a> - Anlık piyasa haberleri</li>
+                                    <li><a href="https://www.cnbc.com" target="_blank">📺 CNBC</a> - Canlı piyasa takibi</li>
+                                    <li><a href="https://finance.yahoo.com" target="_blank">💹 Yahoo Finance</a> - Ücretsiz, kapsamlı veri</li>
+                                    <li><a href="https://www.marketwatch.com" target="_blank">📊 MarketWatch</a> - Piyasa analizi</li>
+                                    <li><a href="https://www.investing.com" target="_blank">💼 Investing.com</a> - Ekonomik takvim ve veriler</li>
+                                </ul>
+                            </div>
+
+                            <div class="source-card turkey">
+                                <h3>🇹🇷 Türkiye Kaynakları</h3>
+                                <ul>
+                                    <li><a href="https://www.bloomberght.com" target="_blank">📰 Bloomberg HT</a> - Türkiye finans haberleri</li>
+                                    <li><a href="https://www.paraanaliz.com" target="_blank">💹 Para Analiz</a> - Teknik analiz ve yorumlar</li>
+                                    <li><a href="https://www.dunya.com" target="_blank">📰 Dünya Gazetesi</a> - Ekonomi gazetesi</li>
+                                    <li><a href="https://www.foreks.com" target="_blank">📊 Foreks</a> - Borsa ve döviz</li>
+                                    <li><a href="https://www.mynet.com/finans" target="_blank">💼 Mynet Finans</a> - Genel finans haberleri</li>
+                                </ul>
+                            </div>
+
+                            <div class="source-card tools">
+                                <h3>🔧 Yararlı Araçlar</h3>
+                                <ul>
+                                    <li><a href="https://www.tradingview.com" target="_blank">📈 TradingView</a> - En iyi grafik platformu (ÜCRETSİZ)</li>
+                                    <li><a href="https://finviz.com" target="_blank">🗺️ Finviz</a> - Piyasa haritası ve tarama</li>
+                                    <li><a href="https://www.borsagundem.com" target="_blank">📊 Borsa Gündem</a> - BIST analiz</li>
+                                    <li><a href="https://www.investing.com/economic-calendar" target="_blank">📅 Ekonomik Takvim</a> - Önemli veri açıklamaları</li>
+                                </ul>
+                            </div>
+
+                            <div class="source-card learning">
+                                <h3>🎓 Öğrenme Kaynakları</h3>
+                                <ul>
+                                    <li><a href="https://www.investopedia.com" target="_blank">📚 Investopedia</a> - Finans ansiklopedisi</li>
+                                    <li><a href="https://www.youtube.com/@TheChartGuys" target="_blank">🎥 The Chart Guys</a> - Teknik analiz videoları</li>
+                                    <li><a href="https://www.babypips.com" target="_blank">👶 BabyPips</a> - Forex öğrenme (temeller geçerli)</li>
+                                    <li><a href="https://www.reddit.com/r/stocks" target="_blank">💬 r/stocks</a> - Reddit topluluğu</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+        </section>
+
+        <!-- Haberler Page -->
+        <section id="haberler" class="page">
+            <div class="container">
+                <h1><i class="fas fa-newspaper"></i> Piyasa Haberleri</h1>
+                <p class="page-subtitle">Güncel finans haberleri ve uzman analizleriyle piyasaları takip edin</p>
+
+                <!-- News Category Tabs -->
+                    <div class="news-tabs-container">
+                        <div class="news-tabs">
+                            <button class="news-tab active" data-category="all">
+                                <i class="fas fa-globe"></i> Tüm Haberler
+                            </button>
+                            <button class="news-tab" data-category="realtime">
+                                <i class="fas fa-bolt"></i> Güncel Haberler
+                            </button>
+                            <button class="news-tab" data-category="analysis">
+                                <i class="fas fa-chart-line"></i> Uzman Analizleri
+                            </button>
+                            <button class="news-tab" data-category="turkey">
+                                <i class="fas fa-lira-sign"></i> Türkiye
+                            </button>
+                            <button class="news-tab" data-category="global">
+                                <i class="fas fa-flag-usa"></i> Global Piyasalar
+                            </button>
+                            <button class="news-tab" data-category="crypto">
+                                <i class="fab fa-bitcoin"></i> Kripto
+                            </button>
+                        </div>
+                        <button id="refreshNews" class="btn-refresh">
+                            <i class="fas fa-sync-alt"></i> Yenile
+                        </button>
+                    </div>
+
+                    <!-- Real-time News Feed -->
+                    <div class="news-category-content" data-category="realtime">
+                        <div class="section-header">
+                            <h2><i class="fas fa-rss"></i> Güncel Finans Haberleri</h2>
+                        </div>
+                        <div id="newsContainer" class="news-grid"></div>
+                    </div>
+
+                    <!-- Global Markets Section -->
+                    <div class="news-category-content" data-category="global">
+                        <div class="section-header">
+                            <h2><i class="fas fa-flag-usa"></i> Global Piyasalar</h2>
+                        </div>
+
+                        <div class="analysis-grid">
+                            <!-- Federal Reserve Faiz Kararı Analizi -->
+                            <article class="analysis-card">
+                                <div class="analysis-header">
+                                    <div class="analysis-badge fed">
+                                        <i class="fas fa-landmark"></i> FED
+                                    </div>
+                                    <span class="analysis-time">2 saat önce</span>
+                                </div>
+
+                                <h3 class="analysis-title">Fed Faiz Kararı: %5.50 Sabit - 2025'te 3 İndirim Sinyali</h3>
+
+                                <div class="key-metrics">
+                                    <div class="metric-card">
+                                        <div class="metric-label">Faiz Oranı</div>
+                                        <div class="metric-value">5.25-5.50%</div>
+                                        <div class="metric-change neutral">Değişiklik Yok</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-label">2025 Tahmini</div>
+                                        <div class="metric-value">4.50%</div>
+                                        <div class="metric-change positive">-3 İndirim</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-label">Oy Dağılımı</div>
+                                        <div class="metric-value">11-1</div>
+                                        <div class="metric-change neutral">Konsensüs</div>
+                                    </div>
+                                </div>
+
+                                <div class="market-impact-section">
+                                    <h4><i class="fas fa-chart-line"></i> Piyasa Tepkisi</h4>
+                                    <div class="impact-grid">
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">S&P 500</span>
+                                            <span class="impact-value">+1.2%</span>
+                                        </div>
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">NASDAQ</span>
+                                            <span class="impact-value">+1.8%</span>
+                                        </div>
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">Bitcoin</span>
+                                            <span class="impact-value">+3.2%</span>
+                                        </div>
+                                        <div class="impact-item negative">
+                                            <span class="impact-name">Dolar (DXY)</span>
+                                            <span class="impact-value">-0.6%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="insights-section">
+                                    <div class="insight-box">
+                                        <i class="fas fa-quote-left"></i>
+                                        <p>"Enflasyon hedefimize ilerliyor ancak yavaş. Mart'ta ilk indirime başlayabiliriz."</p>
+                                        <span class="insight-author">- Jerome Powell, Fed Başkanı</span>
+                                    </div>
+                                </div>
+
+                                <div class="strategy-tags">
+                                    <span class="strategy-tag bullish"><i class="fas fa-arrow-up"></i> Hisse Senedi: Pozitif</span>
+                                    <span class="strategy-tag bullish"><i class="fas fa-arrow-up"></i> Tahvil: Yükseliş</span>
+                                    <span class="strategy-tag bearish"><i class="fas fa-arrow-down"></i> Dolar: Zayıflama</span>
+                                </div>
+
+                                <div class="analysis-footer">
+                                    <span class="impact-badge high"><i class="fas fa-bolt"></i> ÇOK YÜKSEK ETKİ</span>
+                                    <span class="sentiment-badge positive"><i class="fas fa-check-circle"></i> OLUMLU</span>
+                                </div>
+                            </article>
+
+                            <!-- Apple Kazanç Raporu Analizi -->
+                            <article class="analysis-card">
+                                <div class="analysis-header">
+                                    <div class="analysis-badge tech">
+                                        <i class="fab fa-apple"></i> AAPL
+                                    </div>
+                                    <span class="analysis-time">1 gün önce</span>
+                                </div>
+
+                                <h3 class="analysis-title">Apple Q4: Güçlü Kazanç, China Endişesi Devam Ediyor</h3>
+
+                                <div class="key-metrics">
+                                    <div class="metric-card">
+                                        <div class="metric-label">EPS</div>
+                                        <div class="metric-value">$2.18</div>
+                                        <div class="metric-change positive">Beklentiyi Aştı</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-label">Gelir</div>
+                                        <div class="metric-value">$119.6B</div>
+                                        <div class="metric-change positive">+6.2% YoY</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-label">Kar Marjı</div>
+                                        <div class="metric-value">46.2%</div>
+                                        <div class="metric-change positive">Mükemmel</div>
+                                    </div>
+                                </div>
+
+                                <div class="product-performance">
+                                    <h4><i class="fas fa-chart-bar"></i> Ürün Kategorileri</h4>
+                                    <div class="performance-bars">
+                                        <div class="perf-bar-item">
+                                            <span class="perf-label">iPhone</span>
+                                            <div class="perf-bar-bg">
+                                                <div class="perf-bar-fill positive" style="width: 70%"></div>
+                                            </div>
+                                            <span class="perf-value">+5.5%</span>
+                                        </div>
+                                        <div class="perf-bar-item">
+                                            <span class="perf-label">Services</span>
+                                            <div class="perf-bar-bg">
+                                                <div class="perf-bar-fill positive" style="width: 85%"></div>
+                                            </div>
+                                            <span class="perf-value">+11.3%</span>
+                                        </div>
+                                        <div class="perf-bar-item">
+                                            <span class="perf-label">China</span>
+                                            <div class="perf-bar-bg">
+                                                <div class="perf-bar-fill negative" style="width: 25%"></div>
+                                            </div>
+                                            <span class="perf-value negative">-2.5%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="insights-section">
+                                    <div class="insight-box">
+                                        <i class="fas fa-quote-left"></i>
+                                        <p>"Services segmenti 2 milyar aktif cihaza ulaştı. Vision Pro ile AR/VR'da çığır açacağız."</p>
+                                        <span class="insight-author">- Tim Cook, Apple CEO</span>
+                                    </div>
+                                </div>
+
+                                <div class="risk-signals">
+                                    <div class="risk-item warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>China'da Huawei rekabeti</span>
+                                    </div>
+                                    <div class="risk-item warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>P/E 29 - Yüksek değerleme</span>
+                                    </div>
+                                </div>
+
+                                <div class="strategy-tags">
+                                    <span class="strategy-tag neutral"><i class="fas fa-hand-paper"></i> HOLD: $189 seviyesinde</span>
+                                    <span class="strategy-tag bullish"><i class="fas fa-arrow-up"></i> BUY: $180-185 altında</span>
+                                </div>
+
+                                <div class="analysis-footer">
+                                    <span class="impact-badge medium"><i class="fas fa-bolt"></i> YÜKSEK ETKİ</span>
+                                    <span class="sentiment-badge neutral"><i class="fas fa-balance-scale"></i> KARIŞIK</span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- Turkey Section -->
+                    <div class="news-category-content" data-category="turkey">
+                        <div class="section-header">
+                            <h2><i class="fas fa-lira-sign"></i> Türkiye Piyasaları</h2>
+                        </div>
+
+                        <div class="analysis-grid">
+                            <!-- Türkiye Enflasyon Analizi -->
+                            <article class="analysis-card">
+                                <div class="analysis-header">
+                                    <div class="analysis-badge turkey">
+                                        <i class="fas fa-lira-sign"></i> TÜİK
+                                    </div>
+                                    <span class="analysis-time">3 saat önce</span>
+                                </div>
+
+                                <h3 class="analysis-title">Türkiye Enflasyonu %64.8 - TCMB Faiz Artırımı Geliyor</h3>
+
+                                <div class="key-metrics">
+                                    <div class="metric-card">
+                                        <div class="metric-label">Yıllık TÜFE</div>
+                                        <div class="metric-value">64.8%</div>
+                                        <div class="metric-change negative">Yüksek</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-label">Aylık TÜFE</div>
+                                        <div class="metric-value">2.75%</div>
+                                        <div class="metric-change negative">Beklenti Üstü</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-label">Çekirdek</div>
+                                        <div class="metric-value">59.3%</div>
+                                        <div class="metric-change negative">Endişe Verici</div>
+                                    </div>
+                                </div>
+
+                                <div class="inflation-breakdown">
+                                    <h4><i class="fas fa-chart-pie"></i> Kategori Bazlı Artışlar</h4>
+                                    <div class="performance-bars">
+                                        <div class="perf-bar-item">
+                                            <span class="perf-label">Gıda</span>
+                                            <div class="perf-bar-bg">
+                                                <div class="perf-bar-fill negative" style="width: 87%"></div>
+                                            </div>
+                                            <span class="perf-value negative">+4.35%</span>
+                                        </div>
+                                        <div class="perf-bar-item">
+                                            <span class="perf-label">Ulaştırma</span>
+                                            <div class="perf-bar-bg">
+                                                <div class="perf-bar-fill negative" style="width: 62%"></div>
+                                            </div>
+                                            <span class="perf-value negative">+3.12%</span>
+                                        </div>
+                                        <div class="perf-bar-item">
+                                            <span class="perf-label">Konut</span>
+                                            <div class="perf-bar-bg">
+                                                <div class="perf-bar-fill negative" style="width: 58%"></div>
+                                            </div>
+                                            <span class="perf-value negative">+2.88%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="market-impact-section">
+                                    <h4><i class="fas fa-chart-line"></i> BIST 100 Tepkisi</h4>
+                                    <div class="impact-grid">
+                                        <div class="impact-item negative">
+                                            <span class="impact-name">BIST 100</span>
+                                            <span class="impact-value">-1.4%</span>
+                                        </div>
+                                        <div class="impact-item negative">
+                                            <span class="impact-name">Bankacılık</span>
+                                            <span class="impact-value">-2.5%</span>
+                                        </div>
+                                        <div class="impact-item negative">
+                                            <span class="impact-name">USD/TRY</span>
+                                            <span class="impact-value">+0.7%</span>
+                                        </div>
+                                        <div class="impact-item negative">
+                                            <span class="impact-name">Tahvil</span>
+                                            <span class="impact-value">27.2%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="tcmb-forecast">
+                                    <h4><i class="fas fa-university"></i> TCMB Faiz Beklentisi</h4>
+                                    <div class="forecast-items">
+                                        <div class="forecast-item">
+                                            <span class="forecast-label">Mevcut:</span>
+                                            <span class="forecast-value">42.50%</span>
+                                        </div>
+                                        <div class="forecast-arrow">→</div>
+                                        <div class="forecast-item highlight">
+                                            <span class="forecast-label">Beklenen:</span>
+                                            <span class="forecast-value">45.00%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="insights-section">
+                                    <div class="insight-box">
+                                        <i class="fas fa-quote-left"></i>
+                                        <p>"Real faiz hala negatif. TCMB minimum 250bp artırmalı, ideal 500bp."</p>
+                                        <span class="insight-author">- İş Yatırım Ekonomisti</span>
+                                    </div>
+                                </div>
+
+                                <div class="strategy-tags">
+                                    <span class="strategy-tag bullish"><i class="fas fa-shield-alt"></i> Bankacılık: Faiz Marjı</span>
+                                    <span class="strategy-tag bullish"><i class="fas fa-coins"></i> Altın: Koruma</span>
+                                    <span class="strategy-tag neutral"><i class="fas fa-dollar-sign"></i> Döviz: %30-40 Hedge</span>
+                                </div>
+
+                                <div class="analysis-footer">
+                                    <span class="impact-badge high"><i class="fas fa-bolt"></i> ÇOK YÜKSEK ETKİ</span>
+                                    <span class="sentiment-badge negative"><i class="fas fa-exclamation-circle"></i> NEGATİF</span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- Crypto Section -->
+                    <div class="news-category-content" data-category="crypto">
+                        <div class="section-header">
+                            <h2><i class="fab fa-bitcoin"></i> Kripto Para Haberleri</h2>
+                        </div>
+
+                        <div class="analysis-grid">
+                            <!-- Bitcoin Analysis -->
+                            <article class="analysis-card">
+                                <div class="analysis-header">
+                                    <div class="analysis-badge" style="background: linear-gradient(135deg, #f7931a 0%, #f2a900 100%); color: white;">
+                                        <i class="fab fa-bitcoin"></i> BTC
+                                    </div>
+                                    <span class="analysis-time">4 saat önce</span>
+                                </div>
+
+                                <h3 class="analysis-title">Bitcoin $70K'yı Aştı - Kurumsal Yatırımcı İlgisi Artıyor</h3>
+
+                                <div class="key-metrics">
+                                    <div class="metric-card">
+                                        <div class="metric-label">Fiyat</div>
+                                        <div class="metric-value">$72,400</div>
+                                        <div class="metric-change positive">+8.5% (24h)</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-label">Piyasa Değeri</div>
+                                        <div class="metric-value">$1.42T</div>
+                                        <div class="metric-change positive">Dominans %54</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-label">24h Hacim</div>
+                                        <div class="metric-value">$45.2B</div>
+                                        <div class="metric-change positive">Yüksek</div>
+                                    </div>
+                                </div>
+
+                                <div class="market-impact-section">
+                                    <h4><i class="fas fa-chart-line"></i> Altcoin Performansı</h4>
+                                    <div class="impact-grid">
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">Ethereum</span>
+                                            <span class="impact-value">+6.2%</span>
+                                        </div>
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">Solana</span>
+                                            <span class="impact-value">+12.8%</span>
+                                        </div>
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">BNB</span>
+                                            <span class="impact-value">+4.1%</span>
+                                        </div>
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">XRP</span>
+                                            <span class="impact-value">+9.3%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="insights-section">
+                                    <div class="insight-box">
+                                        <i class="fas fa-quote-left"></i>
+                                        <p>"Bitcoin ETF'lerine bu ay $2.1 milyar net giriş oldu. Kurumsal yatırımcılar pozisyon alıyor."</p>
+                                        <span class="insight-author">- Bloomberg Crypto Analisti</span>
+                                    </div>
+                                </div>
+
+                                <div class="strategy-tags">
+                                    <span class="strategy-tag bullish"><i class="fas fa-arrow-up"></i> Kısa Vadeli: Yükseliş</span>
+                                    <span class="strategy-tag neutral"><i class="fas fa-hand-paper"></i> $75K Direnci Önemli</span>
+                                </div>
+
+                                <div class="analysis-footer">
+                                    <span class="impact-badge high"><i class="fas fa-bolt"></i> ÇOK YÜKSEK ETKİ</span>
+                                    <span class="sentiment-badge positive"><i class="fas fa-check-circle"></i> OLUMLU</span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <p class="disclaimer"><i class="fas fa-info-circle"></i> <strong>Önemli Not:</strong> Bu analizler eğitim amaçlıdır. Gerçek yatırım kararlarınızı vermeden önce güncel haberleri takip edin ve profesyonel danışmanlık alın. Geçmiş performans gelecek getiriyi garanti etmez.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Markets Page - 100+ Stocks -->
+        <section id="markets" class="page">
+            <div class="container">
+                <h1>📊 Piyasalar - 100+ Hisse Senedi Takibi</h1>
+                <p class="subtitle">Gerçek zamanlı 100+ hisse senedi verisi ile piyasayı takip et!</p>
+
+                <!-- Market Controls -->
+                <div class="market-controls">
+                    <div class="search-filter-bar">
+                        <input type="text" id="stockSearch" placeholder="🔍 Hisse ara (örn: AAPL, THYAO)..." class="search-input">
+                        <select id="marketFilter" class="filter-select">
+                            <option value="all">Tüm Piyasalar</option>
+                            <option value="us">ABD Hisseleri</option>
+                            <option value="bist">BIST Hisseleri</option>
+                        </select>
+                        <select id="sectorFilter" class="filter-select">
+                            <option value="all">Tüm Sektörler</option>
+                            <option value="technology">Teknoloji</option>
+                            <option value="financial">Finans</option>
+                            <option value="healthcare">Sağlık</option>
+                            <option value="energy">Enerji</option>
+                        </select>
+                        <select id="sortBy" class="filter-select">
+                            <option value="name">İsme Göre</option>
+                            <option value="price-high">Fiyat (Yüksek→Düşük)</option>
+                            <option value="change-high">Değişim % (Yüksek→Düşük)</option>
+                        </select>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="grid"><i class="fas fa-th"></i> Kart</button>
+                        <button class="view-btn" data-view="table"><i class="fas fa-list"></i> Tablo</button>
+                        <button class="view-btn" data-view="watchlist"><i class="fas fa-star"></i> İzleme (<span id="watchlistCount">0</span>)</button>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="market-stats">
+                    <div class="stat-box">
+                        <i class="fas fa-arrow-trend-up green"></i>
+                        <h4>Yükselen</h4>
+                        <p class="stat-number green" id="risingCount">-</p>
+                    </div>
+                    <div class="stat-box">
+                        <i class="fas fa-arrow-trend-down red"></i>
+                        <h4>Düşen</h4>
+                        <p class="stat-number red" id="fallingCount">-</p>
+                    </div>
+                    <div class="stat-box">
+                        <i class="fas fa-fire orange"></i>
+                        <h4>En Yüksek Hacim</h4>
+                        <p class="stat-number orange" id="highestVolume">-</p>
+                    </div>
+                    <div class="stat-box">
+                        <i class="fas fa-chart-line blue"></i>
+                        <h4>Ortalama Değişim</h4>
+                        <p class="stat-number blue" id="avgChange">-</p>
+                    </div>
+                </div>
+
+                <!-- Grid View -->
+                <div id="stocksGrid" class="stocks-grid"></div>
+
+                <!-- Table View -->
+                <div id="stocksTable" class="stocks-table" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>⭐</th>
+                                <th>Sembol</th>
+                                <th>Şirket</th>
+                                <th>Sektör</th>
+                                <th>Fiyat</th>
+                                <th>Değişim %</th>
+                                <th>Hacim</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stocksTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Watchlist View -->
+                <div id="watchlistView" class="watchlist-view" style="display: none;">
+                    <div class="watchlist-header">
+                        <h2><i class="fas fa-star"></i> İzleme Listem</h2>
+                        <button id="clearWatchlist" class="btn-secondary"><i class="fas fa-trash"></i> Temizle</button>
+                    </div>
+                    <div id="watchlistContainer" class="stocks-grid"></div>
+                    <div id="emptyWatchlist" class="empty-state" style="display: none;">
+                        <i class="fas fa-star" style="font-size: 4rem; opacity: 0.3;"></i>
+                        <h3>İzleme listesi boş</h3>
+                        <p>Hisselerin yanındaki yıldıza tıklayarak favoriye ekle</p>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div id="loadingStocks" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Piyasa verileri yükleniyor...</p>
+                </div>
+
+                <!-- Stock Modal -->
+                <div id="stockModal" class="modal">
+                    <div class="modal-content">
+                        <span class="modal-close">&times;</span>
+                        <div class="modal-header">
+                            <h2 id="modalStockName">-</h2>
+                            <button id="modalWatchlistBtn" class="btn-icon"><i class="far fa-star"></i></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="stock-price-info">
+                                <div class="current-price">
+                                    <span class="label">Güncel Fiyat</span>
+                                    <span class="value" id="modalPrice">$0.00</span>
+                                </div>
+                                <div class="price-change" id="modalChange">
+                                    <span class="change-value">+0.00</span>
+                                    <span class="change-percent">(+0.00%)</span>
+                                </div>
+                            </div>
+                            <div class="stock-details-grid">
+                                <div class="detail-item"><span class="label">Sektör</span><span class="value" id="modalSector">-</span></div>
+                                <div class="detail-item"><span class="label">Açılış</span><span class="value" id="modalOpen">-</span></div>
+                                <div class="detail-item"><span class="label">Yüksek</span><span class="value" id="modalHigh">-</span></div>
+                                <div class="detail-item"><span class="label">Düşük</span><span class="value" id="modalLow">-</span></div>
+                            </div>
+                            <div class="stock-chart">
+                                <h3>30 Günlük Grafik</h3>
+                                <canvas id="modalChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Simulator Page -->
+        <section id="simulator" class="page">
+            <div class="container">
+                <h1>🎮 Sanal İşlem Simülatörü</h1>
+                <p class="subtitle">Gerçek para riskisiz, $10,000 ile trading pratiği yap!</p>
+
+                <!-- Account Overview -->
+                <div class="simulator-header">
+                    <div class="account-card">
+                        <div class="account-stat">
+                            <i class="fas fa-wallet"></i>
+                            <div>
+                                <span class="stat-label">Toplam Bakiye</span>
+                                <span class="stat-value" id="simTotalBalance">$10,000.00</span>
+                            </div>
+                        </div>
+                        <div class="account-stat">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <div>
+                                <span class="stat-label">Nakit</span>
+                                <span class="stat-value" id="simCash">$10,000.00</span>
+                            </div>
+                        </div>
+                        <div class="account-stat">
+                            <i class="fas fa-chart-pie"></i>
+                            <div>
+                                <span class="stat-label">Hisse Değeri</span>
+                                <span class="stat-value" id="simStockValue">$0.00</span>
+                            </div>
+                        </div>
+                        <div class="account-stat">
+                            <i class="fas fa-percentage"></i>
+                            <div>
+                                <span class="stat-label">Kar/Zarar</span>
+                                <span class="stat-value" id="simProfitLoss">$0.00 (0%)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="btn-primary" id="resetSimulator"><i class="fas fa-redo"></i> Hesabı Sıfırla</button>
+                        <button class="btn-secondary" id="exportHistory"><i class="fas fa-download"></i> İşlem Geçmişi İndir</button>
+                    </div>
+                </div>
+
+                <!-- Portfolio -->
+                <div class="portfolio-section">
+                    <h2><i class="fas fa-briefcase"></i> Portföyüm</h2>
+                    <div id="portfolioContainer" class="portfolio-grid"></div>
+                    <div id="emptyPortfolio" class="empty-state">
+                        <i class="fas fa-briefcase" style="font-size: 4rem; opacity: 0.3;"></i>
+                        <h3>Portföyünüz boş</h3>
+                        <p>İlk hisse alımınızı yapın</p>
+                        <button class="btn-primary" onclick="document.querySelector('[data-page=markets]').click()">
+                            <i class="fas fa-shopping-cart"></i> Hisse Satın Al
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Trading Panel -->
+                <div class="trading-panel">
+                    <h2><i class="fas fa-exchange-alt"></i> İşlem Yap</h2>
+                    <div class="trading-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Hisse Seç</label>
+                                <select id="simStockSelect" class="form-control">
+                                    <option value="">-- Hisse Seçin --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>İşlem Türü</label>
+                                <div class="btn-group">
+                                    <button class="btn-toggle active" data-action="buy">AL</button>
+                                    <button class="btn-toggle" data-action="sell">SAT</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Adet</label>
+                                <input type="number" id="simQuantity" class="form-control" min="1" value="1">
+                            </div>
+                            <div class="form-group">
+                                <label>Toplam</label>
+                                <input type="text" id="simTotal" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="price-info">
+                            <div class="info-item">
+                                <span>Güncel Fiyat:</span>
+                                <span id="simCurrentPrice">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span>Komisyon:</span>
+                                <span id="simCommission">$0.00</span>
+                            </div>
+                            <div class="info-item">
+                                <span>İşlem Sonrası:</span>
+                                <span id="simAfterBalance">-</span>
+                            </div>
+                        </div>
+                        <button id="executeTradeBtn" class="btn-primary btn-large">
+                            <i class="fas fa-check"></i> İşlemi Gerçekleştir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- History -->
+                <div class="history-section">
+                    <h2><i class="fas fa-history"></i> İşlem Geçmişi</h2>
+                    <div class="history-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>İşlem</th>
+                                    <th>Hisse</th>
+                                    <th>Adet</th>
+                                    <th>Fiyat</th>
+                                    <th>Toplam</th>
+                                    <th>Kar/Zarar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <tr class="empty-row">
+                                    <td colspan="7">Henüz işlem yapmadınız</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Performance Chart -->
+                <div class="performance-section">
+                    <h2><i class="fas fa-chart-area"></i> Performans</h2>
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Finans Akademi - Eğitim Amaçlıdır | <i class="fas fa-exclamation-triangle"></i> Yatırım tavsiyesi değildir.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/stocks-data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/markets.js"></script>
+    <script src="js/simulator.js"></script>
+    <script src="js/news.js"></script>
+    <script>
+        // Initialize additional modules after DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize markets page
+            if (typeof marketsManager !== 'undefined' && marketsManager) {
+                marketsManager.init();
+            }
+
+            // Initialize simulator
+            if (typeof TradingSimulator !== 'undefined') {
+                window.simulator = new TradingSimulator();
+                simulator.init();
+            }
+        });
+    </script>
+
+    <!-- Theme Manager (load early to prevent flash) -->
+    <script src="js/theme-manager.js"></script>
+
+    <!-- Firebase Configuration (optional - will fallback to localStorage if not present) -->
+    <script src="js/firebase-config.js" onerror="console.log('Firebase config not found, using localStorage mode')"></script>
+
+    <!-- Firebase Authentication Module -->
+    <script type="module" src="js/auth.js"></script>
+</body>
+</html>

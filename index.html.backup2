@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/themes.css">
     <link rel="stylesheet" href="css/markets.css">
-    <link rel="stylesheet" href="css/chatbot.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -4169,6 +4168,751 @@ ak istiyorsun. Hangi emri kullanırsın?</li>
             </div>
         </section>
 
+        <!-- Egitim Page -->
+        <section id="egitim" class="page">
+            <div class="container">
+                <h1>30 Günlük Finans Öğrenme Planı</h1>
+
+                <div class="learning-progress">
+                    <h3>İlerleme Durumun</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="learningProgress" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text"><span id="completedDays">0</span>/30 Gün Tamamlandı</p>
+                </div>
+
+                <div class="week-container">
+                    <!-- Hafta 1: Temeller -->
+                    <div class="week-card">
+                        <h2><i class="fas fa-calendar-week"></i> Hafta 1: Temel Kavramlar</h2>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day1" class="day-checkbox">
+                            <label for="day1" class="day-label">
+                                <span class="day-number">Gün 1</span>
+                                <span class="day-title">Hisse Senedi Nedir? Nasıl Çalışır?</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>🎯 Hedef:</strong> Hisse senedi kavramını tam olarak anlamak ve temel işleyişini kavramak</p>
+
+                                <div class="learning-section">
+                                    <h4>📚 Öğrenilecekler:</h4>
+                                    <ul>
+                                        <li>Terimler bölümünden "Hisse Senedi" başlığını oku</li>
+                                        <li>Bir şirket seç (örn: Apple) ve geçmişine bak</li>
+                                        <li>Hisse senedi fiyatlarını neyin etkilediğini araştır</li>
+                                        <li>Borsa nedir, nasıl çalışır? (NASDAQ, NYSE, BIST)</li>
+                                    </ul>
+                                </div>
+
+                                <div class="assignment-section">
+                                    <h4>✍️ ÖDEV 1: Hisse Senedi Araştırması</h4>
+                                    <ol>
+                                        <li>Yahoo Finance'te 3 farklı sektörden birer şirket seç (teknoloji, sağlık, finans)</li>
+                                        <li>Her şirket için şunları not et:
+                                            <ul>
+                                                <li>Güncel hisse fiyatı</li>
+                                                <li>Son 1 yıldaki değişim %</li>
+                                                <li>Piyasa değeri (Market Cap)</li>
+                                                <li>Şirketin ne iş yaptığı (1 cümle)</li>
+                                            </ul>
+                                        </li>
+                                        <li>Bu 3 şirketten hangisine yatırım yapardın ve neden? (3-4 cümle yaz)</li>
+                                    </ol>
+                                </div>
+
+                                <div class="quiz-section">
+                                    <h4>❓ Test Soruları:</h4>
+                                    <div class="quiz-question">
+                                        <p><strong>Soru 1:</strong> Apple'ın 1 hissesini satın aldığında ne olur?</p>
+                                        <div class="quiz-options">
+                                            <label><input type="radio" name="q1" value="a"> A) Apple'ın sahibi olursun</label>
+                                            <label><input type="radio" name="q1" value="b"> B) Apple'ın çok küçük bir ortağı olursun</label>
+                                            <label><input type="radio" name="q1" value="c"> C) Apple'a borç vermiş olursun</label>
+                                            <label><input type="radio" name="q1" value="d"> D) Hiçbir şey olmaz</label>
+                                        </div>
+                                        <div class="quiz-answer" style="display:none;">
+                                            <strong>✅ Cevap: B)</strong> Apple'ın çok küçük bir ortağı olursun. Hisse senedi, şirketin bir parçasına sahip olmak demektir. 1 hisse aldığında milyonlarca hisseden sadece 1'ine sahipsin, yani çok küçük bir ortak olursun.
+                                        </div>
+                                    </div>
+
+                                    <div class="quiz-question">
+                                        <p><strong>Soru 2:</strong> Hisse senedi fiyatları neden değişir?</p>
+                                        <div class="quiz-options">
+                                            <label><input type="radio" name="q2" value="a"> A) Sadece şirketin kârı değişirse</label>
+                                            <label><input type="radio" name="q2" value="b"> B) Arz ve talebe göre</label>
+                                            <label><input type="radio" name="q2" value="c"> C) Borsa karar verir</label>
+                                            <label><input type="radio" name="q2" value="d"> D) Rastgele değişir</label>
+                                        </div>
+                                        <div class="quiz-answer" style="display:none;">
+                                            <strong>✅ Cevap: B)</strong> Arz ve talebe göre. Hisse senedi fiyatı basit ekonomi kuralıyla belirlenir: Çok kişi almak isterse (talep yüksek) fiyat yükselir, çok kişi satmak isterse (arz yüksek) fiyat düşer. Şirket haberleri, ekonomik veriler, psikoloji - hepsi arz/talep dengesini etkiler.
+                                        </div>
+                                    </div>
+
+                                    <div class="quiz-question">
+                                        <p><strong>Soru 3:</strong> "Market Cap (Piyasa Değeri)" ne demektir?</p>
+                                        <div class="quiz-options">
+                                            <label><input type="radio" name="q3" value="a"> A) Şirketin kasasındaki para</label>
+                                            <label><input type="radio" name="q3" value="b"> B) Şirketin yıllık kârı</label>
+                                            <label><input type="radio" name="q3" value="c"> C) Hisse fiyatı × Toplam hisse sayısı</label>
+                                            <label><input type="radio" name="q3" value="d"> D) Şirketin borcu</label>
+                                        </div>
+                                        <div class="quiz-answer" style="display:none;">
+                                            <strong>✅ Cevap: C)</strong> Hisse fiyatı × Toplam hisse sayısı. Örnek: Apple'ın hisse fiyatı $180 ve 15 milyar hissesi var → Market Cap = $180 × 15B = $2.7 trilyon. Bu, borsaya göre Apple'ın toplam değeridir.
+                                        </div>
+                                    </div>
+
+                                    <button class="btn-secondary show-answers-btn" onclick="this.parentElement.querySelectorAll('.quiz-answer').forEach(a => a.style.display = a.style.display === 'none' ? 'block' : 'none'); this.textContent = this.textContent.includes('Göster') ? '🔒 Cevapları Gizle' : '🔓 Cevapları Göster'">🔓 Cevapları Göster</button>
+                                </div>
+
+                                <div class="practical-exercise">
+                                    <h4>💻 Pratik Uygulama:</h4>
+                                    <p><strong>Simülatör Challenge:</strong></p>
+                                    <ol>
+                                        <li>Bu sitedeki "Piyasalar" sekmesine git</li>
+                                        <li>3 farklı hisse seç ve favorilerine ekle</li>
+                                        <li>Her hissenin güncel fiyatını not et</li>
+                                        <li>1 hafta sonra tekrar kontrol et - hangisi en çok değişmiş?</li>
+                                    </ol>
+                                </div>
+
+                                <div class="key-takeaways">
+                                    <h4>🔑 Anahtar Noktalar:</h4>
+                                    <ul>
+                                        <li>✅ Hisse senedi = Şirkete ortaklık</li>
+                                        <li>✅ Fiyat = Arz ve talep dengesi</li>
+                                        <li>✅ Borsa = Alıcı ve satıcının buluştuğu pazar</li>
+                                        <li>✅ Market Cap = Şirketin toplam değeri</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day2" class="day-checkbox">
+                            <label for="day2" class="day-label">
+                                <span class="day-number">Gün 2</span>
+                                <span class="day-title">Endeksler ve Piyasa Yapısı</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>🎯 Hedef:</strong> S&P 500, NASDAQ, BIST 100 ne anlama geliyor ve nasıl çalışıyorlar?</p>
+
+                                <div class="learning-section">
+                                    <h4>📚 Öğrenilecekler:</h4>
+                                    <ul>
+                                        <li>Dashboard'u aç ve endeksleri izle</li>
+                                        <li>Her endeksin hangi şirketleri içerdiğini araştır</li>
+                                        <li>BIST 100'deki en büyük 5 şirketi öğren</li>
+                                        <li>Piyasa değerine göre ağırlıklandırma nedir?</li>
+                                    </ul>
+                                </div>
+
+                                <div class="assignment-section">
+                                    <h4>✍️ ÖDEV 2: Endeks Karşılaştırması</h4>
+                                    <ol>
+                                        <li>Investing.com'da S&P 500, NASDAQ, BIST 100 endekslerini bul</li>
+                                        <li>Her endeks için not al: Güncel değer, yıllık değişim %, en büyük 3 şirket</li>
+                                        <li>Hangi endeks daha riskli görünüyor ve neden?</li>
+                                    </ol>
+                                </div>
+
+                                <div class="quiz-section">
+                                    <h4>❓ Test Soruları:</h4>
+                                    <div class="quiz-question">
+                                        <p><strong>Soru:</strong> S&P 500 endeksi ne demektir?</p>
+                                        <div class="quiz-options">
+                                            <label><input type="radio" name="q2_1" value="a"> A) Amerika'nın en büyük 500 şirketi</label>
+                                            <label><input type="radio" name="q2_1" value="b"> B) Dünyanın en büyük 500 şirketi</label>
+                                            <label><input type="radio" name="q2_1" value="c"> C) Teknoloji şirketlerinin endeksi</label>
+                                        </div>
+                                        <div class="quiz-answer" style="display:none;">
+                                            <strong>✅ Cevap: A)</strong> S&P 500, Amerika'nın en büyük 500 şirketinden oluşur. Bu şirketler piyasa değerine göre seçilir ve ağırlıklandırılır. ABD ekonomisinin genel sağlığını gösterir.
+                                        </div>
+                                    </div>
+                                    <button class="btn-secondary show-answers-btn" onclick="this.parentElement.querySelectorAll('.quiz-answer').forEach(a => a.style.display = a.style.display === 'none' ? 'block' : 'none'); this.textContent = this.textContent.includes('Göster') ? '🔒 Cevapları Gizle' : '🔓 Cevapları Göster'">🔓 Cevapları Göster</button>
+                                </div>
+
+                                <div class="key-takeaways">
+                                    <h4>🔑 Anahtar Noktalar:</h4>
+                                    <ul>
+                                        <li>✅ Endeks = Birçok hissenin ortalama performansı</li>
+                                        <li>✅ S&P 500 = Amerika'nın kalbi (500 şirket)</li>
+                                        <li>✅ NASDAQ = Teknoloji ağırlıklı</li>
+                                        <li>✅ BIST 100 = Türkiye'nin en büyük 100 şirketi</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day3" class="day-checkbox">
+                            <label for="day3" class="day-label">
+                                <span class="day-number">Gün 3</span>
+                                <span class="day-title">Boğa vs Ayı Piyasası</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>🎯 Hedef:</strong> Piyasa döngülerini tanımak ve her dönemde nasıl hareket edileceğini öğrenmek</p>
+
+                                <div class="learning-section">
+                                    <h4>📚 Öğrenilecekler:</h4>
+                                    <ul>
+                                        <li>Bull Market (Boğa Piyasası) nedir? Özellikleri neler?</li>
+                                        <li>Bear Market (Ayı Piyasası) nedir? Ne zaman başlar?</li>
+                                        <li>Son 20 yılda yaşanan büyük piyasa döngüleri</li>
+                                        <li>Her dönemde yatırımcı psikolojisi nasıl değişir?</li>
+                                    </ul>
+                                </div>
+
+                                <div class="assignment-section">
+                                    <h4>✍️ ÖDEV 3: Piyasa Döngüsü Analizi</h4>
+                                    <ol>
+                                        <li>TradingView'da S&P 500'ün 2000-2024 grafiğini aç</li>
+                                        <li>Bu dönemde 3 büyük bear market'i işaretle:
+                                            <ul>
+                                                <li>2000-2002: Dotcom balonu patlaması</li>
+                                                <li>2007-2009: Finansal kriz</li>
+                                                <li>2020: COVID-19 krizi</li>
+                                            </ul>
+                                        </li>
+                                        <li>Her krizde kaç % düştü? Ne kadar sürede toparlandı?</li>
+                                        <li>Şu anda hangi dönemdeyiz? (Bull mu Bear mi?) Neden?</li>
+                                    </ol>
+                                </div>
+
+                                <div class="quiz-section">
+                                    <h4>❓ Test Soruları:</h4>
+                                    <div class="quiz-question">
+                                        <p><strong>Soru 1:</strong> Bull market ne zaman başlar?</p>
+                                        <div class="quiz-options">
+                                            <label><input type="radio" name="q3_1" value="a"> A) Piyasa dipten %10 yükselince</label>
+                                            <label><input type="radio" name="q3_1" value="b"> B) Piyasa dipten %20 yükselince</label>
+                                            <label><input type="radio" name="q3_1" value="c"> C) Ekonomi büyüyünce</label>
+                                        </div>
+                                        <div class="quiz-answer" style="display:none;">
+                                            <strong>✅ Cevap: B)</strong> Bull market resmi olarak piyasa dipten %20 yükseldiğinde başlar. Bu teknik bir tanımdır ve piyasanın trend değiştirdiğini gösterir.
+                                        </div>
+                                    </div>
+
+                                    <div class="quiz-question">
+                                        <p><strong>Soru 2:</strong> Bear market'te yatırımcı ne yapmalı?</p>
+                                        <div class="quiz-options">
+                                            <label><input type="radio" name="q3_2" value="a"> A) Hepsini sat, nakde geç</label>
+                                            <label><input type="radio" name="q3_2" value="b"> B) Panik yapma, uzun vadeli düşün</label>
+                                            <label><input type="radio" name="q3_2" value="c"> C) Daha fazla borçlanıp al</label>
+                                        </div>
+                                        <div class="quiz-answer" style="display:none;">
+                                            <strong>✅ Cevap: B)</strong> Panik yapma, uzun vadeli düşün. Tarihsel olarak her bear market sonrası toparlanma gelmiştir. Satış yapmak yerine (zararı realize etmek yerine) beklemek ve hatta ucuzlayan fiyatlardan alım yapmak daha akıllıca olabilir. "Be fearful when others are greedy, and greedy when others are fearful" - Warren Buffett
+                                        </div>
+                                    </div>
+
+                                    <div class="quiz-question">
+                                        <p><strong>Soru 3:</strong> 2008 finansal krizinde S&P 500 ne kadar düştü?</p>
+                                        <div class="quiz-options">
+                                            <label><input type="radio" name="q3_3" value="a"> A) -20%</label>
+                                            <label><input type="radio" name="q3_3" value="b"> B) -37%</label>
+                                            <label><input type="radio" name="q3_3" value="c"> C) -57%</label>
+                                        </div>
+                                        <div class="quiz-answer" style="display:none;">
+                                            <strong>✅ Cevap: C)</strong> S&P 500, 2007 Ekim zirvesinden 2009 Mart dibine kadar yaklaşık %57 düştü. Bu son 100 yılın en büyük ikinci kriziydi (1929 Büyük Depresyon'dan sonra). Ama 2013'te tekrar zirveye döndü - yani 4 yıl sonra.
+                                        </div>
+                                    </div>
+
+                                    <button class="btn-secondary show-answers-btn" onclick="this.parentElement.querySelectorAll('.quiz-answer').forEach(a => a.style.display = a.style.display === 'none' ? 'block' : 'none'); this.textContent = this.textContent.includes('Göster') ? '🔒 Cevapları Gizle' : '🔓 Cevapları Göster'">🔓 Cevapları Göster</button>
+                                </div>
+
+                                <div class="practical-exercise">
+                                    <h4>💻 Pratik Uygulama:</h4>
+                                    <p><strong>Tarih Analizi Challenge:</strong></p>
+                                    <ol>
+                                        <li>TradingView'da S&P 500 grafiğini 2020 Şubat'a ayarla</li>
+                                        <li>COVID krizi: Mart 2020'de kaç % düştü?</li>
+                                        <li>Ne kadar sürede toparlandı?</li>
+                                        <li>Eğer Mart 2020'de $10,000 yatırım yapsaydın, bugün ne kadar olurdu?</li>
+                                    </ol>
+                                </div>
+
+                                <div class="key-takeaways">
+                                    <h4>🔑 Anahtar Noktalar:</h4>
+                                    <ul>
+                                        <li>✅ Bull Market = %20+ yükseliş, iyimserlik</li>
+                                        <li>✅ Bear Market = %20+ düşüş, korku</li>
+                                        <li>✅ Tarihsel olarak tüm krizler toparlanmış</li>
+                                        <li>✅ Panik satış yapma, uzun vadeli düşün</li>
+                                        <li>✅ Krizler = Ucuzlama fırsatları (değer yatırımcıları için)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day4" class="day-checkbox">
+                            <label for="day4" class="day-label">
+                                <span class="day-number">Gün 4</span>
+                                <span class="day-title">Alım-Satım Emirleri</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Market order vs Limit order farkını öğren</p>
+                                <ul>
+                                    <li>Her emir türünün avantaj/dezavantajlarını karşılaştır</li>
+                                    <li>Stop loss nedir ve neden önemli?</li>
+                                    <li>Örnek senaryo: 100 TL'den hisse aldın, stop loss nereye koyarsın?</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> Kağıt üzerinde 3 farklı emir senaryosu yaz</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day5" class="day-checkbox">
+                            <label for="day5" class="day-label">
+                                <span class="day-number">Gün 5</span>
+                                <span class="day-title">Hacim ve Likidite</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> İşlem hacminin önemini anlamak</p>
+                                <ul>
+                                    <li>Yüksek hacimli ve düşük hacimli hisse örnekleri bul</li>
+                                    <li>Hacim grafiğini fiyat grafiği ile karşılaştır</li>
+                                    <li>Neden bazı hisseler "likit değil" denir?</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> Apple ve küçük bir teknoloji şirketinin hacmini karşılaştır</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day6" class="day-checkbox">
+                            <label for="day6" class="day-label">
+                                <span class="day-number">Gün 6-7</span>
+                                <span class="day-title">Hafta Tekrarı ve Pratik</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> İlk haftayı pekiştir</p>
+                                <ul>
+                                    <li>Tüm terimleri tekrar gözden geçir</li>
+                                    <li>Dashboard'da 30 dakika piyasayı izle</li>
+                                    <li>Bir arkadaşına/aileye öğrendiklerini anlat (en iyi öğrenme yöntemi!)</li>
+                                    <li>Sorular listesi oluştur ve cevaplarını araştır</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hafta 2: Grafik Okuma -->
+                    <div class="week-card">
+                        <h2><i class="fas fa-calendar-week"></i> Hafta 2: Grafik Analizi Temelleri</h2>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day8" class="day-checkbox">
+                            <label for="day8" class="day-label">
+                                <span class="day-number">Gün 8</span>
+                                <span class="day-title">Grafik Türlerini Tanımak</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Line chart vs Candlestick chart</p>
+                                <ul>
+                                    <li>TradingView'da hesap aç (ücretsiz)</li>
+                                    <li>Her iki grafik türünü de dene</li>
+                                    <li>Grafikler bölümündeki örnekleri incele</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> Bir hissenin 1 aylık grafiğini çiz (kağıt-kalemle)</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day9" class="day-checkbox">
+                            <label for="day9" class="day-label">
+                                <span class="day-number">Gün 9</span>
+                                <span class="day-title">Mum Grafiği Anatomisi</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Her mumu okuyabilmek</p>
+                                <ul>
+                                    <li>Yeşil vs kırmızı mum farkı</li>
+                                    <li>Gövde, fitil, gölge nedir?</li>
+                                    <li>20 farklı muma bak ve yorumla</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> TradingView'da Tesla'nın grafiğinde 10 mumu analiz et</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day10" class="day-checkbox">
+                            <label for="day10" class="day-label">
+                                <span class="day-number">Gün 10</span>
+                                <span class="day-title">Temel Mum Formasyonları</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Doji, Hammer, Shooting Star</p>
+                                <ul>
+                                    <li>Her formasyonun anlamını ezberle</li>
+                                    <li>Gerçek grafiklerde bu formasyonları bul</li>
+                                    <li>Sonrasında ne oldu? Kontrol et</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> 5 farklı hissede hammer formasyonu bul</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day11" class="day-checkbox">
+                            <label for="day11" class="day-label">
+                                <span class="day-number">Gün 11</span>
+                                <span class="day-title">Trend Çizgileri</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Uptrend ve downtrend çizgisi çizebilmek</p>
+                                <ul>
+                                    <li>TradingView'da çizgi aracını kullan</li>
+                                    <li>Yükseliş trendinde dip noktalarını birleştir</li>
+                                    <li>Düşüş trendinde tepe noktalarını birleştir</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> 10 farklı hisseye trend çizgisi çiz</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day12" class="day-checkbox">
+                            <label for="day12" class="day-label">
+                                <span class="day-number">Gün 12</span>
+                                <span class="day-title">Destek ve Direnç</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Destek/direnç seviyelerini bulabilmek</p>
+                                <ul>
+                                    <li>Fiyatın defalarca test ettiği seviyeleri işaretle</li>
+                                    <li>Yatay çizgiler çiz</li>
+                                    <li>Bu seviyelerden trading stratejisi oluştur</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> Apple hissesinde 3 destek, 3 direnç bul</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day13" class="day-checkbox">
+                            <label for="day13" class="day-label">
+                                <span class="day-number">Gün 13-14</span>
+                                <span class="day-title">Grafik Analizi Pratiği</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Öğrendiklerini birleştir</p>
+                                <ul>
+                                    <li>5 hisse seç</li>
+                                    <li>Her birinde: Trend, destek/direnç, formasyonları bul</li>
+                                    <li>Al/sat/bekle kararı ver ve nedenini yaz</li>
+                                    <li>1 hafta sonra kararını kontrol et, doğru mu çıktı?</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hafta 3: İleri Analiz -->
+                    <div class="week-card">
+                        <h2><i class="fas fa-calendar-week"></i> Hafta 3: Göstergeler ve İleri Analiz</h2>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day15" class="day-checkbox">
+                            <label for="day15" class="day-label">
+                                <span class="day-number">Gün 15</span>
+                                <span class="day-title">Hareketli Ortalamalar (MA)</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> MA 50 ve MA 200 kullanmak</p>
+                                <ul>
+                                    <li>TradingView'da grafiğe MA 50 ve MA 200 ekle</li>
+                                    <li>Golden Cross ve Death Cross örnekleri bul</li>
+                                    <li>Fiyatın MA'lar ile ilişkisini gözlemle</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> S&P 500'de son 2 yılın golden/death cross'larını bul</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day16" class="day-checkbox">
+                            <label for="day16" class="day-label">
+                                <span class="day-number">Gün 16</span>
+                                <span class="day-title">RSI (Relative Strength Index)</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Aşırı alım/satım bölgelerini tanımak</p>
+                                <ul>
+                                    <li>Grafiğe RSI göstergesini ekle</li>
+                                    <li>RSI > 70: Aşırı alım (sat sinyali)</li>
+                                    <li>RSI < 30: Aşırı satım (al sinyali)</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> 10 hissede RSI'ı kontrol et, hangileri alım/satım bölgesinde?</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day17" class="day-checkbox">
+                            <label for="day17" class="day-label">
+                                <span class="day-number">Gün 17</span>
+                                <span class="day-title">MACD Göstergesi</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Trend değişimlerini yakalamak</p>
+                                <ul>
+                                    <li>MACD'nin ne olduğunu öğren</li>
+                                    <li>Kesişim noktalarına dikkat et</li>
+                                    <li>MA ile birlikte kullan (doğrulama için)</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> Tesla'da MACD ile 5 alım/satım sinyali bul</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day18" class="day-checkbox">
+                            <label for="day18" class="day-label">
+                                <span class="day-number">Gün 18</span>
+                                <span class="day-title">Hacim Analizi İleri Seviye</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Hacmi stratejiye dahil etmek</p>
+                                <ul>
+                                    <li>Hacim + Fiyat ilişkisini derinlemesine incele</li>
+                                    <li>Hacim patlaması = önemli hareket gelebilir</li>
+                                    <li>Düşük hacimli hareketlere güvenme</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> Apple'da son 1 aydaki en yüksek hacimli günleri bul, o gün ne oldu?</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day19" class="day-checkbox">
+                            <label for="day19" class="day-label">
+                                <span class="day-number">Gün 19</span>
+                                <span class="day-title">Fibonacci Seviyeleri</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Fibonacci retracement kullanmak</p>
+                                <ul>
+                                    <li>TradingView'da Fibonacci aracını bul</li>
+                                    <li>%38.2, %50, %61.8 seviyelerini öğren</li>
+                                    <li>Bu seviyelerde fiyat durma eğilimindedir</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> Bir yükseliş trendinde Fibonacci çiz ve test edilip edilmediğini kontrol et</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day20" class="day-checkbox">
+                            <label for="day20" class="day-label">
+                                <span class="day-number">Gün 20-21</span>
+                                <span class="day-title">Tüm Göstergeleri Birleştir</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Kendi trading stratejini oluştur</p>
+                                <ul>
+                                    <li>Bir hisse seç</li>
+                                    <li>MA, RSI, MACD, destek/direnç - hepsini uygula</li>
+                                    <li>Tüm göstergeler aynı yönü işaret ediyorsa → Güçlü sinyal</li>
+                                    <li>Çelişiyorlarsa → Belirsizlik, bekle</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hafta 4: Gerçek Dünya -->
+                    <div class="week-card">
+                        <h2><i class="fas fa-calendar-week"></i> Hafta 4: Gerçek Dünya Uygulaması</h2>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day22" class="day-checkbox">
+                            <label for="day22" class="day-label">
+                                <span class="day-number">Gün 22</span>
+                                <span class="day-title">Ekonomik Takvim Kullanımı</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Önemli veri açıklamalarını takip etmek</p>
+                                <ul>
+                                    <li>Investing.com ekonomik takvime bak</li>
+                                    <li>Faiz kararları, işsizlik verileri, enflasyon - bunlar kritik</li>
+                                    <li>Veri açıklanmadan önce ve sonra piyasayı gözlemle</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> Bu haftaki önemli veri açıklamalarını listele</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day23" class="day-checkbox">
+                            <label for="day23" class="day-label">
+                                <span class="day-number">Gün 23</span>
+                                <span class="day-title">Şirket Kâr Raporları</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Earnings report'ları anlamak</p>
+                                <ul>
+                                    <li>Yahoo Finance'te bir şirketin son kâr raporunu bul</li>
+                                    <li>EPS (hisse başına kazanç) nedir?</li>
+                                    <li>Beklentiye göre sonuç ne oldu?</li>
+                                    <li>Açıklama sonrası hisse ne yaptı?</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> Bu ay kâr açıklayacak 5 şirket bul ve takip et</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day24" class="day-checkbox">
+                            <label for="day24" class="day-label">
+                                <span class="day-number">Gün 24</span>
+                                <span class="day-title">Sektör Analizi</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Sektörel rotasyon ve ilişkiler</p>
+                                <ul>
+                                    <li>Teknoloji, sağlık, finans, enerji sektörlerini karşılaştır</li>
+                                    <li>Hangi sektör bu ay güçlü, hangisi zayıf?</li>
+                                    <li>Sektör ETF'lerini incele (örn: XLK, XLF)</li>
+                                </ul>
+                                <p><strong>Pratik:</strong> Finviz.com'da sektör haritasını incele</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day25" class="day-checkbox">
+                            <label for="day25" class="day-label">
+                                <span class="day-number">Gün 25</span>
+                                <span class="day-title">Risk Yönetimi</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> En önemli konu - PARA YÖNETİMİ</p>
+                                <ul>
+                                    <li>%2 Kuralı: Hiçbir işlemde sermayenin %2'sinden fazlasını riske atma</li>
+                                    <li>Position sizing: Ne kadar almalısın?</li>
+                                    <li>Diversification: "Tüm yumurtalarını tek sepete koyma"</li>
+                                    <li>Stop loss kullanmayı alışkanlık haline getir</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day26" class="day-checkbox">
+                            <label for="day26" class="day-label">
+                                <span class="day-number">Gün 26</span>
+                                <span class="day-title">Psikoloji ve Duygusal Kontrol</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Trading psikolojisi</p>
+                                <ul>
+                                    <li>FOMO (Fear of Missing Out): Kaçırma korkusu</li>
+                                    <li>Açgözlülük: "Biraz daha yükselsin" derken kaybetmek</li>
+                                    <li>Panik satış: Kayıpları büyütmek</li>
+                                    <li>Disiplin: Planına sadık kal!</li>
+                                </ul>
+                                <p><strong>Önemli:</strong> Duygusal kararlar vermek = Kaybetmek</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day27" class="day-checkbox">
+                            <label for="day27" class="day-label">
+                                <span class="day-number">Gün 27</span>
+                                <span class="day-title">Demo Hesap Kullanımı</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Gerçek para riske atmadan pratik yap</p>
+                                <ul>
+                                    <li>TradingView Paper Trading veya başka demo hesap aç</li>
+                                    <li>Sanal para ile 10 işlem yap</li>
+                                    <li>Her işlemi kaydet: Neden aldın? Neden sattın?</li>
+                                    <li>Sonuçları analiz et</li>
+                                </ul>
+                                <p><strong>Kural:</strong> Demo'da tutarlı kar etmeden gerçek paraya geçme!</p>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day28" class="day-checkbox">
+                            <label for="day28" class="day-label">
+                                <span class="day-number">Gün 28</span>
+                                <span class="day-title">Trading Planı Oluştur</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Yazılı bir trading planın olsun</p>
+                                <ul>
+                                    <li>Stratejin: Hangi göstergeleri kullanacaksın?</li>
+                                    <li>Risk toleransın: Her işlemde maksimum %kaç kaybedebilirsin?</li>
+                                    <li>Zaman dilimin: Günlük mü, haftalık mı işlem yapacaksın?</li>
+                                    <li>Hedefin: Yılda %kaç getiri hedefliyorsun? (Gerçekçi ol!)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day29" class="day-checkbox">
+                            <label for="day29" class="day-label">
+                                <span class="day-number">Gün 29</span>
+                                <span class="day-title">Portföy Analizi</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> Örnek portföy oluştur</p>
+                                <ul>
+                                    <li>10,000 TL sanal bütçeyle portföy oluştur</li>
+                                    <li>%30 teknoloji, %20 sağlık, %20 finans, %30 diğer - dengeli dağıtım</li>
+                                    <li>Uzun vadeli (1 yıl+) tutmayı planla</li>
+                                    <li>Aylık performansı takip et</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="day-item">
+                            <input type="checkbox" id="day30" class="day-checkbox">
+                            <label for="day30" class="day-label">
+                                <span class="day-number">Gün 30</span>
+                                <span class="day-title">Genel Değerlendirme ve Sonraki Adımlar</span>
+                            </label>
+                            <div class="day-content">
+                                <p><strong>Hedef:</strong> İlk ayı değerlendir</p>
+                                <ul>
+                                    <li>Ne öğrendin? Listele</li>
+                                    <li>Hangi konular hala karışık? Tekrar et</li>
+                                    <li>Demo hesabındaki sonuçlar nasıl?</li>
+                                    <li>Gerçek para ile başlamaya hazır mısın? (Acele etme!)</li>
+                                </ul>
+                                <p><strong>Sonraki Adım:</strong> 2-3 ay daha demo hesap ile pratik yap, ardından küçük miktarla başla</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bonus-resources">
+                    <h2><i class="fas fa-gift"></i> Bonus Kaynaklar</h2>
+                    <div class="resource-grid">
+                        <div class="resource-item">
+                            <h3>📚 Önerilen Kitaplar</h3>
+                            <ul>
+                                <li>"A Random Walk Down Wall Street" - Burton Malkiel</li>
+                                <li>"The Intelligent Investor" - Benjamin Graham</li>
+                                <li>"Technical Analysis of the Financial Markets" - John Murphy</li>
+                            </ul>
+                        </div>
+                        <div class="resource-item">
+                            <h3>🎥 YouTube Kanalları</h3>
+                            <ul>
+                                <li>The Chart Guys (Teknik analiz)</li>
+                                <li>Rayner Teo (Trading stratejileri)</li>
+                                <li>Financial Education (Genel finans)</li>
+                            </ul>
+                        </div>
+                        <div class="resource-item">
+                            <h3>🎓 Online Kurslar</h3>
+                            <ul>
+                                <li>Investopedia Academy</li>
+                                <li>Udemy: Stock Trading & Investing</li>
+                                <li>Coursera: Financial Markets (Yale University)</li>
+                            </ul>
+                        </div>
+                        <div class="resource-item">
+                            <h3>💬 Topluluklar</h3>
+                            <ul>
+                                <li>r/stocks (Reddit)</li>
+                                <li>TradingView Community</li>
+                                <li>Investing.com Forum</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Markets Page - 100+ Stocks -->
         <section id="markets" class="page">
             <div class="container">
@@ -4481,8 +5225,5 @@ ak istiyorsun. Hangi emri kullanırsın?</li>
 
     <!-- Firebase Authentication Module -->
     <script type="module" src="js/auth.js"></script>
-
-    <!-- Chatbot Widget -->
-    <script src="js/chatbot.js"></script>
 </body>
 </html>

@@ -1,0 +1,69 @@
+# Finans Akademi Chatbot - Python Dependencies
+
+# Core Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# LangChain and RAG
+langchain==0.1.5
+langchain-community==0.0.16
+langchain-openai==0.0.3
+openai==1.10.0
+
+# Vector Store
+faiss-cpu==1.7.4
+# For GPU support use: faiss-gpu==1.7.4
+
+# Embeddings
+sentence-transformers==2.3.1
+
+# Web Search
+duckduckgo-search==4.4.0
+
+# HTML Parsing & Web Scraping
+beautifulsoup4==4.12.3
+lxml==5.1.0
+html2text==2024.2.26
+
+# Database
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.25
+
+# HTTP Client
+httpx==0.26.0
+requests==2.31.0
+
+# Environment Variables
+python-dotenv==1.0.1
+
+# Data Processing
+numpy==1.26.3
+pandas==2.2.0
+
+# Turkish Language Support
+turkish-stemmer==1.0.1
+
+# Utilities
+python-multipart==0.0.6
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Logging & Monitoring
+loguru==0.7.2
+
+# Rate Limiting
+slowapi==0.1.9
+
+# CORS
+fastapi-cors==0.0.6
+
+# Caching
+cachetools==5.3.2
+
+# JSON handling
+orjson==3.9.13
+
+# Date & Time
+python-dateutil==2.8.2
