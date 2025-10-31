@@ -1,0 +1,296 @@
+<!-- Trading Simulator Page -->
+<section id="simulator" class="page">
+    <div class="container">
+        <h1>🎮 Sanal İşlem Simülatörü</h1>
+        <p class="subtitle">Gerçek para kullanmadan, güvenli ortamda alım-satım pratiği yapın!</p>
+
+        <!-- Account Overview -->
+        <div class="simulator-header">
+            <div class="account-card">
+                <div class="account-stat">
+                    <i class="fas fa-wallet"></i>
+                    <div>
+                        <span class="stat-label">Toplam Bakiye</span>
+                        <span class="stat-value" id="simTotalBalance">$10,000.00</span>
+                    </div>
+                </div>
+                <div class="account-stat">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <div>
+                        <span class="stat-label">Nakit</span>
+                        <span class="stat-value" id="simCash">$10,000.00</span>
+                    </div>
+                </div>
+                <div class="account-stat">
+                    <i class="fas fa-chart-pie"></i>
+                    <div>
+                        <span class="stat-label">Hisse Değeri</span>
+                        <span class="stat-value" id="simStockValue">$0.00</span>
+                    </div>
+                </div>
+                <div class="account-stat">
+                    <i class="fas fa-percentage"></i>
+                    <div>
+                        <span class="stat-label">Kar/Zarar</span>
+                        <span class="stat-value" id="simProfitLoss">$0.00 (0%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="btn-primary" id="resetSimulator"><i class="fas fa-redo"></i> Hesabı Sıfırla</button>
+                <button class="btn-secondary" id="exportHistory"><i class="fas fa-download"></i> İşlem Geçmişini İndir</button>
+                <button class="btn-info" id="showTutorial"><i class="fas fa-question-circle"></i> Nasıl Kullanılır?</button>
+            </div>
+        </div>
+
+        <!-- Portfolio -->
+        <div class="portfolio-section">
+            <h2><i class="fas fa-briefcase"></i> Portföyüm</h2>
+
+            <div id="portfolioContainer" class="portfolio-grid">
+                <!-- Portfolio items will be loaded here -->
+            </div>
+
+            <div id="emptyPortfolio" class="empty-state">
+                <i class="fas fa-briefcase" style="font-size: 4rem; opacity: 0.3;"></i>
+                <h3>Portföyünüz boş</h3>
+                <p>İlk hisse alımınızı yapın ve portföyünüzü oluşturmaya başlayın</p>
+                <button class="btn-primary" onclick="document.querySelector('[data-page=markets]').click()">
+                    <i class="fas fa-shopping-cart"></i> Hisse Satın Al
+                </button>
+            </div>
+        </div>
+
+        <!-- Trading Panel -->
+        <div class="trading-panel">
+            <h2><i class="fas fa-exchange-alt"></i> İşlem Yap</h2>
+
+            <div class="trading-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Hisse Seç</label>
+                        <select id="simStockSelect" class="form-control">
+                            <option value="">-- Hisse Seçin --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>İşlem Türü</label>
+                        <div class="btn-group">
+                            <button class="btn-toggle active" data-action="buy">AL</button>
+                            <button class="btn-toggle" data-action="sell">SAT</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Emir Tipi</label>
+                        <select id="orderType" class="form-control">
+                            <option value="market">Market Emri (Anında)</option>
+                            <option value="limit">Limit Emri</option>
+                            <option value="stop">Stop Loss</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="limitPriceGroup" style="display: none;">
+                        <label>Limit Fiyat</label>
+                        <input type="number" id="limitPrice" class="form-control" step="0.01" placeholder="$0.00">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Adet</label>
+                        <input type="number" id="simQuantity" class="form-control" min="1" value="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Toplam Tutar</label>
+                        <input type="text" id="simTotal" class="form-control" readonly>
+                    </div>
+                </div>
+
+                <div class="price-info">
+                    <div class="info-item">
+                        <span>Güncel Fiyat:</span>
+                        <span id="simCurrentPrice">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Komisyon (0.1%):</span>
+                        <span id="simCommission">$0.00</span>
+                    </div>
+                    <div class="info-item">
+                        <span>İşlem Sonrası Bakiye:</span>
+                        <span id="simAfterBalance">-</span>
+                    </div>
+                </div>
+
+                <button id="executeTradeBtn" class="btn-primary btn-large">
+                    <i class="fas fa-check"></i> İşlemi Gerçekleştir
+                </button>
+            </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="history-section">
+            <h2><i class="fas fa-history"></i> İşlem Geçmişi</h2>
+
+            <div class="history-filters">
+                <button class="filter-btn active" data-filter="all">Tümü</button>
+                <button class="filter-btn" data-filter="buy">Alım</button>
+                <button class="filter-btn" data-filter="sell">Satım</button>
+            </div>
+
+            <div class="history-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th>İşlem</th>
+                            <th>Hisse</th>
+                            <th>Adet</th>
+                            <th>Fiyat</th>
+                            <th>Toplam</th>
+                            <th>Komisyon</th>
+                            <th>Kar/Zarar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr class="empty-row">
+                            <td colspan="8">Henüz işlem yapmadınız</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Performance Chart -->
+        <div class="performance-section">
+            <h2><i class="fas fa-chart-area"></i> Performans Grafiği</h2>
+
+            <div class="chart-controls">
+                <button class="period-btn active" data-period="7">7 Gün</button>
+                <button class="period-btn" data-period="30">30 Gün</button>
+                <button class="period-btn" data-period="90">90 Gün</button>
+                <button class="period-btn" data-period="all">Tümü</button>
+            </div>
+
+            <canvas id="performanceChart"></canvas>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard-section">
+            <h2><i class="fas fa-trophy"></i> Liderlik Tablosu (Yerel)</h2>
+            <p class="info-text">En yüksek getiri sağlayan sanal portföyler</p>
+
+            <div class="leaderboard">
+                <div class="leaderboard-item gold">
+                    <span class="rank">🥇 1</span>
+                    <span class="name">Sen</span>
+                    <span class="return">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="tips-section">
+            <h2><i class="fas fa-lightbulb"></i> Pratik İpuçları</h2>
+
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>Risk Yönetimi</h4>
+                    <p>Hiçbir işlemde sermayenin %2'sinden fazlasını riske atma</p>
+                </div>
+
+                <div class="tip-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h4>Çeşitlendirme</h4>
+                    <p>5-10 farklı hisse ile portföy oluştur, riski dağıt</p>
+                </div>
+
+                <div class="tip-card">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h4>Stop Loss Kullan</h4>
+                    <p>Her işlemde stop loss koy, kayıpları sınırla</p>
+                </div>
+
+                <div class="tip-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <h4>Sabırlı Ol</h4>
+                    <p>Günlük dalgalanmalara takılma, uzun vadeli düşün</p>
+                </div>
+
+                <div class="tip-card">
+                    <i class="fas fa-book-open"></i>
+                    <h4>Araştır</h4>
+                    <p>Alım yapmadan önce şirketi ve sektörü araştır</p>
+                </div>
+
+                <div class="tip-card">
+                    <i class="fas fa-brain"></i>
+                    <h4>Duygusal Olma</h4>
+                    <p>FOMO ve panik satıştan kaçın, planına sadık kal</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tutorial Modal -->
+        <div id="tutorialModal" class="modal">
+            <div class="modal-content tutorial-content">
+                <span class="modal-close">&times;</span>
+                <h2>🎓 Sanal İşlem Simülatörü Kullanım Rehberi</h2>
+
+                <div class="tutorial-steps">
+                    <div class="tutorial-step">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <h3>Başlangıç Sermayesi</h3>
+                            <p>$10,000 sanal para ile başlıyorsun. Bu gerçek para değil, sadece pratik için!</p>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h3>Hisse Seç</h3>
+                            <p>"İşlem Yap" bölümünden almak istediğin hisseyi seç. 100+ hisse arasından seçim yapabilirsin.</p>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <h3>İşlem Yap</h3>
+                            <p>AL veya SAT seçip, adet gir ve "İşlemi Gerçekleştir"e tıkla. Komisyon otomatik hesaplanır.</p>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <h3>Portföyünü İzle</h3>
+                            <p>Aldığın hisseler portföyünde görünür. Kar/zarar anlık güncellenir.</p>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step">
+                        <span class="step-number">5</span>
+                        <div class="step-content">
+                            <h3>Performansını Analiz Et</h3>
+                            <p>İşlem geçmişi ve performans grafiğinde ne kadar başarılı olduğunu gör.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tutorial-footer">
+                    <button class="btn-primary" onclick="document.getElementById('tutorialModal').style.display='none'">
+                        Anladım, Başlayalım!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
