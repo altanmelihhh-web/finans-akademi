@@ -101,6 +101,25 @@ function initNavigation() {
                     setTimeout(() => {
                         initPracticeChart();
                     }, 100);
+                } else if (pageName === 'haberler') {
+                    // Initialize news manager when news page is opened
+                    if (!window.newsManager) {
+                        window.newsManager = new NewsManager();
+                        window.newsManager.init();
+
+                        // Setup refresh button
+                        const refreshBtn = document.getElementById('refreshNews');
+                        if (refreshBtn) {
+                            refreshBtn.addEventListener('click', () => {
+                                refreshBtn.querySelector('i').classList.add('fa-spin');
+                                window.newsManager.refresh().then(() => {
+                                    setTimeout(() => {
+                                        refreshBtn.querySelector('i').classList.remove('fa-spin');
+                                    }, 500);
+                                });
+                            });
+                        }
+                    }
                 }
             }
         });

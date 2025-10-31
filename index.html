@@ -1423,6 +1423,17 @@
                         </div>
                     </div>
 
+                    <!-- Real-time News Feed -->
+                    <div class="realtime-news-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-rss"></i> Güncel Finans Haberleri</h2>
+                            <button id="refreshNews" class="btn-refresh">
+                                <i class="fas fa-sync-alt"></i> Yenile
+                            </button>
+                        </div>
+                        <div id="newsContainer" class="news-grid"></div>
+                    </div>
+
                     <div class="live-news-feed">
                         <h2><i class="fas fa-newspaper"></i> Detaylı Haber Analizleri ve Yorumlar</h2>
 
@@ -2533,6 +2544,7 @@
     <script src="js/app.js"></script>
     <script src="js/markets.js"></script>
     <script src="js/simulator.js"></script>
+    <script src="js/news.js"></script>
     <script>
         // Initialize additional modules after DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
