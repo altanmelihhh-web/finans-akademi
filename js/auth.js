@@ -338,7 +338,7 @@ async function loadUserDataFromFirestore(userId) {
             }
 
             // Trigger UI updates
-            if (window.simulator) {
+            if (window.simulator && typeof window.simulator.loadFromStorage === 'function') {
                 window.simulator.loadFromStorage();
             }
         } else {
@@ -457,7 +457,7 @@ function mergePortfolios(existing, local) {
 // Load user data from localStorage (fallback)
 function loadUserDataFromLocalStorage() {
     console.log('ℹ️ Loading data from localStorage');
-    if (window.simulator) {
+    if (window.simulator && typeof window.simulator.loadFromStorage === 'function') {
         window.simulator.loadFromStorage();
     }
 }
