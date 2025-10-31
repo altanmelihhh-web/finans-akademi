@@ -147,39 +147,11 @@ function initMarketData() {
 }
 
 function updateMarketData() {
-    // Simulated market data - In production, you would fetch from real APIs
-    // For BIST data: https://api.bigpara.com or https://evds2.tcmb.gov.tr
-    // For US markets: https://finnhub.io or https://www.alphavantage.co
+    // ⚠️ STATIC DATA REMOVED!
+    // unified-market-data.js now handles ALL market data with real APIs
+    // DO NOT add static data here - it will overwrite API data!
 
-    const marketData = {
-        sp500: { value: 4783.45, change: 1.24 },
-        nasdaq: { value: 15235.84, change: 1.67 },
-        dow: { value: 37305.16, change: 0.85 },
-        bist100: { value: 8947.32, change: 2.15 },
-        usdtry: { value: 32.45, change: 0.32 },
-        eurtry: { value: 35.78, change: 0.45 },
-        aapl: { value: 182.31, change: -0.67 },
-        msft: { value: 371.55, change: 1.23 },
-        tsla: { value: 248.42, change: -2.45 }
-    };
-
-    // Update DOM elements
-    Object.keys(marketData).forEach(key => {
-        const valueEl = document.getElementById(key);
-        const changeEl = document.getElementById(key + '-change');
-
-        if (valueEl && changeEl) {
-            const data = marketData[key];
-            valueEl.textContent = data.value.toLocaleString('tr-TR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-
-            const changeText = (data.change > 0 ? '+' : '') + data.change.toFixed(2) + '%';
-            changeEl.textContent = changeText;
-            changeEl.className = 'index-change ' + (data.change > 0 ? 'positive' : 'negative');
-        }
-    });
+    console.log('ℹ️ updateMarketData() - Skipping static data (using API data from unified-market-data.js)');
 
     // Update winners and losers
     updateWinnersLosers();

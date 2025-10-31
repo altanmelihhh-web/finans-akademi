@@ -184,7 +184,7 @@ class UnifiedMarketData {
     }
 
     /**
-     * API LAYER 2: Twelve Data (Global Stocks + BIST)
+     * API LAYER 2: Twelve Data (Global Stocks + BIST) - FIX: Better error handling
      */
     async getTwelveDataQuote(symbol) {
         const cacheKey = `twelve_${symbol}`;
@@ -198,10 +198,25 @@ class UnifiedMarketData {
         }
 
         try {
-            // Twelve Data API (CORS-friendly, free tier)
-            const url = `https://api.twelvedata.com/quote?symbol=${symbol}&apikey=${this.apiKeys.twelvedata}`;
+            // Twelve Data API - Add exchange for BIST stocks
+            let apiSymbol = symbol;
+            let exchange = '';
+
+            if (symbol.includes('.IS')) {
+                // BIST stock - use IST exchange
+                apiSymbol = symbol.replace('.IS', '');
+                exchange = '&exchange=IST';
+            }
+
+            const url = `https://api.twelvedata.com/quote?symbol=${apiSymbol}${exchange}&apikey=${this.apiKeys.twelvedata}`;
             const response = await fetch(url);
             const data = await response.json();
+
+            // Check for errors
+            if (data.status === 'error') {
+                console.error(`❌ Twelve Data error (${symbol}):`, data.message);
+                return null;
+            }
 
             if (data && data.close) {
                 const prevClose = parseFloat(data.previous_close || data.close);
@@ -418,17 +433,17 @@ class UnifiedMarketData {
     }
 
     /**
-     * Update US Indices
+     * Update US Indices - FIX: Use Finnhub index symbols
      */
     async updateUSIndices() {
         const indices = [
-            { symbol: '^GSPC', id: 'sp500', name: 'S&P 500' },
-            { symbol: '^IXIC', id: 'nasdaq', name: 'NASDAQ' },
-            { symbol: '^DJI', id: 'dow', name: 'DOW JONES' }
+            { symbol: '.SPX', id: 'sp500', name: 'S&P 500' },  // Finnhub format
+            { symbol: '.IXIC', id: 'nasdaq', name: 'NASDAQ' },
+            { symbol: '.DJI', id: 'dow', name: 'DOW JONES' }
         ];
 
         for (const index of indices) {
-            const quote = await this.getSmartQuote(index.symbol);
+            const quote = await this.getFinnhubQuote(index.symbol);
             if (quote) {
                 this.updateElement(
                     index.id,
@@ -436,23 +451,27 @@ class UnifiedMarketData {
                     quote.changePercent
                 );
                 console.log(`📊 ${index.name}: ${quote.price.toFixed(2)} (${quote.source})`);
+            } else {
+                console.warn(`⚠️ ${index.name} veri alınamadı`);
             }
-            await this.delay(200); // Nazik rate limiting
+            await this.delay(200);
         }
     }
 
     /**
-     * Update US Stocks (Dashboard)
+     * Update US Stocks (Dashboard) - FIX: Ensure UI updates
      */
     async updateUSStocks() {
         const stocks = ['AAPL', 'MSFT', 'TSLA'];
 
         for (const symbol of stocks) {
-            const quote = await this.getSmartQuote(symbol);
+            const quote = await this.getFinnhubQuote(symbol);
             if (quote) {
                 const id = symbol.toLowerCase();
                 this.updateElement(id, `$${quote.price.toFixed(2)}`, quote.changePercent);
                 console.log(`📈 ${symbol}: $${quote.price.toFixed(2)} (${quote.source})`);
+            } else {
+                console.warn(`⚠️ ${symbol} veri alınamadı`);
             }
             await this.delay(200);
         }
