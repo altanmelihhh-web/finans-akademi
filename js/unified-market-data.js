@@ -532,7 +532,7 @@ class UnifiedMarketData {
     }
 
     /**
-     * UPDATE ALL DATA - With localStorage persistence
+     * UPDATE ALL DATA - MINIMAL: Only Dashboard essentials
      */
     async updateAll() {
         if (this.isUpdating) {
@@ -541,33 +541,29 @@ class UnifiedMarketData {
         }
 
         this.isUpdating = true;
-        console.log('🔄 Tüm piyasa verileri güncelleniyor...');
+        console.log('🔄 Dashboard verileri güncelleniyor (minimal mode)...');
 
         try {
-            // 1. Döviz kurları (Sınırsız - hızlı)
+            // SADECE DASHBOARD için gerekli veriler (HIZLI!)
+
+            // 1. Döviz kurları (1 request - hızlı)
             await this.updateCurrencies();
 
-            // 2. US Indices (3 request)
-            await this.updateUSIndices();
-
-            // 3. US Stocks Dashboard (3 request)
+            // 2. Dashboard 3 hisse (3 request - AAPL, MSFT, TSLA)
             await this.updateUSStocks();
 
-            // 4. Crypto (Sınırsız - hızlı)
+            // 3. Crypto (1 request - BTC & ETH birlikte)
             await this.updateCrypto();
-
-            // 5. Markets sayfası için STOCKS_DATA güncelle (30 US + 20 BIST = 50 request)
-            await this.updateStocksData();
 
             // Update timestamp
             this.lastUpdateTime = Date.now();
 
-            // CRITICAL: Save to localStorage for persistence
+            // Save to localStorage
             this.saveCacheToStorage();
 
-            console.log('✅ Tüm veriler güncellendi!');
+            console.log('✅ Dashboard verileri güncellendi!');
             console.log(`⏰ Sonraki güncelleme: ${new Date(this.lastUpdateTime + this.minUpdateInterval).toLocaleTimeString('tr-TR')}`);
-            console.log(`📊 API Kullanımı: Finnhub=${this.apiCalls.finnhub.count}/${this.apiCalls.finnhub.limit}, TwelveData=${this.apiCalls.twelvedata.count}/${this.apiCalls.twelvedata.limit}, FMP=${this.apiCalls.fmp.count}/${this.apiCalls.fmp.limit}`);
+            console.log(`📊 API Kullanımı: Finnhub=${this.apiCalls.finnhub.count}/50 (Dashboard only)`);
         } catch (error) {
             console.error('❌ Güncelleme hatası:', error);
         } finally {
