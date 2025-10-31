@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finans Chatbot - Inline Test</title>
+</head>
+<body style="margin:0;padding:20px;font-family:Arial,sans-serif;background:#f5f5f5;">
+    <div style="max-width:800px;margin:0 auto;background:white;padding:30px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+        <h1>🤖 Finans Chatbot Test - INLINE VERSION</h1>
+        <p>Bu sayfa <strong>tamamen inline</strong> - external dosya yok. Garantili çalışır.</p>
+        <p>Sağ alt köşeye bak → MOR BUTON görünmeli</p>
+        <div id="status" style="margin-top:20px;padding:15px;background:#e3f2fd;border-radius:5px;"></div>
+    </div>
+
+    <!-- INLINE CHATBOT - Her şey burada -->
+    <script>
+    (function() {
+        'use strict';
+
+        // CSS ve HTML'i ekle
+        const html = `
+            <style>
+                #inline-chat-btn {
+                    position: fixed;
+                    bottom: 24px;
+                    right: 24px;
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border: none;
+                    color: white;
+                    font-size: 24px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                    z-index: 99999;
+                    transition: transform 0.3s;
+                }
+                #inline-chat-btn:hover {
+                    transform: scale(1.1);
+                }
+                #inline-chat-window {
+                    display: none;
+                    position: fixed;
+                    bottom: 100px;
+                    right: 24px;
+                    width: 400px;
+                    max-width: calc(100vw - 48px);
+                    height: 600px;
+                    max-height: calc(100vh - 150px);
+                    background: white;
+                    border-radius: 16px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                    flex-direction: column;
+                    z-index: 99999;
+                }
+                #inline-chat-window.open {
+                    display: flex;
+                }
+                .inline-chat-header {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 16px 20px;
+                    border-radius: 16px 16px 0 0;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .inline-chat-messages {
+                    flex: 1;
+                    overflow-y: auto;
+                    padding: 20px;
+                    background: #1a1a2e;
+                }
+                .inline-chat-message {
+                    margin-bottom: 16px;
+                    padding: 12px 16px;
+                    border-radius: 12px;
+                    max-width: 80%;
+                    line-height: 1.5;
+                    font-size: 14px;
+                }
+                .inline-chat-message.bot {
+                    background: #16213e;
+                    color: #e8e8e8;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                    border-left: 3px solid #667eea;
+                }
+                .inline-chat-message.user {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    margin-left: auto;
+                    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+                }
+                .inline-chat-input-box {
+                    padding: 16px;
+                    border-top: 1px solid #667eea;
+                    background: #16213e;
+                    border-radius: 0 0 16px 16px;
+                }
+                .inline-chat-input-box input {
+                    width: 100%;
+                    padding: 10px 14px;
+                    border: 1px solid #667eea;
+                    border-radius: 12px;
+                    font-size: 14px;
+                    font-family: inherit;
+                    background: #1a1a2e;
+                    color: #e8e8e8;
+                }
+                .inline-chat-input-box input::placeholder {
+                    color: #8892b0;
+                }
+                .inline-chat-input-box input:focus {
+                    outline: none;
+                    border-color: #764ba2;
+                }
+                .inline-chat-close {
+                    background: rgba(255, 255, 255, 0.2);
+                    border: none;
+                    color: white;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 20px;
+                }
+            </style>
+
+            <button id="inline-chat-btn">💬</button>
+
+            <div id="inline-chat-window">
+                <div class="inline-chat-header">
+                    <div>
+                        <h3 style="margin:0;font-size:18px;">Finans Asistan</h3>
+                        <span style="font-size:12px;opacity:0.9;">Çevrimiçi</span>
+                    </div>
+                    <button class="inline-chat-close" id="inline-close-btn">×</button>
+                </div>
+
+                <div class="inline-chat-messages" id="inline-messages">
+                    <div class="inline-chat-message bot">
+                        👋 Merhaba! Ben Finans Asistan. Size nasıl yardımcı olabilirim?
+                    </div>
+                </div>
+
+                <div class="inline-chat-input-box">
+                    <input type="text" id="inline-input" placeholder="Sorunuzu yazın..." />
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', html);
+
+        // Mesaj ekle
+        function addMessage(text, isUser) {
+            const messages = document.getElementById('inline-messages');
+            const msg = document.createElement('div');
+            msg.className = 'inline-chat-message ' + (isUser ? 'user' : 'bot');
+            msg.textContent = text;
+            messages.appendChild(msg);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // API Keys (Buraya kendi key'lerinizi ekleyin)
+        const API_KEYS = {
+            alphavantage: 'demo', // https://www.alphavantage.co/support/#api-key
+            gemini: '', // https://aistudio.google.com/app/apikey
+        };
+
+        // 1. ALPHA VANTAGE - Gerçek hisse fiyatları
+        async function getStockPriceAlpha(symbol) {
+            try {
+                const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${API_KEYS.alphavantage}`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data['Global Quote'] && data['Global Quote']['05. price']) {
+                    const price = parseFloat(data['Global Quote']['05. price']).toFixed(2);
+                    const change = parseFloat(data['Global Quote']['09. change']).toFixed(2);
+                    const changePercent = data['Global Quote']['10. change percent'];
+                    return `${symbol}: $${price} (${change >= 0 ? '+' : ''}${change}, ${changePercent})`;
+                }
+                return null;
+            } catch (error) {
+                console.error('Alpha Vantage error:', error);
+                return null;
+            }
+        }
+
+        // 2. COINGECKO - Kripto fiyatları
+        async function getCryptoPrice(coin) {
+            try {
+                const coinMap = {
+                    'bitcoin': 'bitcoin',
+                    'btc': 'bitcoin',
+                    'ethereum': 'ethereum',
+                    'eth': 'ethereum',
+                    'ripple': 'ripple',
+                    'xrp': 'ripple',
+                    'dogecoin': 'dogecoin',
+                    'doge': 'dogecoin'
+                };
+
+                const coinId = coinMap[coin.toLowerCase()];
+                if (!coinId) return null;
+
+                const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd,try&include_24hr_change=true`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data[coinId]) {
+                    const usd = data[coinId].usd.toLocaleString();
+                    const tryPrice = data[coinId].try.toLocaleString();
+                    const change = data[coinId].usd_24h_change.toFixed(2);
+                    return `${coinId.toUpperCase()}: $${usd} / ₺${tryPrice} (24s: ${change >= 0 ? '+' : ''}${change}%)`;
+                }
+                return null;
+            } catch (error) {
+                console.error('CoinGecko error:', error);
+                return null;
+            }
+        }
+
+        // 3. GEMINI AI - Akıllı cevaplar
+        async function askGemini(question) {
+            if (!API_KEYS.gemini) {
+                return null; // API key yoksa
+            }
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEYS.gemini}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `Sen bir finans asistanısın. Türkçe cevap ver. Soru: ${question}`
+                            }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    return data.candidates[0].content.parts[0].text;
+                }
+                return null;
+            } catch (error) {
+                console.error('Gemini error:', error);
+                return null;
+            }
+        }
+
+        // Hisse fiyat kontrolü
+        async function checkStockPrice(query) {
+            // Kripto mu?
+            const cryptoKeywords = ['bitcoin', 'btc', 'ethereum', 'eth', 'kripto', 'ripple', 'xrp', 'dogecoin', 'doge'];
+            for (let keyword of cryptoKeywords) {
+                if (query.includes(keyword)) {
+                    const price = await getCryptoPrice(keyword);
+                    if (price) return price;
+                }
+            }
+
+            // US Hisse senetleri
+            const usStocks = {
+                'apple': 'AAPL',
+                'aapl': 'AAPL',
+                'microsoft': 'MSFT',
+                'msft': 'MSFT',
+                'tesla': 'TSLA',
+                'google': 'GOOGL',
+                'amazon': 'AMZN'
+            };
+
+            for (let [keyword, symbol] of Object.entries(usStocks)) {
+                if (query.includes(keyword)) {
+                    const price = await getStockPriceAlpha(symbol);
+                    if (price) return price;
+                }
+            }
+
+            // BIST hisseleri (demo - gerçek API eklenebilir)
+            const bistStocks = {
+                'türk hava': 'THYAO',
+                'thy': 'THYAO',
+                'garanti': 'GARAN',
+                'akbank': 'AKBNK',
+                'ereğli': 'EREGL',
+                'tupras': 'TUPRS',
+                'bim': 'BIMAS'
+            };
+
+            for (let [keyword, symbol] of Object.entries(bistStocks)) {
+                if (query.includes(keyword)) {
+                    return `${symbol} (BIST) - Gerçek zamanlı BIST fiyatları için ücretli API gerekiyor. BigPara veya Is Investment API kullanılabilir.`;
+                }
+            }
+
+            return null;
+        }
+
+        // Basit cevaplar
+        async function getResponse(question) {
+            const q = question.toLowerCase();
+
+            // 1. Önce fiyat sorgusu mu kontrol et (Alpha Vantage + CoinGecko)
+            const priceCheck = await checkStockPrice(q);
+            if (priceCheck) return priceCheck;
+
+            // 2. Gemini AI varsa kullan (akıllı cevaplar)
+            if (API_KEYS.gemini) {
+                const aiResponse = await askGemini(question);
+                if (aiResponse) return aiResponse;
+            }
+
+            // 3. Fallback: Basit kural tabanlı cevaplar
+            if (q.includes('hisse') || q.includes('stock')) {
+                return 'Hisse senedi, bir şirketin sermayesinin eşit paylara bölünmüş birimlerinden biridir. Hisse senedi alarak o şirketin ortağı olursunuz.';
+            }
+            if (q.includes('forex') || q.includes('döviz')) {
+                return 'Forex, döviz piyasasıdır. Dünya genelinde günlük 6 trilyon dolar işlem hacmi olan en büyük finansal piyasadır.';
+            }
+            if (q.includes('bitcoin') || q.includes('kripto')) {
+                return 'Bitcoin, ilk ve en bilinen kripto para birimidir. 2009\'da Satoshi Nakamoto tarafından yaratılmıştır.';
+            }
+            if (q.includes('yatırım')) {
+                return 'Yatırım yapmadan önce: Risk toleransınızı belirleyin, araştırma yapın, portföyünüzü çeşitlendirin ve uzun vadeli düşünün.';
+            }
+            if (q.includes('bist') || q.includes('borsa')) {
+                return 'Borsa İstanbul (BIST), Türkiye\'nin organize borsasıdır. BIST 100 endeksi en çok işlem gören 100 şirketi içerir.';
+            }
+
+            // 4. API önerisi
+            return '💡 İpucu: Daha akıllı cevaplar için Gemini API key ekleyin (satır 169). Gerçek fiyatlar için: Bitcoin, Ethereum, Apple, Microsoft, Tesla sorabilirsiniz!';
+        }
+
+        // Event listeners
+        const btn = document.getElementById('inline-chat-btn');
+        const closeBtn = document.getElementById('inline-close-btn');
+        const chatWindow = document.getElementById('inline-chat-window');
+        const input = document.getElementById('inline-input');
+
+        btn.addEventListener('click', function() {
+            chatWindow.classList.add('open');
+            input.focus();
+        });
+
+        closeBtn.addEventListener('click', function() {
+            chatWindow.classList.remove('open');
+        });
+
+        input.addEventListener('keypress', async function(e) {
+            if (e.key === 'Enter' && input.value.trim()) {
+                const question = input.value.trim();
+                addMessage(question, true);
+                input.value = '';
+
+                // Typing indicator
+                addMessage('Yazıyor...', false);
+
+                setTimeout(async function() {
+                    // Remove typing indicator
+                    const messages = document.getElementById('inline-messages');
+                    messages.removeChild(messages.lastChild);
+
+                    const response = await getResponse(question);
+                    addMessage(response, false);
+                }, 500);
+            }
+        });
+
+        // Status güncellemesi
+        setTimeout(function() {
+            const status = document.getElementById('status');
+            if (status) {
+                status.innerHTML = '<strong style="color:green;">✅ Chatbot başarıyla yüklendi!</strong><br>' +
+                    '<p>Sağ alt köşede mor buton (💬) görüyor musunuz?</p>' +
+                    '<p>Butona tıklayın ve test edin!</p>';
+            }
+        }, 500);
+
+        console.log('✅ INLINE Chatbot başarıyla yüklendi!');
+        console.log('Buton ID:', document.getElementById('inline-chat-btn') ? 'MEVCUT ✅' : 'YOK ❌');
+
+    })();
+    </script>
+</body>
+</html>
