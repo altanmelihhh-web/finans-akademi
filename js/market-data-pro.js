@@ -340,32 +340,53 @@ class MarketDataPro {
         }
 
         console.log('📦 Applying markets cache...');
+        console.log(`   Cache has ${Object.keys(marketsCache).length} entries`);
+
         let updatedCount = 0;
+        let skippedCount = 0;
 
         Object.entries(marketsCache).forEach(([symbol, quote]) => {
             const stock = window.STOCKS_DATA.us_stocks.find(s => s.symbol === symbol);
-            if (stock && quote && quote.price > 0) {
-                stock.price = quote.price;
-                stock.change = quote.changePercent;
-                stock.volume = quote.volume || 1000000;
-                updatedCount++;
 
-                if (updatedCount <= 3) {
-                    // Log first 3 for debugging
-                    console.log(`  ✓ Updated ${symbol}: $${stock.price.toFixed(2)} (${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)}%)`);
-                }
+            if (!stock) {
+                console.warn(`  ⚠️ Stock not found in STOCKS_DATA: ${symbol}`);
+                skippedCount++;
+                return;
+            }
+
+            if (!quote || !quote.price || quote.price <= 0) {
+                console.warn(`  ⚠️ Invalid quote for ${symbol}:`, quote);
+                skippedCount++;
+                return;
+            }
+
+            // Update the stock
+            stock.price = quote.price;
+            stock.change = quote.changePercent;
+            stock.volume = quote.volume || 1000000;
+            updatedCount++;
+
+            if (updatedCount <= 5) {
+                // Log first 5 for debugging
+                console.log(`  ✓ ${symbol}: $${stock.price.toFixed(2)} → STOCKS_DATA.price = ${stock.price}`);
             }
         });
 
-        console.log(`✓ Markets cache applied: ${updatedCount} stocks updated`);
+        console.log(`✓ Markets cache applied: ${updatedCount} updated, ${skippedCount} skipped`);
+
+        // Verify data before rendering
+        const firstStock = window.STOCKS_DATA.us_stocks[0];
+        console.log(`   Verification: STOCKS_DATA[0] = ${firstStock.symbol} price=$${firstStock.price}`);
 
         // IMPORTANT: Force re-render after data update!
         if (window.marketsManager) {
             // Reload stocks from updated STOCKS_DATA
             if (typeof window.marketsManager.loadStocks === 'function') {
+                console.log('   Calling marketsManager.loadStocks()...');
                 window.marketsManager.loadStocks();
             } else {
                 // Fallback: just render
+                console.log('   Calling marketsManager.renderStocks()...');
                 if (typeof window.marketsManager.renderStocks === 'function') {
                     window.marketsManager.renderStocks();
                 }
