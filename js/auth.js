@@ -94,18 +94,12 @@ function showLoginButton() {
     if (!authContainer) return;
 
     authContainer.innerHTML = `
-        <div class="auth-buttons">
-            <button id="loginBtn" class="login-btn google-btn">
-                <i class="fab fa-google"></i> Google ile Giriş
-            </button>
-            <button id="emailLoginBtn" class="login-btn email-btn">
-                <i class="fas fa-envelope"></i> Email ile Giriş
-            </button>
-        </div>
+        <button id="loginBtn" class="login-btn">
+            <i class="fas fa-sign-in-alt"></i> Giriş Yap
+        </button>
     `;
 
-    document.getElementById('loginBtn').addEventListener('click', handleGoogleLogin);
-    document.getElementById('emailLoginBtn').addEventListener('click', showEmailLoginModal);
+    document.getElementById('loginBtn').addEventListener('click', showEmailLoginModal);
 }
 
 // Show localStorage mode notification
@@ -131,8 +125,16 @@ function showEmailLoginModal() {
             <span class="close-modal">&times;</span>
             <h2>Giriş Yap / Kayıt Ol</h2>
 
+            <button onclick="handleGoogleLogin()" class="google-login-btn">
+                <i class="fab fa-google"></i> Google ile devam et
+            </button>
+
+            <div class="auth-divider">
+                <span>veya</span>
+            </div>
+
             <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">Giriş Yap</button>
+                <button class="auth-tab active" data-tab="login">Email ile Giriş</button>
                 <button class="auth-tab" data-tab="register">Kayıt Ol</button>
             </div>
 
@@ -148,14 +150,6 @@ function showEmailLoginModal() {
                 <input type="password" id="registerPassword" placeholder="Şifre (min 6 karakter)" required>
                 <button onclick="handleEmailRegister()" class="submit-btn">Kayıt Ol</button>
             </div>
-
-            <div class="auth-divider">
-                <span>veya</span>
-            </div>
-
-            <button onclick="handleGoogleLogin()" class="google-login-btn">
-                <i class="fab fa-google"></i> Google ile devam et
-            </button>
         </div>
     `;
 
