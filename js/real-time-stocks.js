@@ -70,7 +70,7 @@ class RealTimeStockSystem {
     }
 
     /**
-     * Yahoo Finance API - Tek hisse fiyatı
+     * Yahoo Finance API - Tek hisse fiyatı (CORS proxy ile)
      */
     async getStockQuote(symbol) {
         const cacheKey = `quote_${symbol}`;
@@ -81,7 +81,9 @@ class RealTimeStockSystem {
         }
 
         try {
-            const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
+            // CORS proxy kullan (allorigins.win - ücretsiz)
+            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
+            const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`;
             const response = await fetch(url);
             const data = await response.json();
 
@@ -127,7 +129,9 @@ class RealTimeStockSystem {
         }
 
         try {
-            const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=${days}d`;
+            // CORS proxy kullan
+            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=${days}d`;
+            const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`;
             const response = await fetch(url);
             const data = await response.json();
 
