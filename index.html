@@ -1867,13 +1867,98 @@
                                 <span class="day-title">Hisse Senedi Nedir? Nasıl Çalışır?</span>
                             </label>
                             <div class="day-content">
-                                <p><strong>Hedef:</strong> Hisse senedi kavramını tam olarak anlamak</p>
-                                <ul>
-                                    <li>Terimler bölümünden "Hisse Senedi" başlığını oku</li>
-                                    <li>Bir şirket seç (örn: Apple) ve geçmişine bak</li>
-                                    <li>Soru: "Neden hisse senedi fiyatları değişir?" - Cevabını araştır</li>
-                                </ul>
-                                <p><strong>Pratik:</strong> Yahoo Finance'te 5 farklı şirket ara ve fiyatlarına bak</p>
+                                <p><strong>🎯 Hedef:</strong> Hisse senedi kavramını tam olarak anlamak ve temel işleyişini kavramak</p>
+
+                                <div class="learning-section">
+                                    <h4>📚 Öğrenilecekler:</h4>
+                                    <ul>
+                                        <li>Terimler bölümünden "Hisse Senedi" başlığını oku</li>
+                                        <li>Bir şirket seç (örn: Apple) ve geçmişine bak</li>
+                                        <li>Hisse senedi fiyatlarını neyin etkilediğini araştır</li>
+                                        <li>Borsa nedir, nasıl çalışır? (NASDAQ, NYSE, BIST)</li>
+                                    </ul>
+                                </div>
+
+                                <div class="assignment-section">
+                                    <h4>✍️ ÖDEV 1: Hisse Senedi Araştırması</h4>
+                                    <ol>
+                                        <li>Yahoo Finance'te 3 farklı sektörden birer şirket seç (teknoloji, sağlık, finans)</li>
+                                        <li>Her şirket için şunları not et:
+                                            <ul>
+                                                <li>Güncel hisse fiyatı</li>
+                                                <li>Son 1 yıldaki değişim %</li>
+                                                <li>Piyasa değeri (Market Cap)</li>
+                                                <li>Şirketin ne iş yaptığı (1 cümle)</li>
+                                            </ul>
+                                        </li>
+                                        <li>Bu 3 şirketten hangisine yatırım yapardın ve neden? (3-4 cümle yaz)</li>
+                                    </ol>
+                                </div>
+
+                                <div class="quiz-section">
+                                    <h4>❓ Test Soruları:</h4>
+                                    <div class="quiz-question">
+                                        <p><strong>Soru 1:</strong> Apple'ın 1 hissesini satın aldığında ne olur?</p>
+                                        <div class="quiz-options">
+                                            <label><input type="radio" name="q1" value="a"> A) Apple'ın sahibi olursun</label>
+                                            <label><input type="radio" name="q1" value="b"> B) Apple'ın çok küçük bir ortağı olursun</label>
+                                            <label><input type="radio" name="q1" value="c"> C) Apple'a borç vermiş olursun</label>
+                                            <label><input type="radio" name="q1" value="d"> D) Hiçbir şey olmaz</label>
+                                        </div>
+                                        <div class="quiz-answer" style="display:none;">
+                                            <strong>✅ Cevap: B)</strong> Apple'ın çok küçük bir ortağı olursun. Hisse senedi, şirketin bir parçasına sahip olmak demektir. 1 hisse aldığında milyonlarca hisseden sadece 1'ine sahipsin, yani çok küçük bir ortak olursun.
+                                        </div>
+                                    </div>
+
+                                    <div class="quiz-question">
+                                        <p><strong>Soru 2:</strong> Hisse senedi fiyatları neden değişir?</p>
+                                        <div class="quiz-options">
+                                            <label><input type="radio" name="q2" value="a"> A) Sadece şirketin kârı değişirse</label>
+                                            <label><input type="radio" name="q2" value="b"> B) Arz ve talebe göre</label>
+                                            <label><input type="radio" name="q2" value="c"> C) Borsa karar verir</label>
+                                            <label><input type="radio" name="q2" value="d"> D) Rastgele değişir</label>
+                                        </div>
+                                        <div class="quiz-answer" style="display:none;">
+                                            <strong>✅ Cevap: B)</strong> Arz ve talebe göre. Hisse senedi fiyatı basit ekonomi kuralıyla belirlenir: Çok kişi almak isterse (talep yüksek) fiyat yükselir, çok kişi satmak isterse (arz yüksek) fiyat düşer. Şirket haberleri, ekonomik veriler, psikoloji - hepsi arz/talep dengesini etkiler.
+                                        </div>
+                                    </div>
+
+                                    <div class="quiz-question">
+                                        <p><strong>Soru 3:</strong> "Market Cap (Piyasa Değeri)" ne demektir?</p>
+                                        <div class="quiz-options">
+                                            <label><input type="radio" name="q3" value="a"> A) Şirketin kasasındaki para</label>
+                                            <label><input type="radio" name="q3" value="b"> B) Şirketin yıllık kârı</label>
+                                            <label><input type="radio" name="q3" value="c"> C) Hisse fiyatı × Toplam hisse sayısı</label>
+                                            <label><input type="radio" name="q3" value="d"> D) Şirketin borcu</label>
+                                        </div>
+                                        <div class="quiz-answer" style="display:none;">
+                                            <strong>✅ Cevap: C)</strong> Hisse fiyatı × Toplam hisse sayısı. Örnek: Apple'ın hisse fiyatı $180 ve 15 milyar hissesi var → Market Cap = $180 × 15B = $2.7 trilyon. Bu, borsaya göre Apple'ın toplam değeridir.
+                                        </div>
+                                    </div>
+
+                                    <button class="btn-secondary show-answers-btn" onclick="this.parentElement.querySelectorAll('.quiz-answer').forEach(a => a.style.display = a.style.display === 'none' ? 'block' : 'none'); this.textContent = this.textContent.includes('Göster') ? '🔒 Cevapları Gizle' : '🔓 Cevapları Göster'">🔓 Cevapları Göster</button>
+                                </div>
+
+                                <div class="practical-exercise">
+                                    <h4>💻 Pratik Uygulama:</h4>
+                                    <p><strong>Simülatör Challenge:</strong></p>
+                                    <ol>
+                                        <li>Bu sitedeki "Piyasalar" sekmesine git</li>
+                                        <li>3 farklı hisse seç ve favorilerine ekle</li>
+                                        <li>Her hissenin güncel fiyatını not et</li>
+                                        <li>1 hafta sonra tekrar kontrol et - hangisi en çok değişmiş?</li>
+                                    </ol>
+                                </div>
+
+                                <div class="key-takeaways">
+                                    <h4>🔑 Anahtar Noktalar:</h4>
+                                    <ul>
+                                        <li>✅ Hisse senedi = Şirkete ortaklık</li>
+                                        <li>✅ Fiyat = Arz ve talep dengesi</li>
+                                        <li>✅ Borsa = Alıcı ve satıcının buluştuğu pazar</li>
+                                        <li>✅ Market Cap = Şirketin toplam değeri</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
