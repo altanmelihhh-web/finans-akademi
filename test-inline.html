@@ -82,6 +82,7 @@
                 }
                 .inline-chat-message.bot {
                     background: white;
+                    color: #333;
                     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
                 }
                 .inline-chat-message.user {
@@ -150,9 +151,41 @@
             messages.scrollTop = messages.scrollHeight;
         }
 
+        // Gerçek fiyat kontrolü (async)
+        async function checkStockPrice(query) {
+            // Türk Hava Yolları, Garanti, Akbank, vs. tespit et
+            const stocks = {
+                'türk hava': 'THYAO',
+                'thy': 'THYAO',
+                'garanti': 'GARAN',
+                'akbank': 'AKBNK',
+                'ereğli': 'EREGL',
+                'tupras': 'TUPRS',
+                'bim': 'BIMAS'
+            };
+
+            for (let [keyword, symbol] of Object.entries(stocks)) {
+                if (query.includes(keyword)) {
+                    try {
+                        // BIST fiyatları için basit API (demo - gerçekte bir API kullanın)
+                        // Şimdilik rastgele fiyat gösterelim
+                        const mockPrice = (Math.random() * 100 + 50).toFixed(2);
+                        return `${symbol} hissesinin güncel fiyatı: ₺${mockPrice} (Demo veri - Gerçek API entegrasyonu için Alpha Vantage veya BigPara kullanılabilir)`;
+                    } catch (error) {
+                        return 'Fiyat bilgisi şu anda alınamıyor.';
+                    }
+                }
+            }
+            return null;
+        }
+
         // Basit cevaplar
-        function getResponse(question) {
+        async function getResponse(question) {
             const q = question.toLowerCase();
+
+            // Önce fiyat sorgusu mu kontrol et
+            const priceCheck = await checkStockPrice(q);
+            if (priceCheck) return priceCheck;
 
             if (q.includes('hisse') || q.includes('stock')) {
                 return 'Hisse senedi, bir şirketin sermayesinin eşit paylara bölünmüş birimlerinden biridir. Hisse senedi alarak o şirketin ortağı olursunuz.';
@@ -168,6 +201,11 @@
             }
             if (q.includes('bist') || q.includes('borsa')) {
                 return 'Borsa İstanbul (BIST), Türkiye\'nin organize borsasıdır. BIST 100 endeksi en çok işlem gören 100 şirketi içerir.';
+            }
+
+            // Web araması önerisi
+            if (q.includes('değer') || q.includes('fiyat') || q.includes('kaç')) {
+                return 'Bu bilgiyi almak için gerçek zamanlı API entegrasyonu gerekiyor. Şu anda demo moddasınız. Hangi hisseyi merak ediyorsunuz? (THY, Garanti, Akbank, Ereğli, Tupraş, BİM)';
             }
 
             return 'Bu konuda size nasıl yardımcı olabilirim? Hisse senedi, forex, kripto para, yatırım veya borsa hakkında sorular sorabilirsiniz.';
@@ -188,16 +226,23 @@
             chatWindow.classList.remove('open');
         });
 
-        input.addEventListener('keypress', function(e) {
+        input.addEventListener('keypress', async function(e) {
             if (e.key === 'Enter' && input.value.trim()) {
                 const question = input.value.trim();
                 addMessage(question, true);
                 input.value = '';
 
-                setTimeout(function() {
-                    const response = getResponse(question);
+                // Typing indicator
+                addMessage('Yazıyor...', false);
+
+                setTimeout(async function() {
+                    // Remove typing indicator
+                    const messages = document.getElementById('inline-messages');
+                    messages.removeChild(messages.lastChild);
+
+                    const response = await getResponse(question);
                     addMessage(response, false);
-                }, 300);
+                }, 500);
             }
         });
 
