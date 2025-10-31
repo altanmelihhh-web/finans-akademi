@@ -7,26 +7,42 @@ class MarketDataSystem {
     constructor() {
         // API Keys
         this.apiKeys = {
-            // Finnhub free tier: 60 calls/min
-            // Kendi key'ini al: https://finnhub.io/register
-            finnhub: 'demo' // BURAYA KENDİ KEY'İNİ KOY (ücretsiz)
+            // Finnhub free tier: 60 calls/min (1 call/second)
+            finnhub: 'd42gjvpr01qorler9mm0d42gjvpr01qorler9mmg'
         };
 
         this.cache = new Map();
-        this.cacheTimeout = 60000; // 60 saniye
+        this.cacheTimeout = 300000; // 5 dakika cache (rate limit için)
         this.isUpdating = false;
+        this.lastUpdateTime = 0;
     }
 
     async init() {
         console.log('🚀 Market Data System V2 başlatılıyor...');
 
-        // İlk güncelleme
-        await this.updateAll();
+        // Sayfa ilk yüklendiğinde sadece CACHE'den veri kullan (eğer varsa)
+        const hasCachedData = this.cache.size > 0;
 
-        // Her 2 dakikada bir güncelle (rate limit için güvenli)
-        setInterval(() => this.updateAll(), 120000);
+        if (!hasCachedData) {
+            // İlk yükleme - API'den çek
+            console.log('📥 İlk veri yükleniyor (API)...');
+            await this.updateAll();
+        } else {
+            console.log('⚡ Cache\'den veri yüklendi (API çağrısı YOK)');
+        }
+
+        // Her 5 dakikada bir güncelle (rate limit koruması)
+        // 60 req/min = her hisse için 1 saniye delay + cache = güvenli
+        setInterval(() => {
+            const timeSinceLastUpdate = Date.now() - this.lastUpdateTime;
+            if (timeSinceLastUpdate >= 300000) { // 5 dakika geçtiyse
+                this.updateAll();
+            }
+        }, 300000); // 5 dakika
 
         console.log('✅ Market Data System V2 hazır!');
+        console.log('⏱️  Otomatik güncelleme: Her 5 dakikada bir');
+        console.log('💾 Cache süresi: 5 dakika');
     }
 
     /**
@@ -173,7 +189,11 @@ class MarketDataSystem {
             // 4. Markets sayfası için STOCKS_DATA güncelle
             await this.updateStocksData();
 
+            // Güncelleme zamanını kaydet
+            this.lastUpdateTime = Date.now();
+
             console.log('✅ Tüm veriler güncellendi!');
+            console.log(`⏰ Sonraki güncelleme: ${new Date(this.lastUpdateTime + 300000).toLocaleTimeString('tr-TR')}`);
         } catch (error) {
             console.error('❌ Güncelleme hatası:', error);
         } finally {
