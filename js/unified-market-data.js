@@ -20,7 +20,10 @@ class UnifiedMarketData {
             twelvedata: 'fdac468065d2400da3b17abc0ca59d13',
 
             // Financial Modeling Prep - Backup API (250 req/day)
-            fmp: 'zg8u1jbHsWNW7Bp0FRjvz0CL7byPAA0C'
+            fmp: 'zg8u1jbHsWNW7Bp0FRjvz0CL7byPAA0C',
+
+            // EODHD - End of Day Historical Data (20 req/day free, BIST support!)
+            eodhd: '690510e04472e7.04785343'
         };
 
         // Multi-level cache (Memory + localStorage)
@@ -37,7 +40,8 @@ class UnifiedMarketData {
         this.apiCalls = {
             finnhub: { count: 0, resetTime: Date.now() + 60000, limit: 50 }, // 60/min → 50 güvenli
             twelvedata: { count: 0, resetTime: Date.now() + 86400000, limit: 700 }, // 800/day → 700 güvenli
-            fmp: { count: 0, resetTime: Date.now() + 86400000, limit: 200 } // 250/day → 200 güvenli
+            fmp: { count: 0, resetTime: Date.now() + 86400000, limit: 200 }, // 250/day → 200 güvenli
+            eodhd: { count: 0, resetTime: Date.now() + 86400000, limit: 18 } // 20/day → 18 güvenli
         };
 
         // Load cache from localStorage on init
@@ -250,7 +254,64 @@ class UnifiedMarketData {
     }
 
     /**
-     * API LAYER 3: Financial Modeling Prep (Backup)
+     * API LAYER 3: EODHD - End of Day Historical Data (BIST SUPPORT!)
+     */
+    async getEODHDQuote(symbol) {
+        const cacheKey = `eodhd_${symbol}`;
+
+        const cached = this.getCache(cacheKey);
+        if (cached) return cached;
+
+        if (!this.canMakeAPICall('eodhd')) {
+            console.warn(`⚠️ EODHD rate limit (18/day), cache kullanılıyor: ${symbol}`);
+            return null;
+        }
+
+        try {
+            // EODHD format: THYAO.IS for BIST stocks
+            const url = `https://eodhd.com/api/real-time/${symbol}?api_token=${this.apiKeys.eodhd}&fmt=json`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            // Check for errors
+            if (data.error) {
+                console.error(`❌ EODHD error (${symbol}):`, data.error);
+                return null;
+            }
+
+            if (data && data.close) {
+                const currentPrice = parseFloat(data.close);
+                const prevClose = parseFloat(data.previousClose || currentPrice);
+                const change = currentPrice - prevClose;
+                const changePercent = (change / prevClose) * 100;
+
+                const quote = {
+                    symbol: symbol,
+                    price: currentPrice,
+                    change: change,
+                    changePercent: changePercent,
+                    high: parseFloat(data.high || currentPrice),
+                    low: parseFloat(data.low || currentPrice),
+                    open: parseFloat(data.open || currentPrice),
+                    previousClose: prevClose,
+                    volume: parseInt(data.volume || 0),
+                    source: 'eodhd'
+                };
+
+                this.setCache(cacheKey, quote);
+                this.trackAPICall('eodhd');
+
+                return quote;
+            }
+        } catch (error) {
+            console.error(`❌ EODHD error (${symbol}):`, error.message);
+        }
+
+        return null;
+    }
+
+    /**
+     * API LAYER 4: Financial Modeling Prep (Backup)
      */
     async getFMPQuote(symbol) {
         const cacheKey = `fmp_${symbol}`;
@@ -295,12 +356,94 @@ class UnifiedMarketData {
     }
 
     /**
-     * SMART QUOTE - Cascade through APIs
+     * API LAYER 5: BigPara Web Scraping (BIST FALLBACK - NO LIMITS!)
+     */
+    async getBigParaQuote(symbol) {
+        const cacheKey = `bigpara_${symbol}`;
+
+        const cached = this.getCache(cacheKey);
+        if (cached) return cached;
+
+        try {
+            // BigPara URL pattern: https://bigpara.hurriyet.com.tr/hisse/THYAO
+            const cleanSymbol = symbol.replace('.IS', '');
+            const bigparaUrl = `https://bigpara.hurriyet.com.tr/hisse/${cleanSymbol}`;
+
+            // Use CORS proxy
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(bigparaUrl)}`;
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+
+            if (data.contents) {
+                const html = data.contents;
+
+                // Simple regex parsing (fragile but works for fallback)
+                const priceMatch = html.match(/data-id="hisse_fiyat"[^>]*>([0-9,\.]+)</);
+                const changeMatch = html.match(/data-id="hisse_degisim"[^>]*>%([0-9,\.\-]+)</);
+
+                if (priceMatch && changeMatch) {
+                    const price = parseFloat(priceMatch[1].replace(',', '.'));
+                    const changePercent = parseFloat(changeMatch[1].replace(',', '.'));
+
+                    const quote = {
+                        symbol: symbol,
+                        price: price,
+                        change: (price * changePercent) / 100,
+                        changePercent: changePercent,
+                        high: price,
+                        low: price,
+                        open: price,
+                        previousClose: price / (1 + changePercent / 100),
+                        volume: 0,
+                        source: 'bigpara-scraping'
+                    };
+
+                    this.setCache(cacheKey, quote);
+                    console.log(`🕷️ BigPara scraping success: ${symbol} = ₺${price}`);
+
+                    return quote;
+                }
+            }
+        } catch (error) {
+            console.error(`❌ BigPara scraping error (${symbol}):`, error.message);
+        }
+
+        return null;
+    }
+
+    /**
+     * SMART QUOTE - 3-TIER CASCADE for BIST!
      */
     async getSmartQuote(symbol, preferredAPI = 'auto') {
-        // BIST stocks - Twelve Data only
+        // BIST stocks - 3-tier cascade: EODHD → Twelve Data → BigPara Scraping
         if (symbol.includes('.IS') || symbol.includes('XU')) {
-            return await this.getTwelveDataQuote(symbol);
+            console.log(`🇹🇷 BIST hisse tespit edildi: ${symbol}, 3-tier cascade başlatılıyor...`);
+
+            // Tier 1: EODHD (20/day limit - en güvenilir)
+            let quote = await this.getEODHDQuote(symbol);
+            if (quote) {
+                console.log(`✅ BIST ${symbol}: EODHD başarılı`);
+                return quote;
+            }
+
+            // Tier 2: Twelve Data (800/day limit)
+            console.log(`⚠️ EODHD başarısız, Twelve Data deneniyor: ${symbol}`);
+            quote = await this.getTwelveDataQuote(symbol);
+            if (quote) {
+                console.log(`✅ BIST ${symbol}: Twelve Data başarılı`);
+                return quote;
+            }
+
+            // Tier 3: BigPara Scraping (unlimited but fragile)
+            console.log(`⚠️ Twelve Data başarısız, BigPara scraping deneniyor: ${symbol}`);
+            quote = await this.getBigParaQuote(symbol);
+            if (quote) {
+                console.log(`✅ BIST ${symbol}: BigPara scraping başarılı`);
+                return quote;
+            }
+
+            console.error(`❌ TÜM BIST API'leri başarısız: ${symbol}`);
+            return null;
         }
 
         // US Stocks - Try Finnhub first, fallback to others
@@ -542,18 +685,19 @@ class UnifiedMarketData {
             }
         }
 
-        // BIST Stocks - Twelve Data ile
+        // BIST Stocks - 3-TIER CASCADE: EODHD → Twelve Data → BigPara
         if (window.STOCKS_DATA.bist_stocks) {
-            console.log('  📊 BIST hisseleri güncelleniyor (Twelve Data)...');
+            console.log('  📊 BIST hisseleri güncelleniyor (3-tier cascade: EODHD → Twelve Data → BigPara)...');
 
             const bistStocksToUpdate = window.STOCKS_DATA.bist_stocks.slice(0, 20);
 
             for (let i = 0; i < bistStocksToUpdate.length; i++) {
                 const stock = bistStocksToUpdate[i];
-                // BIST sembolleri - Twelve Data formatı
+                // BIST sembolleri - .IS suffix ekle
                 const symbol = `${stock.symbol}.IS`; // Örn: THYAO.IS
 
-                const quote = await this.getTwelveDataQuote(symbol);
+                // 3-tier cascade kullan
+                const quote = await this.getSmartQuote(symbol);
 
                 if (quote) {
                     stock.price = quote.price;
@@ -561,10 +705,15 @@ class UnifiedMarketData {
                     stock.volume = quote.volume || 1000000;
                     console.log(`  📈 ${stock.symbol}: ₺${quote.price.toFixed(2)} (${quote.source})`);
                 } else {
-                    console.warn(`  ⚠️ ${stock.symbol}: BIST verisi alınamadı (API key gerekli)`);
+                    console.warn(`  ⚠️ ${stock.symbol}: TÜM BIST API'leri başarısız`);
                 }
 
-                await this.delay(500); // BIST için daha uzun delay
+                // Smart delay based on source
+                if (quote && quote.source === 'bigpara-scraping') {
+                    await this.delay(2000); // Scraping için uzun delay
+                } else {
+                    await this.delay(500); // Normal API delay
+                }
             }
         }
 
