@@ -397,12 +397,12 @@ class MarketsManager {
             this.modalChart.destroy();
         }
 
-        // Gerçek 30 günlük veriyi Yahoo Finance'den al
+        // Gerçek 30 günlük veriyi Finnhub'dan al
         let chartData = { labels: [], prices: [] };
 
-        if (window.realTimeStocks && typeof window.realTimeStocks.getChartData === 'function') {
+        if (window.marketData && typeof window.marketData.getChartData === 'function') {
             try {
-                chartData = await window.realTimeStocks.getChartData(stock.symbol);
+                chartData = await window.marketData.getChartData(stock.symbol);
             } catch (error) {
                 console.error('Chart data error:', error);
                 // Fallback: Basit veri
