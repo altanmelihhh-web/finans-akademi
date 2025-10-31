@@ -1423,19 +1423,46 @@
                         </div>
                     </div>
 
+                    <!-- News Category Tabs -->
+                    <div class="news-tabs-container">
+                        <div class="news-tabs">
+                            <button class="news-tab active" data-category="all">
+                                <i class="fas fa-globe"></i> Tüm Haberler
+                            </button>
+                            <button class="news-tab" data-category="realtime">
+                                <i class="fas fa-bolt"></i> Güncel Haberler
+                            </button>
+                            <button class="news-tab" data-category="analysis">
+                                <i class="fas fa-chart-line"></i> Uzman Analizleri
+                            </button>
+                            <button class="news-tab" data-category="turkey">
+                                <i class="fas fa-lira-sign"></i> Türkiye
+                            </button>
+                            <button class="news-tab" data-category="global">
+                                <i class="fas fa-flag-usa"></i> Global Piyasalar
+                            </button>
+                            <button class="news-tab" data-category="crypto">
+                                <i class="fab fa-bitcoin"></i> Kripto
+                            </button>
+                        </div>
+                        <button id="refreshNews" class="btn-refresh">
+                            <i class="fas fa-sync-alt"></i> Yenile
+                        </button>
+                    </div>
+
                     <!-- Real-time News Feed -->
-                    <div class="realtime-news-section">
+                    <div class="news-category-content" data-category="realtime">
                         <div class="section-header">
                             <h2><i class="fas fa-rss"></i> Güncel Finans Haberleri</h2>
-                            <button id="refreshNews" class="btn-refresh">
-                                <i class="fas fa-sync-alt"></i> Yenile
-                            </button>
                         </div>
                         <div id="newsContainer" class="news-grid"></div>
                     </div>
 
-                    <div class="live-news-feed">
-                        <h2><i class="fas fa-chart-line"></i> Uzman Piyasa Analizleri</h2>
+                    <!-- Global Markets Section -->
+                    <div class="news-category-content" data-category="global">
+                        <div class="section-header">
+                            <h2><i class="fas fa-flag-usa"></i> Global Piyasalar</h2>
+                        </div>
 
                         <div class="analysis-grid">
                             <!-- Federal Reserve Faiz Kararı Analizi -->
@@ -1594,7 +1621,16 @@
                                     <span class="sentiment-badge neutral"><i class="fas fa-balance-scale"></i> KARIŞIK</span>
                                 </div>
                             </article>
+                        </div>
+                    </div>
 
+                    <!-- Turkey Section -->
+                    <div class="news-category-content" data-category="turkey">
+                        <div class="section-header">
+                            <h2><i class="fas fa-lira-sign"></i> Türkiye Piyasaları</h2>
+                        </div>
+
+                        <div class="analysis-grid">
                             <!-- Türkiye Enflasyon Analizi -->
                             <article class="analysis-card">
                                 <div class="analysis-header">
@@ -1708,8 +1744,88 @@
                                 </div>
                             </article>
                         </div>
+                    </div>
 
-                        <p class="disclaimer"><i class="fas fa-info-circle"></i> <strong>Önemli Not:</strong> Bu analizler eğitim amaçlıdır. Gerçek yatırım kararlarınızı vermeden önce güncel haberleri takip edin ve profesyonel danışmanlık alın. Geçmiş performans gelecek getiriyi garanti etmez.</p>
+                    <!-- Crypto Section -->
+                    <div class="news-category-content" data-category="crypto">
+                        <div class="section-header">
+                            <h2><i class="fab fa-bitcoin"></i> Kripto Para Haberleri</h2>
+                        </div>
+
+                        <div class="analysis-grid">
+                            <!-- Bitcoin Analysis -->
+                            <article class="analysis-card">
+                                <div class="analysis-header">
+                                    <div class="analysis-badge" style="background: linear-gradient(135deg, #f7931a 0%, #f2a900 100%); color: white;">
+                                        <i class="fab fa-bitcoin"></i> BTC
+                                    </div>
+                                    <span class="analysis-time">4 saat önce</span>
+                                </div>
+
+                                <h3 class="analysis-title">Bitcoin $70K'yı Aştı - Kurumsal Yatırımcı İlgisi Artıyor</h3>
+
+                                <div class="key-metrics">
+                                    <div class="metric-card">
+                                        <div class="metric-label">Fiyat</div>
+                                        <div class="metric-value">$72,400</div>
+                                        <div class="metric-change positive">+8.5% (24h)</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-label">Piyasa Değeri</div>
+                                        <div class="metric-value">$1.42T</div>
+                                        <div class="metric-change positive">Dominans %54</div>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="metric-label">24h Hacim</div>
+                                        <div class="metric-value">$45.2B</div>
+                                        <div class="metric-change positive">Yüksek</div>
+                                    </div>
+                                </div>
+
+                                <div class="market-impact-section">
+                                    <h4><i class="fas fa-chart-line"></i> Altcoin Performansı</h4>
+                                    <div class="impact-grid">
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">Ethereum</span>
+                                            <span class="impact-value">+6.2%</span>
+                                        </div>
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">Solana</span>
+                                            <span class="impact-value">+12.8%</span>
+                                        </div>
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">BNB</span>
+                                            <span class="impact-value">+4.1%</span>
+                                        </div>
+                                        <div class="impact-item positive">
+                                            <span class="impact-name">XRP</span>
+                                            <span class="impact-value">+9.3%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="insights-section">
+                                    <div class="insight-box">
+                                        <i class="fas fa-quote-left"></i>
+                                        <p>"Bitcoin ETF'lerine bu ay $2.1 milyar net giriş oldu. Kurumsal yatırımcılar pozisyon alıyor."</p>
+                                        <span class="insight-author">- Bloomberg Crypto Analisti</span>
+                                    </div>
+                                </div>
+
+                                <div class="strategy-tags">
+                                    <span class="strategy-tag bullish"><i class="fas fa-arrow-up"></i> Kısa Vadeli: Yükseliş</span>
+                                    <span class="strategy-tag neutral"><i class="fas fa-hand-paper"></i> $75K Direnci Önemli</span>
+                                </div>
+
+                                <div class="analysis-footer">
+                                    <span class="impact-badge high"><i class="fas fa-bolt"></i> ÇOK YÜKSEK ETKİ</span>
+                                    <span class="sentiment-badge positive"><i class="fas fa-check-circle"></i> OLUMLU</span>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <p class="disclaimer"><i class="fas fa-info-circle"></i> <strong>Önemli Not:</strong> Bu analizler eğitim amaçlıdır. Gerçek yatırım kararlarınızı vermeden önce güncel haberleri takip edin ve profesyonel danışmanlık alın. Geçmiş performans gelecek getiriyi garanti etmez.</p>
                     </div>
                 </div>
             </div>

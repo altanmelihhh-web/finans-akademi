@@ -2950,3 +2950,99 @@ footer i {
         justify-content: center;
     }
 }
+
+/* ===================================
+   News Category Tabs
+   =================================== */
+
+.news-tabs-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.news-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.news-tab {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.news-tab:hover {
+    background: var(--card-hover);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.news-tab.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.news-tab i {
+    font-size: 1rem;
+}
+
+.news-category-content {
+    display: none;
+}
+
+.news-category-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Tabs */
+@media (max-width: 768px) {
+    .news-tabs-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .news-tabs {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .news-tab {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-refresh {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -119,6 +119,9 @@ function initNavigation() {
                                 });
                             });
                         }
+
+                        // Setup news category tabs
+                        initNewsTabNavigation();
                     }
                 }
             }
@@ -1730,6 +1733,67 @@ function checkAnswer(userAnswer) {
 // ===================================
 // Console Info
 // ===================================
+
+// ===================================
+// News Tab Navigation
+// ===================================
+
+function initNewsTabNavigation() {
+    const tabs = document.querySelectorAll('.news-tab');
+    const contents = document.querySelectorAll('.news-category-content');
+
+    // Show all content by default when "Tüm Haberler" is active
+    function showAllContent() {
+        contents.forEach(content => {
+            content.classList.add('active');
+        });
+    }
+
+    // Show specific category
+    function showCategory(category) {
+        contents.forEach(content => {
+            if (content.dataset.category === category) {
+                content.classList.add('active');
+            } else {
+                content.classList.remove('active');
+            }
+        });
+    }
+
+    // Set up click handlers
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active from all tabs
+            tabs.forEach(t => t.classList.remove('active'));
+
+            // Add active to clicked tab
+            tab.classList.add('active');
+
+            // Get category
+            const category = tab.dataset.category;
+
+            // Show appropriate content
+            if (category === 'all') {
+                showAllContent();
+            } else if (category === 'analysis') {
+                // Show both global and turkey for analysis
+                contents.forEach(content => {
+                    const cat = content.dataset.category;
+                    if (cat === 'global' || cat === 'turkey' || cat === 'crypto') {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            } else {
+                showCategory(category);
+            }
+        });
+    });
+
+    // Show all content by default
+    showAllContent();
+}
 
 console.log('%c🚀 Finans Akademi v1.0', 'color: #2563eb; font-size: 20px; font-weight: bold;');
 console.log('%cGerçek API entegrasyonu için:', 'color: #10b981; font-size: 14px;');
