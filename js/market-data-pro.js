@@ -595,8 +595,8 @@ class MarketDataPro {
 
         // TIER 1: Cloudflare Worker Proxy (UNLIMITED, CORS-free!) - Try first
         try {
-            // Use Cloudflare Worker to bypass CORS
-            const workerUrl = `https://bist-proxy.altanmelihhh.workers.dev/?symbol=${symbol}`;
+            // Use Cloudflare Worker with path-based routing (more reliable)
+            const workerUrl = `https://bist-proxy.altanmelihhh.workers.dev/${symbol}`;
 
             const response = await fetch(workerUrl);
             const data = await response.json();
