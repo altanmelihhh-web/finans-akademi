@@ -330,6 +330,9 @@ class MarketDataPro {
                     window.marketsManager.updateStats();
                 }
 
+                // Update Winners/Losers after each batch
+                this.updateWinnersLosers();
+
                 console.log(`✓ Batch ${batchNum}/${batches} complete (${Math.round((batchNum / batches) * 100)}%)`);
 
                 // No batch delay needed - we delay within each stock fetch
@@ -339,6 +342,9 @@ class MarketDataPro {
             this.cache.memory.set('markets', marketsCache);
             this.state.lastMarketsUpdate = Date.now();
             this.saveCache();
+
+            // Final update of Winners/Losers
+            this.updateWinnersLosers();
 
             console.log('✅ Markets background update complete!');
 
@@ -1112,6 +1118,79 @@ class MarketDataPro {
                 this.updateElement('bist100', data.indices.bist100.price.toFixed(2), data.indices.bist100.changePercent);
             }
         }
+
+        // Update Winners/Losers
+        this.updateWinnersLosers();
+    }
+
+    /**
+     * Update Winners and Losers dynamically from real market data
+     */
+    updateWinnersLosers() {
+        if (!window.STOCKS_DATA) return;
+
+        // Combine all stocks (US + BIST)
+        const allStocks = [
+            ...(window.STOCKS_DATA.us_stocks || []),
+            ...(window.STOCKS_DATA.bist_stocks || [])
+        ];
+
+        // Filter stocks with valid prices and changes
+        const validStocks = allStocks.filter(stock =>
+            stock.price > 0 &&
+            stock.change !== undefined &&
+            stock.change !== null &&
+            !isNaN(stock.change)
+        );
+
+        if (validStocks.length === 0) {
+            console.log('ℹ️ No valid stock data yet for Winners/Losers');
+            return;
+        }
+
+        // Sort by change percentage
+        const sorted = [...validStocks].sort((a, b) => b.change - a.change);
+
+        // Top 3 Winners
+        const winners = sorted.slice(0, 3);
+
+        // Top 3 Losers (from the end)
+        const losers = sorted.slice(-3).reverse();
+
+        // Render Winners
+        const winnersEl = document.getElementById('winners');
+        if (winnersEl) {
+            winnersEl.innerHTML = winners.map(stock => {
+                const isBIST = this.isBISTStock(stock.symbol);
+                const currency = isBIST ? '₺' : '$';
+                return `
+                    <div class="stat-item">
+                        <span class="stock-symbol">${stock.symbol}</span>
+                        <span class="stock-change positive">+${stock.change.toFixed(2)}%</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Losers
+        const losersEl = document.getElementById('losers');
+        if (losersEl) {
+            losersEl.innerHTML = losers.map(stock => {
+                const isBIST = this.isBISTStock(stock.symbol);
+                const currency = isBIST ? '₺' : '$';
+                return `
+                    <div class="stat-item">
+                        <span class="stock-symbol">${stock.symbol}</span>
+                        <span class="stock-change negative">${stock.change.toFixed(2)}%</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        console.log('📊 Winners/Losers updated:', {
+            winners: winners.map(s => `${s.symbol} +${s.change.toFixed(2)}%`),
+            losers: losers.map(s => `${s.symbol} ${s.change.toFixed(2)}%`)
+        });
     }
 
     updateElement(id, value, changePercent = null) {
