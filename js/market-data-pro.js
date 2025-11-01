@@ -854,13 +854,14 @@ class MarketDataPro {
         this.perf.cacheMisses++;
 
         try {
-            // US Indices from Yahoo Finance (Finnhub requires paid plan for indices)
+            // US Indices via Cloudflare Worker (bypasses CORS!)
             const indices = {};
+            const WORKER_URL = 'https://indices-proxy.altanmelihhh.workers.dev';
 
-            // Helper function to fetch from Yahoo Finance
-            const fetchYahooIndex = async (symbol, name) => {
+            // Helper function to fetch from Cloudflare Worker
+            const fetchIndexViaWorker = async (symbol, name) => {
                 try {
-                    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`;
+                    const url = `${WORKER_URL}/${symbol}`;
                     const res = await fetch(url);
                     const data = await res.json();
 
@@ -871,36 +872,37 @@ class MarketDataPro {
                             price: meta.regularMarketPrice,
                             change: meta.regularMarketPrice - meta.previousClose,
                             changePercent: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100,
-                            source: 'yahoo-finance'
+                            source: 'cloudflare-worker'
                         };
                     }
                 } catch (error) {
-                    console.warn(`⚠️ ${name}: CORS/API error, using fallback`);
-                    // Return null, will use fallback below
+                    console.warn(`⚠️ ${name}: Worker error, using fallback -`, error.message);
                     return null;
                 }
                 return null;
             };
 
-            // S&P 500
-            const sp500 = await fetchYahooIndex('^GSPC', 'S&P 500');
+            // S&P 500 via Worker
+            const sp500 = await fetchIndexViaWorker('GSPC', 'S&P 500');
             if (sp500) {
                 indices.sp500 = sp500;
+                console.log(`✓ S&P 500: ${sp500.price.toFixed(2)} (${sp500.changePercent >= 0 ? '+' : ''}${sp500.changePercent.toFixed(2)}%) - Cloudflare Worker`);
             } else {
-                // Fallback with realistic data
                 indices.sp500 = {
                     symbol: 'S&P 500',
-                    price: 5950 + (Math.random() * 100 - 50), // Around 5,950 ±50
+                    price: 5950 + (Math.random() * 100 - 50),
                     change: Math.random() * 40 - 20,
                     changePercent: (Math.random() * 1.5 - 0.75),
                     source: 'fallback'
                 };
+                console.log(`⚠️ S&P 500: Using fallback data`);
             }
 
-            // NASDAQ
-            const nasdaq = await fetchYahooIndex('^IXIC', 'NASDAQ');
+            // NASDAQ via Worker
+            const nasdaq = await fetchIndexViaWorker('IXIC', 'NASDAQ');
             if (nasdaq) {
                 indices.nasdaq = nasdaq;
+                console.log(`✓ NASDAQ: ${nasdaq.price.toFixed(2)} (${nasdaq.changePercent >= 0 ? '+' : ''}${nasdaq.changePercent.toFixed(2)}%) - Cloudflare Worker`);
             } else {
                 indices.nasdaq = {
                     symbol: 'NASDAQ',
@@ -909,12 +911,14 @@ class MarketDataPro {
                     changePercent: (Math.random() * 1.8 - 0.9),
                     source: 'fallback'
                 };
+                console.log(`⚠️ NASDAQ: Using fallback data`);
             }
 
-            // DOW JONES
-            const dow = await fetchYahooIndex('^DJI', 'DOW JONES');
+            // DOW JONES via Worker
+            const dow = await fetchIndexViaWorker('DJI', 'DOW JONES');
             if (dow) {
                 indices.dow = dow;
+                console.log(`✓ DOW JONES: ${dow.price.toFixed(2)} (${dow.changePercent >= 0 ? '+' : ''}${dow.changePercent.toFixed(2)}%) - Cloudflare Worker`);
             } else {
                 indices.dow = {
                     symbol: 'DOW JONES',
@@ -923,34 +927,23 @@ class MarketDataPro {
                     changePercent: (Math.random() * 1.2 - 0.6),
                     source: 'fallback'
                 };
+                console.log(`⚠️ DOW JONES: Using fallback data`);
             }
 
-            // BIST 100 - Try Yahoo Finance (will fail due to CORS, fallback to realistic data)
-            try {
-                const bist100Url = 'https://query1.finance.yahoo.com/v8/finance/chart/XU100.IS';
-                const bist100Res = await fetch(bist100Url);
-                const bist100Data = await bist100Res.json();
-
-                if (bist100Data && bist100Data.chart && bist100Data.chart.result[0]) {
-                    const meta = bist100Data.chart.result[0].meta;
-                    indices.bist100 = {
-                        symbol: 'BIST 100',
-                        price: meta.regularMarketPrice,
-                        change: meta.regularMarketPrice - meta.previousClose,
-                        changePercent: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100,
-                        source: 'yahoo-finance'
-                    };
-                }
-            } catch (error) {
-                // CORS error expected - use realistic fallback
-                console.log('ℹ️ BIST 100: CORS blocked, using realistic data');
+            // BIST 100 via Worker
+            const bist100 = await fetchIndexViaWorker('XU100.IS', 'BIST 100');
+            if (bist100) {
+                indices.bist100 = bist100;
+                console.log(`✓ BIST 100: ${bist100.price.toFixed(2)} (${bist100.changePercent >= 0 ? '+' : ''}${bist100.changePercent.toFixed(2)}%) - Cloudflare Worker`);
+            } else {
                 indices.bist100 = {
                     symbol: 'BIST 100',
-                    price: 10871.25 + (Math.random() * 200 - 100), // Around 10,871 ±100
-                    change: Math.random() * 40 - 20, // ±20
-                    changePercent: (Math.random() * 2 - 1), // ±1%
+                    price: 10871.25 + (Math.random() * 200 - 100),
+                    change: Math.random() * 40 - 20,
+                    changePercent: (Math.random() * 2 - 1),
                     source: 'fallback'
                 };
+                console.log(`⚠️ BIST 100: Using fallback data`);
             }
 
             this.setCached(cacheKey, indices);
