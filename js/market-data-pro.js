@@ -279,12 +279,14 @@ class MarketDataPro {
         console.log('🔄 Markets background update starting...');
 
         try {
-            // Only US stocks for now (BIST has CORS issues with Yahoo Finance)
+            // Combine US and BIST stocks (BIST now works via Cloudflare Worker!)
             const usStocks = window.STOCKS_DATA.us_stocks;
-            const totalStocks = usStocks.length;
+            const bistStocks = window.STOCKS_DATA.bist_stocks;
+            const allStocks = [...usStocks, ...bistStocks];
+            const totalStocks = allStocks.length;
             const batches = Math.ceil(totalStocks / this.batch.size);
 
-            console.log(`📦 Processing ${totalStocks} US stocks in ${batches} batches (BIST disabled due to CORS)`);
+            console.log(`📦 Processing ${totalStocks} stocks (${usStocks.length} US + ${bistStocks.length} BIST) in ${batches} batches`);
 
             const marketsCache = {};
 
@@ -293,7 +295,7 @@ class MarketDataPro {
                 const batchNum = i + 1;
                 const start = i * this.batch.size;
                 const end = Math.min(start + this.batch.size, totalStocks);
-                const batchStocks = usStocks.slice(start, end);
+                const batchStocks = allStocks.slice(start, end);
 
                 console.log(`📦 Batch ${batchNum}/${batches}: ${batchStocks.map(s => s.symbol).join(', ')}`);
 
@@ -591,12 +593,12 @@ class MarketDataPro {
             return cached;
         }
 
-        // TIER 1: Yahoo Finance (UNLIMITED, FREE!) - Try first
+        // TIER 1: Cloudflare Worker Proxy (UNLIMITED, CORS-free!) - Try first
         try {
-            const yahooSymbol = `${symbol}.IS`; // THYAO.IS format
-            const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`;
+            // Use Cloudflare Worker to bypass CORS
+            const workerUrl = `https://bist-proxy.altanmelihhh.workers.dev/?symbol=${symbol}`;
 
-            const response = await fetch(url);
+            const response = await fetch(workerUrl);
             const data = await response.json();
 
             if (data && data.chart && data.chart.result && data.chart.result[0]) {
@@ -624,11 +626,11 @@ class MarketDataPro {
                 };
 
                 this.setCached(cacheKey, bistQuote);
-                console.log(`✓ BIST ${symbol}: ₺${currentPrice.toFixed(2)} (Yahoo Finance - Unlimited)`);
+                console.log(`✓ BIST ${symbol}: ₺${currentPrice.toFixed(2)} (Cloudflare Worker)`);
                 return bistQuote;
             }
         } catch (error) {
-            console.warn(`⚠️ BIST ${symbol}: Yahoo Finance failed, trying Alpha Vantage...`);
+            console.warn(`⚠️ BIST ${symbol}: Cloudflare Worker failed, trying Alpha Vantage...`);
         }
 
         // TIER 2: Alpha Vantage (25/day backup)
