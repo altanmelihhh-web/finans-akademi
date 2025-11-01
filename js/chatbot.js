@@ -211,25 +211,160 @@ class FinansChatbot {
     }
 
     async callAPI(message, forceWebSearch = false) {
-        const response = await fetch(this.apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: message,
-                session_id: this.sessionId,
-                history: this.history,
-                force_web_search: forceWebSearch
-            })
+        // Use Gemini API directly (no backend needed!)
+        const GEMINI_API_KEY = 'AIzaSyDsx7CgP-aKXbB7qd4_i4XXl__tO68kJ3Y';
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+        const startTime = Date.now();
+
+        try {
+            // Collect market context from the page
+            const marketContext = this.getMarketContext();
+
+            // Build conversation history for Gemini
+            const conversationHistory = this.history.slice(-10).map(msg => ({
+                role: msg.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: msg.content }]
+            }));
+
+            // System instruction as first message
+            const systemPrompt = `Sen Finans Akademi'nin yapay zeka asistanısın. Türkçe konuşuyorsun.
+
+GÖREVIN:
+- Finans, borsa, hisse senedi, forex, kripto para, yatırım konularında yardım et
+- Kullanıcıya site içindeki verileri göster (hisse fiyatları, endeksler, etc.)
+- Eğitici ve anlaşılır ol, karmaşık terimleri açıkla
+- Yatırım tavsiyesi verme, sadece bilgi ver
+
+GÜNCEL PİYASA VERİLERİ:
+${marketContext}
+
+Kullanıcı sorularını bu verilerle yanıtla. Fiyatlar gerçek zamanlı!`;
+
+            // Combine system prompt + history + current message
+            const contents = [
+                {
+                    role: 'user',
+                    parts: [{ text: systemPrompt }]
+                },
+                ...conversationHistory,
+                {
+                    role: 'user',
+                    parts: [{ text: message }]
+                }
+            ];
+
+            const response = await fetch(GEMINI_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: contents,
+                    generationConfig: {
+                        temperature: 0.7,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 1024,
+                    },
+                    safetySettings: [
+                        {
+                            category: "HARM_CATEGORY_HARASSMENT",
+                            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                        },
+                        {
+                            category: "HARM_CATEGORY_HATE_SPEECH",
+                            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                        }
+                    ]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'Gemini API error');
+            }
+
+            const data = await response.json();
+            const responseTime = Date.now() - startTime;
+
+            // Extract answer from Gemini response
+            const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Üzgünüm, yanıt oluşturamadım.';
+
+            return {
+                data: {
+                    answer: answer,
+                    source_type: 'gemini_ai',
+                    confidence: 0.95,
+                    response_time_ms: responseTime,
+                    web_sources: []
+                }
+            };
+
+        } catch (error) {
+            console.error('Gemini API error:', error);
+            throw new Error(`Gemini hatası: ${error.message}`);
+        }
+    }
+
+    /**
+     * Collect current market data as context for AI
+     */
+    getMarketContext() {
+        const context = [];
+
+        // Get index values from Dashboard
+        const indices = [
+            { id: 'sp500', name: 'S&P 500' },
+            { id: 'nasdaq', name: 'NASDAQ' },
+            { id: 'dow', name: 'DOW JONES' },
+            { id: 'bist100', name: 'BIST 100' },
+            { id: 'usdtry', name: 'USD/TRY' },
+            { id: 'eurtry', name: 'EUR/TRY' }
+        ];
+
+        indices.forEach(index => {
+            const el = document.getElementById(index.id);
+            const changeEl = document.getElementById(index.id + '-change');
+            if (el && el.textContent !== '-') {
+                const value = el.textContent;
+                const change = changeEl ? changeEl.textContent : '';
+                context.push(`${index.name}: ${value} ${change}`);
+            }
         });
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'API request failed');
+        // Get stock data if available
+        if (window.STOCKS_DATA) {
+            const usStocks = window.STOCKS_DATA.us_stocks || [];
+            const bistStocks = window.STOCKS_DATA.bist_stocks || [];
+
+            // Sample of stocks with prices
+            const sampleStocks = [...usStocks, ...bistStocks]
+                .filter(s => s.price > 0)
+                .slice(0, 20);
+
+            if (sampleStocks.length > 0) {
+                context.push('\nÖRNEK HİSSELER:');
+                sampleStocks.forEach(stock => {
+                    const currency = stock.symbol.includes('THYAO') || stock.symbol.includes('GARAN') ? '₺' : '$';
+                    context.push(`${stock.symbol} (${stock.name}): ${currency}${stock.price.toFixed(2)} (${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)}%)`);
+                });
+            }
         }
 
-        return await response.json();
+        // Get Winners/Losers if available
+        const winnersEl = document.getElementById('winners');
+        const losersEl = document.getElementById('losers');
+
+        if (winnersEl && winnersEl.textContent) {
+            context.push('\nBUGÜNKÜ KAZANANLAR: ' + winnersEl.textContent);
+        }
+
+        if (losersEl && losersEl.textContent) {
+            context.push('\nBUGÜNKÜ KAYBEDENLER: ' + losersEl.textContent);
+        }
+
+        return context.join('\n');
     }
 
     addMessage(role, text, metadata = {}) {
@@ -330,7 +465,8 @@ class FinansChatbot {
             'site_content': '<i class="fas fa-book"></i>',
             'web_search': '<i class="fas fa-globe"></i>',
             'hybrid': '<i class="fas fa-layer-group"></i>',
-            'fallback': '<i class="fas fa-question-circle"></i>'
+            'fallback': '<i class="fas fa-question-circle"></i>',
+            'gemini_ai': '<i class="fas fa-sparkles"></i>'
         };
         return icons[sourceType] || '';
     }
@@ -340,7 +476,8 @@ class FinansChatbot {
             'site_content': 'Site içeriği',
             'web_search': 'Web araması',
             'hybrid': 'Karma kaynak',
-            'fallback': 'Genel bilgi'
+            'fallback': 'Genel bilgi',
+            'gemini_ai': 'Gemini AI'
         };
         return texts[sourceType] || 'Bilinmiyor';
     }
