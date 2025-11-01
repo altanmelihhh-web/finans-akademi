@@ -221,25 +221,39 @@ class FinansChatbot {
             // Collect market context from the page
             const marketContext = this.getMarketContext();
 
+            // DEBUG: Log context
+            console.log('📊 Market Context for Gemini:', marketContext);
+
             // Build conversation history for Gemini
             const conversationHistory = this.history.slice(-10).map(msg => ({
                 role: msg.role === 'assistant' ? 'model' : 'user',
                 parts: [{ text: msg.content }]
             }));
 
-            // System instruction as first message
+            // System instruction as first message - IMPROVED with explicit data format
             const systemPrompt = `Sen Finans Akademi'nin yapay zeka asistanısın. Türkçe konuşuyorsun.
 
 GÖREVIN:
 - Finans, borsa, hisse senedi, forex, kripto para, yatırım konularında yardım et
-- Kullanıcıya site içindeki verileri göster (hisse fiyatları, endeksler, etc.)
+- Kullanıcıya aşağıdaki GÜNCEL PİYASA VERİLERİ'ni kullanarak cevap ver
 - Eğitici ve anlaşılır ol, karmaşık terimleri açıkla
 - Yatırım tavsiyesi verme, sadece bilgi ver
 
-GÜNCEL PİYASA VERİLERİ:
-${marketContext}
+⚠️ ÖNEMLİ: Aşağıdaki veriler GERÇEK ZAMANLI! Kullanıcı bir endeks veya hisse sorarsa bu verilerden yanıtla.
 
-Kullanıcı sorularını bu verilerle yanıtla. Fiyatlar gerçek zamanlı!`;
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GÜNCEL PİYASA VERİLERİ (GERÇEK ZAMANLI):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${marketContext}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+KURALLAR:
+1. Kullanıcı "S&P 500 kaç?" diye sorarsa yukarıdaki S&P 500 değerini söyle
+2. Kullanıcı "Dolar kaç?" diye sorarsa yukarıdaki USD/TRY değerini söyle
+3. Kullanıcı bir hisse sembolü sorarsa (AAPL, AKBNK, etc.) yukarıdaki listeden bul
+4. "Göremiyorum" DEMEYİN! Veriler yukarıda var, kullan!
+
+Kullanıcı sorularını BU verilerle yanıtla!`;
 
             // Combine system prompt + history + current message
             const contents = [
@@ -323,15 +337,21 @@ Kullanıcı sorularını bu verilerle yanıtla. Fiyatlar gerçek zamanlı!`;
             { id: 'eurtry', name: 'EUR/TRY' }
         ];
 
+        let foundIndices = 0;
         indices.forEach(index => {
             const el = document.getElementById(index.id);
             const changeEl = document.getElementById(index.id + '-change');
-            if (el && el.textContent !== '-') {
-                const value = el.textContent;
-                const change = changeEl ? changeEl.textContent : '';
+            if (el && el.textContent && el.textContent !== '-' && el.textContent.trim() !== '') {
+                const value = el.textContent.trim();
+                const change = changeEl ? changeEl.textContent.trim() : '';
                 context.push(`${index.name}: ${value} ${change}`);
+                foundIndices++;
+            } else {
+                console.warn(`⚠️ Index not found or empty: ${index.name} (${index.id})`);
             }
         });
+
+        console.log(`✅ Found ${foundIndices}/${indices.length} indices in DOM`);
 
         // Get stock data if available
         if (window.STOCKS_DATA) {
