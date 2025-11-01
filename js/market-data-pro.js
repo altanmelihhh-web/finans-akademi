@@ -437,6 +437,10 @@ class MarketDataPro {
         } else {
             console.warn('⚠️ marketsManager not found, will render when it initializes');
         }
+
+        // Update Winners/Losers after cache is applied
+        console.log('   Updating Winners/Losers...');
+        this.updateWinnersLosers();
     }
 
     /**
