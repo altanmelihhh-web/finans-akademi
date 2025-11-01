@@ -212,7 +212,7 @@ class FinansChatbot {
 
     async callAPI(message, forceWebSearch = false) {
         // Use Gemini API directly (no backend needed!)
-        const GEMINI_API_KEY = 'AIzaSyDsx7CgP-aKXbB7qd4_i4XXl__tO68kJ3Y';
+        const GEMINI_API_KEY = 'AIzaSyC779xiQuQ-RIPd5vCmGu5odXH8flH2kt4';
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
         const startTime = Date.now();
