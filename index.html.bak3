@@ -9674,9 +9674,6 @@ Pasif gelirin: 25.000 TL
     <!-- Reports Module -->
     <script type="module" src="js/reports.js"></script>
 
-    <!-- AI Assistant Module -->
-    <script type="module" src="js/ai-assistant.js"></script>
-
     <!-- GEMINI AI CHATBOT -->
     <script src="js/chatbot.js"></script>
 </body>

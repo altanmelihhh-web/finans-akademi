@@ -185,8 +185,41 @@ class FinansChatbot {
         this.showTyping();
 
         try {
-            // Call API
-            const response = await this.callAPI(message, forceWebSearch);
+            // Try AI Assistant first (smart commands)
+            let response;
+
+            if (window.aiAssistant && !forceWebSearch) {
+                console.log('🤖 Trying AI Assistant for smart response...');
+                const smartResponse = await window.aiAssistant.processMessage(message);
+
+                if (smartResponse && smartResponse.type !== 'ai') {
+                    // Smart command handled!
+                    this.hideTyping();
+
+                    let formattedMessage = '';
+
+                    if (smartResponse.title) {
+                        formattedMessage += `## ${smartResponse.title}\n\n`;
+                    }
+
+                    if (smartResponse.content) {
+                        formattedMessage += smartResponse.content;
+                    } else if (smartResponse.message) {
+                        formattedMessage += smartResponse.message;
+                    }
+
+                    this.addMessage('assistant', formattedMessage, {
+                        sourceType: 'ai_assistant',
+                        smartCommand: true
+                    });
+
+                    this.saveHistory();
+                    return;
+                }
+            }
+
+            // Fallback to Gemini API
+            response = await this.callAPI(message, forceWebSearch);
 
             // Hide typing indicator
             this.hideTyping();
