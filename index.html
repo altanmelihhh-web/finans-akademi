@@ -22,9 +22,9 @@
             <ul class="nav-menu">
                 <li><a href="#" class="nav-link active" data-page="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
                 <li><a href="#" class="nav-link" data-page="markets"><i class="fas fa-chart-line"></i> Piyasalar (100+)</a></li>
+                <li><a href="#" class="nav-link" data-page="raporlar"><i class="fas fa-file-alt"></i> Raporlar</a></li>
                 <li><a href="#" class="nav-link" data-page="simulator"><i class="fas fa-gamepad"></i> Sanal İşlem</a></li>
                 <li><a href="#" class="nav-link" data-page="terimler"><i class="fas fa-book"></i> Terimler</a></li>
-                <li><a href="#" class="nav-link" data-page="grafikler"><i class="fas fa-chart-bar"></i> Grafik Analizi</a></li>
                 <li><a href="#" class="nav-link" data-page="egitim"><i class="fas fa-graduation-cap"></i> Eğitim</a></li>
                 <li><a href="#" class="nav-link" data-page="haberler"><i class="fas fa-newspaper"></i> Haberler</a></li>
                 <li><a href="#" class="nav-link" data-page="kaynaklar"><i class="fas fa-book-open"></i> Kaynaklar</a></li>
@@ -1430,6 +1430,65 @@
 
         </section>
 
+
+        <!-- Raporlar Page -->
+        <section id="raporlar" class="page">
+            <div class="container">
+                <h1><i class="fas fa-file-alt"></i> Günlük Raporlar</h1>
+                <p class="page-subtitle">Sabah ve akşam piyasa raporları ile güncel gelişmeleri takip edin</p>
+
+                <!-- Report Type Tabs -->
+                <div class="report-tabs">
+                    <button class="report-tab active" data-report="morning">
+                        <i class="fas fa-sun"></i>
+                        <span>Sabah Raporu</span>
+                    </button>
+                    <button class="report-tab" data-report="evening">
+                        <i class="fas fa-moon"></i>
+                        <span>Akşam Raporu</span>
+                    </button>
+                    <button class="report-tab" data-report="weekly">
+                        <i class="fas fa-calendar-week"></i>
+                        <span>Haftalık Rapor</span>
+                    </button>
+                </div>
+
+                <!-- Report Actions -->
+                <div class="report-actions">
+                    <button id="refreshReportsBtn" class="btn-action">
+                        <i class="fas fa-sync-alt"></i> Yenile
+                    </button>
+                    <button id="exportReportBtn" class="btn-action">
+                        <i class="fas fa-download"></i> İndir
+                    </button>
+                    <button id="subscribeReportBtn" class="btn-action">
+                        <i class="fas fa-bell"></i> Email Bildirimi
+                    </button>
+                </div>
+
+                <!-- Report Content -->
+                <div id="reportContent" class="report-content">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Rapor hazırlanıyor...</p>
+                    </div>
+                </div>
+
+                <!-- Report Info Box -->
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Raporlar hakkında:</strong>
+                        <ul>
+                            <li><strong>Sabah Raporu:</strong> Piyasa açılışı öncesi özet (08:00)</li>
+                            <li><strong>Akşam Raporu:</strong> Günlük performans analizi (18:00)</li>
+                            <li><strong>Haftalık Rapor:</strong> Geçen hafta özeti (Pazartesi)</li>
+                            <li><strong>Email Bildirimi:</strong> Raporları email ile alın (yakında)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
         <!-- Haberler Page -->
         <section id="haberler" class="page">
             <div class="container">
@@ -9611,6 +9670,9 @@ Pasif gelirin: 25.000 TL
 
     <!-- Progress Tracker Module -->
     <script type="module" src="js/progress-tracker.js"></script>
+
+    <!-- Reports Module -->
+    <script type="module" src="js/reports.js"></script>
 
     <!-- GEMINI AI CHATBOT -->
     <script src="js/chatbot.js"></script>
