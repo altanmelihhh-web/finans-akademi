@@ -675,7 +675,7 @@ class ReportsManager {
     }
 
     /**
-     * Tomorrow tips
+     * Tomorrow tips - SMART DYNAMIC TIPS
      */
     getTomorrowTips() {
         const section = {
@@ -684,18 +684,122 @@ class ReportsManager {
             content: []
         };
 
-        const tips = [
-            "Yarın piyasa açılmadan önce ekonomik takvimi kontrol edin.",
-            "Portföyünüzü gözden geçirin ve gerekirse rebalancing yapın.",
-            "Stop-loss seviyelerinizi güncelleyin.",
-            "Takip ettiğiniz hisselerin haberlerini okuyun.",
-            "Öğrenmeye devam edin - Eğitim sayfasında yeni bir gün tamamlayın!"
+        const tips = [];
+
+        // 1. Market-based tip
+        if (window.marketDataPro) {
+            const dashboardData = window.marketDataPro.cache.memory.get('dashboard');
+            if (dashboardData && dashboardData.indices) {
+                const sp500Change = dashboardData.indices.sp500?.changePercent || 0;
+                const bist100Change = dashboardData.indices.bist100?.changePercent || 0;
+
+                if (sp500Change > 1) {
+                    tips.push("📈 **ABD piyasaları güçlü yükselişte!** Yarın BIST'te pozitif açılış beklenebilir.");
+                } else if (sp500Change < -1) {
+                    tips.push("📉 **ABD piyasalarında düşüş var.** Yarın temkinli olun, stop-loss'larınızı kontrol edin.");
+                }
+
+                if (bist100Change > 2) {
+                    tips.push("🚀 **BIST 100 güçlü performans gösteriyor.** Momentum devam edebilir, ancak aşırı alım riskine dikkat!");
+                } else if (bist100Change < -2) {
+                    tips.push("⚠️ **BIST 100 düşüşte.** Fırsat arayanlara: Kaliteli hisseler indirimde olabilir.");
+                }
+            }
+        }
+
+        // 2. Portfolio-based tip
+        if (window.simulator && window.simulator.portfolio && window.simulator.portfolio.length > 0) {
+            const portfolioSize = window.simulator.portfolio.length;
+            const cash = window.simulator.cash || 0;
+            const initialBalance = window.simulator.initialBalance || 10000;
+            const cashRatio = cash / initialBalance;
+
+            if (portfolioSize > 10) {
+                tips.push("💼 **Portföyünüz çok çeşitlenmiş.** Daha az hisseyle daha fazla odaklanmayı düşünün.");
+            } else if (portfolioSize < 3 && cash < initialBalance * 0.5) {
+                tips.push("⚖️ **Portföyünüz az çeşitlenmiş.** Risk yönetimi için 3-5 farklı sektörde pozisyon alın.");
+            }
+
+            if (cashRatio > 0.7) {
+                tips.push("💰 **Nakitiniz çok yüksek (%${(cashRatio * 100).toFixed(0)})**. Fırsat bekliyor olabilirsiniz, ancak enflasyon nakiti eritiyor!");
+            } else if (cashRatio < 0.1) {
+                tips.push("🎯 **Nakit oranınız düşük.** Fırsat anlarında kullanmak için biraz nakit bulundurun.");
+            }
+        }
+
+        // 3. Day-of-week specific tips
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dayOfWeek = tomorrow.getDay();
+
+        const dayTips = {
+            0: "☀️ **Pazar günü:** Haftalık raporları gözden geçirin, strateji planlayın.",
+            1: "📅 **Pazartesi:** Hafta başı açılışları volatil olabilir. İlk 30 dakika bekleyin.",
+            2: "📊 **Salı:** ABD'de ekonomik veriler açıklanabilir. Takvimi kontrol edin.",
+            3: "🎯 **Çarşamba:** Hafta ortası, TCMB faiz kararı günü olabilir mi? Kontrol edin.",
+            4: "📈 **Perşembe:** İşsizlik verileri açıklanır. Piyasalarda hareket beklenir.",
+            5: "💼 **Cuma:** NFP (Tarım Dışı İstihdam) günü! Piyasalarda yüksek volatilite olabilir.",
+            6: "🎮 **Cumartesi:** Simülatörde pratik yapın, eğitim modüllerini tamamlayın."
+        };
+
+        if (dayTips[dayOfWeek]) {
+            tips.push(dayTips[dayOfWeek]);
+        }
+
+        // 4. Learning-based tip
+        if (window.progressTracker && window.progressTracker.progressData) {
+            const progress = window.progressTracker.progressData;
+            const completedDays = progress.totalDaysCompleted || 0;
+            const streak = progress.currentStreak || 0;
+
+            if (completedDays < 7) {
+                tips.push("🎓 **Eğitim:** Henüz 1. haftayı bitirmediniz. Her gün 20 dakika ayırın!");
+            } else if (streak > 5) {
+                tips.push(`🔥 **${streak} günlük seri!** Harika! Yarın da devam edin, momentum kaybetmeyin.`);
+            } else if (streak === 0 && completedDays > 0) {
+                tips.push("📚 **Eğitim seriniz kesildi.** Yarın yeni bir günü tamamlayarak tekrar başlayın!");
+            }
+        }
+
+        // 5. Technical Analysis tip
+        if (window.STOCKS_DATA) {
+            const allStocks = [...window.STOCKS_DATA.us_stocks, ...window.STOCKS_DATA.bist_stocks];
+            const strongBuys = allStocks.filter(s => s.technicalScore && s.technicalScore >= 75);
+            const strongSells = allStocks.filter(s => s.technicalScore && s.technicalScore <= 30);
+
+            if (strongBuys.length > 0) {
+                const topStock = strongBuys[0];
+                tips.push(`💎 **Teknik analiz:** ${topStock.symbol} güçlü al sinyali veriyor (${Math.floor(topStock.technicalScore / 10)}/10).`);
+            }
+
+            if (strongSells.length > 0) {
+                const worstStock = strongSells[0];
+                tips.push(`⚠️ **Dikkat:** ${worstStock.symbol} güçlü sat sinyali veriyor. Eğer portföyünüzdeyse gözden geçirin!`);
+            }
+        }
+
+        // 6. General wisdom tips (fallback)
+        const generalTips = [
+            "📖 **Warren Buffett:** 'Başkalarının açgözlü olduğu zaman korkun, korktukları zaman açgözlü olun.'",
+            "🎯 **Kural:** Bir hisseyi almadan önce %10 düşerse ne yapacağınızı bilin.",
+            "💡 **Risk Yönetimi:** Portföyünüzün max %2'sini tek bir işlemde riske atın.",
+            "📊 **Analiz:** Hisse almadan önce 5 dakika teknik + temel analiz yapın. Simülatör değil, gerçek para!",
+            "🧘 **Disiplin:** En iyi strateji, duygularınıza göre değil, plana göre hareket etmektir."
         ];
+
+        // Add 1-2 general tips
+        const randomTips = generalTips.sort(() => Math.random() - 0.5).slice(0, 2);
+        tips.push(...randomTips);
+
+        // Render tips
+        if (tips.length === 0) {
+            tips.push("💡 Yarın için piyasa verilerini takip edin ve stratejinizi gözden geçirin.");
+        }
 
         tips.forEach(tip => {
             section.content.push({
                 type: 'text',
-                text: `• ${tip}`
+                text: `${tip}`
             });
         });
 
