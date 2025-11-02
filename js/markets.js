@@ -13,10 +13,10 @@ class MarketsManager {
     }
 
     async init() {
-        await this.loadStocks();
         this.setupEventListeners();
-        this.renderStocks();
-        this.updateStats();
+        await this.loadStocks();
+        // renderStocks() already called by loadStocks() -> filterStocks()
+        // No need to call again
     }
 
     async loadStocks() {
@@ -188,6 +188,18 @@ class MarketsManager {
         const changeClass = stock.change >= 0 ? 'positive' : 'negative';
         const changeIcon = stock.change >= 0 ? 'arrow-up' : 'arrow-down';
 
+        // Show loading state if price is 0
+        const priceDisplay = stock.price > 0
+            ? this.formatCurrency(stock.price, stock.market)
+            : '<span style="opacity: 0.5">Yükleniyor...</span>';
+
+        const changeDisplay = stock.price > 0 && stock.change !== undefined
+            ? `<span class="change ${changeClass}">
+                <i class="fas fa-${changeIcon}"></i>
+                ${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%
+               </span>`
+            : '<span style="opacity: 0.5">-</span>';
+
         return `
             <div class="stock-card" data-symbol="${stock.symbol}">
                 <div class="stock-card-header">
@@ -202,11 +214,8 @@ class MarketsManager {
                 <div class="stock-name">${stock.name}</div>
                 <div class="stock-sector">${stock.sector}</div>
                 <div class="stock-price">
-                    <span class="price">${this.formatCurrency(stock.price, stock.market)}</span>
-                    <span class="change ${changeClass}">
-                        <i class="fas fa-${changeIcon}"></i>
-                        ${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%
-                    </span>
+                    <span class="price">${priceDisplay}</span>
+                    ${changeDisplay}
                 </div>
             </div>
         `;

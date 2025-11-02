@@ -299,9 +299,9 @@ class MarketDataPro {
 
                 console.log(`📦 Batch ${batchNum}/${batches}: ${batchStocks.map(s => s.symbol).join(', ')}`);
 
-                // SEQUENTIAL within batch to avoid rate limit!
-                // Parallel was causing: 10 requests × 5 batches = 50 parallel = 429!
-                for (const stock of batchStocks) {
+                // PARALLEL within batch (safe with 10 stocks/batch, 1.1s between batches)
+                // 10 parallel requests every 1.1s = ~55 req/min (under 60/min limit)
+                const batchPromises = batchStocks.map(async (stock) => {
                     const quote = await this.getStockQuote(stock.symbol);
 
                     if (quote) {
@@ -319,23 +319,25 @@ class MarketDataPro {
                     } else {
                         console.warn(`  ⚠ ${stock.symbol}: Failed to fetch`);
                     }
+                });
 
-                    // Small delay between each stock (rate limit: 60/min = 1 per second)
-                    await this.delay(1100); // 1.1 second = safe!
+                // Wait for all stocks in batch to complete
+                await Promise.all(batchPromises);
+
+                // Update UI progressively (but only every 2 batches to reduce renders)
+                if (batchNum % 2 === 0 || batchNum === batches) {
+                    if (window.marketsManager && typeof window.marketsManager.renderStocks === 'function') {
+                        window.marketsManager.renderStocks();
+                        window.marketsManager.updateStats();
+                    }
                 }
-
-                // Update UI progressively
-                if (window.marketsManager && typeof window.marketsManager.renderStocks === 'function') {
-                    window.marketsManager.renderStocks();
-                    window.marketsManager.updateStats();
-                }
-
-                // Update Winners/Losers after each batch
-                this.updateWinnersLosers();
 
                 console.log(`✓ Batch ${batchNum}/${batches} complete (${Math.round((batchNum / batches) * 100)}%)`);
 
-                // No batch delay needed - we delay within each stock fetch
+                // Delay between batches to respect rate limits (60/min)
+                if (i < batches - 1) { // Don't delay after last batch
+                    await this.delay(1100); // 1.1s between batches
+                }
             }
 
             // Save to cache
@@ -343,7 +345,15 @@ class MarketDataPro {
             this.state.lastMarketsUpdate = Date.now();
             this.saveCache();
 
-            // Final update of Winners/Losers
+            // Final render and update of Winners/Losers
+            if (window.marketsManager) {
+                if (typeof window.marketsManager.renderStocks === 'function') {
+                    window.marketsManager.renderStocks();
+                }
+                if (typeof window.marketsManager.updateStats === 'function') {
+                    window.marketsManager.updateStats();
+                }
+            }
             this.updateWinnersLosers();
 
             console.log('✅ Markets background update complete!');

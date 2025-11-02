@@ -1,0 +1,237 @@
+HAFTA 4 (Devam) - İleri Seviye Yatırım
+
+GÜN 24: Opsiyon ve Türevler
+- Call Option (alma hakkı) vs Put Option (satma hakkı)
+- Strike Price, Premium, Expiration Date
+- Leverage avantajları ve riskleri
+- Vadeli İşlemler (Futures) temel kavramlar
+- Örnek: Apple Call Option stratejisi
+
+GÜN 25: Forex Piyasası
+- Döviz çiftleri (EUR/USD, GBP/USD, USD/TRY)
+- Pip nedir? (Price Interest Point)
+- Leverage 1:100 riski
+- Major vs Minor vs Exotic pairs
+- Forex trading saatleri (24/5)
+
+GÜN 26: Kripto Para
+- Bitcoin, Ethereum temelleri
+- Blockchain teknolojisi nasıl çalışır?
+- Hot Wallet vs Cold Wallet
+- DeFi (Decentralized Finance) giriş
+- Kripto yatırım stratejileri ve riskler
+
+GÜN 27: Altın ve Emtia
+- Altın neden güvenli liman?
+- Petrol, Gümüş, Bakır piyasaları
+- Commodity ETF'ler (emtia fonları)
+- Enflasyon hedge stratejisi
+- Altın fiyatlarını etkileyen faktörler
+
+GÜN 28: Hafta 4 Tekrarı + Final Projesi
+- Gün 22-27 özeti
+- 200.000 TL portföy oluşturma projesi:
+  * %40 Hisse (US + BIST)
+  * %20 Tahvil
+  * %15 Kripto
+  * %10 Altın
+  * %10 Forex
+  * %5 Nakit
+- Risk yönetimi planı (her varlık için stop loss)
+- Haftalık Final Quiz (15 soru)
+
+---
+
+HAFTA 5: Piyasa Psikolojisi ve Trading Stratejileri
+
+GÜN 29: Yatırımcı Psikolojisi
+- Greed (Açgözlülük) ve Fear (Korku) döngüsü
+- Confirmation Bias (Doğrulama yanlılığı)
+- Herd Mentality (Sürü psikolojisi)
+- Loss Aversion (Kayıptan kaçınma)
+- Overconfidence (Aşırı güven) tehlikesi
+
+GÜN 30: FOMO ve FUD
+- Fear Of Missing Out (FOMO)
+- Fear, Uncertainty, Doubt (FUD)
+- Sosyal medya etkisi (Twitter, Reddit, vb.)
+- Pump & Dump şemaları
+- FOMO'dan nasıl korunursun?
+
+GÜN 31: Swing Trading
+- 1-7 günlük işlemler
+- Teknik analiz kombinasyonu
+- En iyi zaman dilimleri (4H, Daily)
+- Swing trading stratejileri
+- Gerçek örnek: TSLA swing trade
+
+GÜN 32: Day Trading
+- Günlük alım-satım
+- Scalping (1-5 dk işlemler)
+- Pattern Day Trader kuralları (US)
+- Intraday göstergeler (VWAP, Bollinger)
+- Day trading disiplini
+
+GÜN 33: Value Investing (Warren Buffett)
+- Buy and Hold stratejisi
+- Undervalued stocks bulma
+- Moat (ekonomik hendek) kavramı
+- 5-10 yıllık yatırım perspektifi
+- Buffett'in portföy analizi
+
+GÜN 34: Dollar Cost Averaging (DCA)
+- Her ay sabit tutar yatırma
+- Volatilite yönetimi
+- DCA vs Lump Sum karşılaştırması
+- Uzun vadeli sonuçlar
+- Gerçek örnek: S&P 500'e 10 yıl DCA
+
+GÜN 35: Hafta 5 Tekrarı
+- Hangi strateji sana uygun?
+- Swing vs Day vs Long-term
+- Kendi yatırım felsefeni belirle
+- Psikoloji tuzaklarından kaçınma planı
+- Haftalık Quiz
+
+---
+
+HAFTA 6: Gerçek Dünya Uygulamaları
+
+GÜN 36: Vergi ve Yasal Düzenlemeler
+- Sermaye kazancı vergisi (Türkiye)
+- Temettü stopajı (%10 veya %15)
+- US hisse vergilendirmesi
+- Forex ve Kripto vergileri
+- Beyanname süreci
+
+GÜN 37: Aracı Kurum Seçimi
+- Komisyon oranları karşılaştırması
+- Platform özellikleri (web, mobil)
+- Güvenilirlik kriterleri (SPK lisansı)
+- Türkiye: İş Yatırım, Ata Yatırım, Garanti Yatırım
+- US Broker: Interactive Brokers, TD Ameritrade
+
+GÜN 38: Sipariş Türleri (İleri Seviye)
+- Market Order vs Limit Order
+- Stop Loss Order vs Stop Limit
+- GTC (Good Till Cancelled)
+- FOK (Fill or Kill)
+- Iceberg Orders (Buzdağı emirleri)
+
+GÜN 39: Borçlanma Araçları
+- Devlet tahvili (DİBS)
+- Hazine bonosu
+- Eurobond (dolar/euro tahvil)
+- Kira Sertifikası (Sukuk)
+- Tahvil fiyat-faiz ilişkisi
+
+GÜN 40: Gayrimenkul Yatırımları
+- GYO (Gayrimenkul Yatırım Ortaklığı)
+- REIT (Real Estate Investment Trust)
+- Kira geliri vs Sermaye kazancı
+- GYO hisse analizi (ISFIN, TRGYO)
+- Gayrimenkul piyasası döngüleri
+
+GÜN 41: Pasif Gelir Stratejileri
+- Temettü hisseleri (Dividend Aristocrats)
+- Tahvil kuponları
+- GYO kira gelirleri
+- P2P lending (Eşten eşe borç verme)
+- Pasif gelir portföyü oluşturma
+
+GÜN 42: Hafta 6 Tekrarı
+- Tüm yatırım araçlarını karşılaştır
+- Vergi optimizasyonu planla
+- Broker seçimi yap
+- Pasif gelir hedefi belirle (aylık X TL)
+- Haftalık Quiz
+
+---
+
+HAFTA 7: Masterclass ve Final
+
+GÜN 43: Makro Ekonomi ve Piyasalar
+- Fed faiz kararları etkisi
+- Enflasyon ve piyasalar
+- İşsizlik verileri
+- GDP (Gayri Safi Yurtiçi Hasıla)
+- Merkez Bankası politikaları
+
+GÜN 44: Kriz Yönetimi
+- 2008 Mortgage krizi dersleri
+- 2020 COVID-19 crash analizi
+- Bear market stratejileri
+- Cash is King (nakit kraldir)
+- Opportunity buying (fırsat alımları)
+
+GÜN 45: Kendi 10 Yıllık Planını Oluştur
+- Hedef: Emeklilik için X TL/USD
+- Asset allocation planı
+- Risk tolerance belirleme
+- Yıllık getiri hedefi
+- Milestone'lar (ara hedefler)
+
+GÜN 46: İleri Seviye Analiz
+- Multi-timeframe analiz
+- Ichimoku Cloud
+- Elliott Wave Theory (giriş)
+- Fibonacci retracement/extension
+- Volume Profile analizi
+
+GÜN 47: Final Quiz (50 Soru)
+- Teknik analiz (15 soru)
+- Temel analiz (15 soru)
+- Stratejiler ve psikoloji (10 soru)
+- Vergi ve yasal (5 soru)
+- Portföy yönetimi (5 soru)
+- Geçme notu: %75 (38/50)
+
+GÜN 48: Gerçek Portföy Analizi
+- 5 öğrencinin portföyünü incele
+- Ne doğru, ne yanlış?
+- Düzeltme önerileri
+- Risk analizi
+- Gelecek projeksiyon
+
+GÜN 49: Sertifika ve Sonraki Adımlar
+- 🎓 Finans Akademi Sertifikası
+- Takip edilecek kaynaklar:
+  * Bloomberg
+  * Investing.com
+  * Yahoo Finance
+  * TradingView
+- Takip edilecek yatırımcılar:
+  * Warren Buffett
+  * Ray Dalio
+  * Cathie Wood
+  * Michael Burry
+- Önerilen kitaplar:
+  * The Intelligent Investor (Graham)
+  * One Up On Wall Street (Lynch)
+  * A Random Walk Down Wall Street (Malkiel)
+- Devam planı:
+  * Sanal portföy takibi (3 ay)
+  * Haftalık analiz yazmak
+  * Gerçek para ile başlamadan önce pratik
+- 🚀 Mezuniyet mesajı ve teşekkür
+
+---
+
+TEBRİKLER! 49 GÜNLÜK EĞİTİMİ TAMAMLADIN!
+
+Artık sıfırdan başlayan biri değilsin. Şunları yapabilirsin:
+✅ Teknik analiz (mum grafik, MA, RSI, MACD)
+✅ Temel analiz (finansal tablolar, değerleme)
+✅ Portföy yönetimi (asset allocation, diversification)
+✅ Risk yönetimi (stop loss, position sizing)
+✅ Trading stratejileri (swing, day, value investing)
+✅ Vergi ve yasal konular
+✅ Kendi 10 yıllık planını oluşturabilirsin
+
+Seviye: ORTA-İLERİ YATIRIMCI 🎓
+
+Sonraki adım: Pratiğe geçmek! Sanal portföy ile başla, 3-6 ay sonra gerçek para ile ufak miktarlarla devam et.
+
+"En iyi yatırım kendinize yaptığınız yatırımdır." - Warren Buffett
+
+Başarılar! 🚀

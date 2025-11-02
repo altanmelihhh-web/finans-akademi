@@ -336,10 +336,16 @@ async function loadUserDataFromFirestore(userId) {
             if (userData.cash !== undefined) {
                 localStorage.setItem('simulatorCash', userData.cash.toString());
             }
+            if (userData.progress) {
+                localStorage.setItem('educationProgress', JSON.stringify(userData.progress));
+            }
 
             // Trigger UI updates
             if (window.simulator && typeof window.simulator.loadFromStorage === 'function') {
                 window.simulator.loadFromStorage();
+            }
+            if (window.progressTracker && typeof window.progressTracker.loadFromLocalStorage === 'function') {
+                window.progressTracker.loadFromLocalStorage();
             }
         } else {
             console.log('📝 Creating new user document');
@@ -362,9 +368,20 @@ async function createUserDocument(userId) {
             portfolio: [],
             transactions: [],
             cash: 10000,
+            progress: {
+                daysCompleted: {},
+                quizScores: {},
+                totalDaysCompleted: 0,
+                currentStreak: 0,
+                longestStreak: 0,
+                avgQuizScore: 0,
+                totalTimeSpent: 0,
+                lastActive: null,
+                startedAt: null
+            },
             lastUpdated: serverTimestamp()
         });
-        console.log('✅ User document created');
+        console.log('✅ User document created with progress tracking');
     } catch (error) {
         console.error('❌ Error creating user document:', error);
     }
@@ -385,6 +402,7 @@ async function saveUserDataToFirestore() {
             portfolio: JSON.parse(localStorage.getItem('portfolio') || '[]'),
             transactions: JSON.parse(localStorage.getItem('transactions') || '[]'),
             cash: parseFloat(localStorage.getItem('simulatorCash') || '10000'),
+            progress: JSON.parse(localStorage.getItem('educationProgress') || '{}'),
             lastUpdated: serverTimestamp()
         };
 
@@ -470,7 +488,7 @@ function setupAutoSave() {
         originalSetItem.call(this, key, value);
 
         // Auto-save to Firestore for specific keys
-        if (['watchlist', 'portfolio', 'transactions', 'simulatorCash'].includes(key)) {
+        if (['watchlist', 'portfolio', 'transactions', 'simulatorCash', 'educationProgress'].includes(key)) {
             // Debounce to avoid too many writes
             clearTimeout(window.firestoreSaveTimeout);
             window.firestoreSaveTimeout = setTimeout(() => {
