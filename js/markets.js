@@ -22,9 +22,14 @@ class MarketsManager {
     async loadStocks() {
         try {
             // Use embedded STOCKS_DATA instead of fetch
-            const data = window.STOCKS_DATA || { us_stocks: [], bist_stocks: [] };
+            const data = window.STOCKS_DATA || {
+                us_stocks: [],
+                bist_stocks: [],
+                tefas_funds: [],
+                bes_funds: []
+            };
 
-            // Combine US and BIST stocks (gerçek veriler real-time-stocks.js tarafından güncelleniyor)
+            // Combine US stocks, BIST stocks, TEFAS funds, and BES funds
             this.stocks = [
                 ...data.us_stocks.map(s => {
                     const stock = {
@@ -56,12 +61,46 @@ class MarketsManager {
                     // Calculate technical score
                     stock.technicalScore = this.calculateTechnicalScore(stock);
                     return stock;
+                }),
+                ...data.tefas_funds.map(s => {
+                    const stock = {
+                        ...s,
+                        market: 'tefas',
+                        open: s.price,
+                        high: s.price * 1.01,
+                        low: s.price * 0.99,
+                        volume: s.volume || 500000,
+                        high52w: s.high52w || s.price * 1.2,
+                        low52w: s.low52w || s.price * 0.8
+                    };
+                    // Calculate technical score (funds usually less volatile)
+                    stock.technicalScore = this.calculateTechnicalScore(stock);
+                    return stock;
+                }),
+                ...data.bes_funds.map(s => {
+                    const stock = {
+                        ...s,
+                        market: 'bes',
+                        open: s.price,
+                        high: s.price * 1.01,
+                        low: s.price * 0.99,
+                        volume: s.volume || 300000,
+                        high52w: s.high52w || s.price * 1.15,
+                        low52w: s.low52w || s.price * 0.85
+                    };
+                    // Calculate technical score (pension funds most conservative)
+                    stock.technicalScore = this.calculateTechnicalScore(stock);
+                    return stock;
                 })
             ];
 
             this.filteredStocks = [...this.stocks];
 
-            console.log(`✅ Loaded ${this.stocks.length} stocks successfully`);
+            console.log(`✅ Loaded ${this.stocks.length} stocks/funds successfully`);
+            console.log(`  - US Stocks: ${data.us_stocks.length}`);
+            console.log(`  - BIST Stocks: ${data.bist_stocks.length}`);
+            console.log(`  - TEFAS Funds: ${data.tefas_funds.length}`);
+            console.log(`  - BES Funds: ${data.bes_funds.length}`);
 
             // Re-render UI after loading (important for cache updates!)
             this.filterStocks(); // This calls renderStocks internally
