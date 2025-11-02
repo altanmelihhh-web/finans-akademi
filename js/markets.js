@@ -98,6 +98,22 @@ class MarketsManager {
         if (clearBtn) {
             clearBtn.addEventListener('click', () => this.clearWatchlist());
         }
+
+        // Stock modal tabs
+        document.querySelectorAll('.stock-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const tabName = e.currentTarget.dataset.tab;
+                this.switchModalTab(tabName);
+            });
+        });
+
+        // Chart timeframe selector
+        document.querySelectorAll('.timeframe-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const timeframe = e.currentTarget.dataset.timeframe;
+                this.changeChartTimeframe(timeframe);
+            });
+        });
     }
 
     filterStocks() {
@@ -367,43 +383,26 @@ class MarketsManager {
         if (!modal) return;
         modal.style.display = 'block';
 
-        // Update modal content with null checks
+        // Update header section
         const modalStockName = document.getElementById('modalStockName');
-        if (modalStockName) modalStockName.textContent = `${stock.name} (${stock.symbol})`;
+        if (modalStockName) modalStockName.textContent = stock.name;
+
+        const modalSymbol = document.getElementById('modalSymbol');
+        if (modalSymbol) modalSymbol.textContent = stock.symbol;
 
         const modalPrice = document.getElementById('modalPrice');
         if (modalPrice) modalPrice.textContent = this.formatCurrency(stock.price, stock.market);
 
-        const modalSector = document.getElementById('modalSector');
-        if (modalSector) modalSector.textContent = stock.sector;
-
-        const modalOpen = document.getElementById('modalOpen');
-        if (modalOpen) modalOpen.textContent = this.formatCurrency(stock.open, stock.market);
-
-        const modalHigh = document.getElementById('modalHigh');
-        if (modalHigh) modalHigh.textContent = this.formatCurrency(stock.high, stock.market);
-
-        const modalLow = document.getElementById('modalLow');
-        if (modalLow) modalLow.textContent = this.formatCurrency(stock.low, stock.market);
-
-        const modal52High = document.getElementById('modal52High');
-        if (modal52High) modal52High.textContent = this.formatCurrency(stock.high52w, stock.market);
-
-        const modal52Low = document.getElementById('modal52Low');
-        if (modal52Low) modal52Low.textContent = this.formatCurrency(stock.low52w, stock.market);
-
         const changeEl = document.getElementById('modalChange');
         if (changeEl) {
             const changeClass = stock.change >= 0 ? 'positive' : 'negative';
-            changeEl.className = `price-change ${changeClass}`;
+            changeEl.className = `price-change-large ${changeClass}`;
+            const changeAmount = stock.price * stock.change / 100;
             changeEl.innerHTML = `
-                <span class="change-value">${stock.change > 0 ? '+' : ''}${this.formatCurrency(stock.price * stock.change / 100, stock.market)}</span>
+                <span class="change-value">${stock.change > 0 ? '+' : ''}${this.formatCurrency(changeAmount, stock.market)}</span>
                 <span class="change-percent">(${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%)</span>
             `;
         }
-
-        // Render chart
-        this.renderModalChart(stock);
 
         // Update watchlist button
         const watchlistBtn = document.getElementById('modalWatchlistBtn');
@@ -412,6 +411,15 @@ class MarketsManager {
             watchlistBtn.innerHTML = `<i class="${isInWatchlist ? 'fas' : 'far'} fa-star"></i>`;
             watchlistBtn.onclick = () => this.toggleWatchlist(stock.symbol);
         }
+
+        // Populate all data tabs
+        this.populateOverviewTab(stock);
+        this.populateDetailsTab(stock);
+        this.populateTechnicalsTab(stock);
+        this.populateFundamentalsTab(stock);
+
+        // Reset to first tab
+        this.switchModalTab('overview');
     }
 
     closeModal() {
@@ -552,6 +560,215 @@ class MarketsManager {
             return (num / 1000).toFixed(1) + 'K';
         }
         return num.toString();
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * MODAL TAB MANAGEMENT
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+
+    switchModalTab(tabName) {
+        // Update active tab button
+        document.querySelectorAll('.stock-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === tabName);
+        });
+
+        // Show corresponding content
+        document.querySelectorAll('.stock-tab-content').forEach(content => {
+            content.classList.toggle('active', content.dataset.tabContent === tabName);
+        });
+    }
+
+    changeChartTimeframe(timeframe) {
+        // Update active button
+        document.querySelectorAll('.timeframe-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.timeframe === timeframe);
+        });
+
+        // Re-render chart with new timeframe
+        if (this.selectedStock) {
+            this.renderModalChart(this.selectedStock, timeframe);
+        }
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * TAB DATA POPULATION
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+
+    populateOverviewTab(stock) {
+        // Quick stats
+        const setEl = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+
+        setEl('modalOpen', this.formatCurrency(stock.open || stock.price, stock.market));
+        setEl('modalHigh', this.formatCurrency(stock.high || stock.price * 1.02, stock.market));
+        setEl('modalLow', this.formatCurrency(stock.low || stock.price * 0.98, stock.market));
+        setEl('modalVolume', this.formatVolume(stock.volume || 0));
+        setEl('modal52High', this.formatCurrency(stock.high52w || stock.price * 1.3, stock.market));
+        setEl('modal52Low', this.formatCurrency(stock.low52w || stock.price * 0.7, stock.market));
+
+        // Render chart
+        this.renderModalChart(stock, '1M');
+    }
+
+    populateDetailsTab(stock) {
+        const setEl = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+
+        setEl('modalSector', stock.sector || 'N/A');
+        setEl('modalMarket', stock.market === 'us' ? 'ABD (US)' : 'BIST (Türkiye)');
+        setEl('modalCurrency', stock.market === 'us' ? 'USD ($)' : 'TRY (₺)');
+        setEl('modalAvgVolume', this.formatVolume(stock.volume || 0));
+
+        // Performance (simulated for now)
+        const setPerfEl = (id, value, isPositive) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = `${isPositive ? '+' : ''}${value}%`;
+                el.className = `perf-value ${isPositive ? 'positive' : 'negative'}`;
+            }
+        };
+
+        setPerfEl('perfToday', stock.change.toFixed(2), stock.change >= 0);
+        setPerfEl('perf1W', (stock.change * 1.2).toFixed(2), stock.change * 1.2 >= 0);
+        setPerfEl('perf1M', (stock.change * 2).toFixed(2), stock.change * 2 >= 0);
+        setPerfEl('perf3M', (stock.change * 3.5).toFixed(2), stock.change * 3.5 >= 0);
+        setPerfEl('perf1Y', (stock.change * 8).toFixed(2), stock.change * 8 >= 0);
+    }
+
+    populateTechnicalsTab(stock) {
+        // Calculate simple RSI
+        const rsi = this.calculateRSI(stock);
+        const rsiEl = document.getElementById('rsiValue');
+        const rsiFillEl = document.getElementById('rsiFill');
+        const rsiSignalEl = document.getElementById('rsiSignal');
+
+        if (rsiEl) rsiEl.textContent = rsi.toFixed(2);
+        if (rsiFillEl) rsiFillEl.style.width = `${rsi}%`;
+        if (rsiSignalEl) {
+            if (rsi < 30) {
+                rsiSignalEl.textContent = '📈 Aşırı Satım - Al Sinyali';
+                rsiSignalEl.style.color = 'var(--success-color)';
+            } else if (rsi > 70) {
+                rsiSignalEl.textContent = '📉 Aşırı Alım - Sat Sinyali';
+                rsiSignalEl.style.color = 'var(--danger-color)';
+            } else {
+                rsiSignalEl.textContent = '➖ Nötr Bölge';
+                rsiSignalEl.style.color = 'rgba(255,255,255,0.7)';
+            }
+        }
+
+        // MACD (simulated)
+        const macdEl = document.getElementById('macdValue');
+        const macdSignalEl = document.getElementById('macdSignal');
+        const macdValue = stock.change * 0.5;
+
+        if (macdEl) macdEl.textContent = macdValue.toFixed(2);
+        if (macdSignalEl) {
+            macdSignalEl.textContent = macdValue > 0 ? '📈 Yukarı Trend' : '📉 Aşağı Trend';
+            macdSignalEl.style.color = macdValue > 0 ? 'var(--success-color)' : 'var(--danger-color)';
+        }
+
+        // Moving Averages
+        const setMA = (period, idValue, idSignal) => {
+            const maValue = stock.price * (1 + (Math.random() - 0.5) * 0.05);
+            const signal = stock.price > maValue ? 'Al' : 'Sat';
+            const signalClass = stock.price > maValue ? 'bullish' : 'bearish';
+
+            const valueEl = document.getElementById(idValue);
+            const signalEl = document.getElementById(idSignal);
+
+            if (valueEl) valueEl.textContent = this.formatCurrency(maValue, stock.market);
+            if (signalEl) {
+                signalEl.textContent = signal;
+                signalEl.className = `ma-signal ${signalClass}`;
+            }
+        };
+
+        setMA(20, 'ma20', 'ma20Signal');
+        setMA(50, 'ma50', 'ma50Signal');
+        setMA(200, 'ma200', 'ma200Signal');
+
+        // Technical Summary Score
+        const techScore = Math.floor(50 + (stock.change * 5));
+        const scoreEl = document.getElementById('techScore');
+        const signalEl = document.getElementById('techSignal');
+
+        if (scoreEl) scoreEl.textContent = `${Math.min(10, Math.max(0, Math.floor(techScore / 10)))}/10`;
+        if (signalEl) {
+            if (techScore > 65) {
+                signalEl.innerHTML = '<i class="fas fa-arrow-up"></i> Güçlü Al';
+                signalEl.style.color = 'var(--success-color)';
+            } else if (techScore < 35) {
+                signalEl.innerHTML = '<i class="fas fa-arrow-down"></i> Güçlü Sat';
+                signalEl.style.color = 'var(--danger-color)';
+            } else {
+                signalEl.innerHTML = '<i class="fas fa-minus-circle"></i> Nötr';
+                signalEl.style.color = 'rgba(255,255,255,0.7)';
+            }
+        }
+    }
+
+    populateFundamentalsTab(stock) {
+        // Simulated fundamental data
+        const setEl = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+
+        setEl('peRatio', (15 + Math.random() * 20).toFixed(2));
+        setEl('pbRatio', (1.5 + Math.random() * 3).toFixed(2));
+        setEl('marketCap', this.formatMarketCap(stock.price * 1000000000));
+        setEl('dividendYield', (Math.random() * 5).toFixed(2) + '%');
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * TECHNICAL CALCULATIONS
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+
+    calculateRSI(stock) {
+        // Simplified RSI calculation based on current change
+        // Real RSI needs 14 days of data
+        const change = stock.change;
+        const rsi = 50 + (change * 2); // Approximate
+        return Math.min(100, Math.max(0, rsi));
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * FORMATTING HELPERS
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+
+    formatVolume(volume) {
+        if (volume >= 1000000000) {
+            return (volume / 1000000000).toFixed(2) + 'B';
+        } else if (volume >= 1000000) {
+            return (volume / 1000000).toFixed(2) + 'M';
+        } else if (volume >= 1000) {
+            return (volume / 1000).toFixed(2) + 'K';
+        }
+        return volume.toLocaleString();
+    }
+
+    formatMarketCap(value) {
+        if (value >= 1000000000000) {
+            return '$' + (value / 1000000000000).toFixed(2) + 'T';
+        } else if (value >= 1000000000) {
+            return '$' + (value / 1000000000).toFixed(2) + 'B';
+        } else if (value >= 1000000) {
+            return '$' + (value / 1000000).toFixed(2) + 'M';
+        }
+        return '$' + value.toLocaleString();
     }
 
     showError(message) {

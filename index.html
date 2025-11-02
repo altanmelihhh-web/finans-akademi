@@ -9547,35 +9547,269 @@ Pasif gelirin: 25.000 TL
                     <p>Piyasa verileri yükleniyor...</p>
                 </div>
 
-                <!-- Stock Modal -->
+                <!-- Stock Modal - IMPROVED VERSION -->
                 <div id="stockModal" class="modal">
-                    <div class="modal-content">
+                    <div class="modal-content stock-modal-modern">
                         <span class="modal-close">&times;</span>
-                        <div class="modal-header">
-                            <h2 id="modalStockName">-</h2>
-                            <button id="modalWatchlistBtn" class="btn-icon"><i class="far fa-star"></i></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="stock-price-info">
-                                <div class="current-price">
-                                    <span class="label">Güncel Fiyat</span>
-                                    <span class="value" id="modalPrice">$0.00</span>
-                                </div>
-                                <div class="price-change" id="modalChange">
+
+                        <!-- Header with Stock Name and Price -->
+                        <div class="stock-modal-header">
+                            <div class="stock-title-section">
+                                <h2 id="modalStockName">-</h2>
+                                <span class="stock-symbol-badge" id="modalSymbol">-</span>
+                            </div>
+                            <div class="stock-price-section">
+                                <div class="current-price-large" id="modalPrice">$0.00</div>
+                                <div class="price-change-large" id="modalChange">
                                     <span class="change-value">+0.00</span>
                                     <span class="change-percent">(+0.00%)</span>
                                 </div>
                             </div>
-                            <div class="stock-details-grid">
-                                <div class="detail-item"><span class="label">Sektör</span><span class="value" id="modalSector">-</span></div>
-                                <div class="detail-item"><span class="label">Açılış</span><span class="value" id="modalOpen">-</span></div>
-                                <div class="detail-item"><span class="label">Yüksek</span><span class="value" id="modalHigh">-</span></div>
-                                <div class="detail-item"><span class="label">Düşük</span><span class="value" id="modalLow">-</span></div>
+                            <button id="modalWatchlistBtn" class="btn-icon watchlist-btn">
+                                <i class="far fa-star"></i>
+                            </button>
+                        </div>
+
+                        <!-- Tab Navigation -->
+                        <div class="stock-modal-tabs">
+                            <button class="stock-tab active" data-tab="overview">
+                                <i class="fas fa-chart-line"></i> Genel Bakış
+                            </button>
+                            <button class="stock-tab" data-tab="details">
+                                <i class="fas fa-info-circle"></i> Detaylar
+                            </button>
+                            <button class="stock-tab" data-tab="technicals">
+                                <i class="fas fa-chart-bar"></i> Teknik
+                            </button>
+                            <button class="stock-tab" data-tab="fundamentals">
+                                <i class="fas fa-calculator"></i> Temel Analiz
+                            </button>
+                        </div>
+
+                        <!-- Tab Content -->
+                        <div class="stock-modal-body">
+
+                            <!-- Overview Tab -->
+                            <div class="stock-tab-content active" data-tab-content="overview">
+                                <!-- Price Chart -->
+                                <div class="modal-section">
+                                    <h3><i class="fas fa-chart-area"></i> Fiyat Grafiği</h3>
+                                    <div class="chart-timeframe-selector">
+                                        <button class="timeframe-btn active" data-timeframe="1D">1G</button>
+                                        <button class="timeframe-btn" data-timeframe="1W">1H</button>
+                                        <button class="timeframe-btn" data-timeframe="1M">1A</button>
+                                        <button class="timeframe-btn" data-timeframe="3M">3A</button>
+                                        <button class="timeframe-btn" data-timeframe="1Y">1Y</button>
+                                    </div>
+                                    <div class="stock-chart-container">
+                                        <canvas id="modalChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Stats Grid -->
+                                <div class="modal-section">
+                                    <h3><i class="fas fa-tachometer-alt"></i> Hızlı İstatistikler</h3>
+                                    <div class="quick-stats-grid">
+                                        <div class="stat-card">
+                                            <div class="stat-label"><i class="fas fa-sun"></i> Açılış</div>
+                                            <div class="stat-value" id="modalOpen">-</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-label"><i class="fas fa-arrow-up"></i> Gün Yüksek</div>
+                                            <div class="stat-value" id="modalHigh">-</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-label"><i class="fas fa-arrow-down"></i> Gün Düşük</div>
+                                            <div class="stat-value" id="modalLow">-</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-label"><i class="fas fa-exchange-alt"></i> Hacim</div>
+                                            <div class="stat-value" id="modalVolume">-</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-label"><i class="fas fa-chart-line"></i> 52H Yüksek</div>
+                                            <div class="stat-value" id="modal52High">-</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-label"><i class="fas fa-chart-line"></i> 52H Düşük</div>
+                                            <div class="stat-value" id="modal52Low">-</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="stock-chart">
-                                <h3>30 Günlük Grafik</h3>
-                                <canvas id="modalChart"></canvas>
+
+                            <!-- Details Tab -->
+                            <div class="stock-tab-content" data-tab-content="details">
+                                <div class="modal-section">
+                                    <h3><i class="fas fa-building"></i> Şirket Bilgileri</h3>
+                                    <div class="info-table">
+                                        <div class="info-row">
+                                            <span class="info-label">Sektör:</span>
+                                            <span class="info-value" id="modalSector">-</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Piyasa:</span>
+                                            <span class="info-value" id="modalMarket">-</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Para Birimi:</span>
+                                            <span class="info-value" id="modalCurrency">-</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Ortalama Hacim:</span>
+                                            <span class="info-value" id="modalAvgVolume">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-section">
+                                    <h3><i class="fas fa-percentage"></i> Performans</h3>
+                                    <div class="performance-grid">
+                                        <div class="perf-item">
+                                            <span class="perf-label">Bugün</span>
+                                            <span class="perf-value" id="perfToday">-</span>
+                                        </div>
+                                        <div class="perf-item">
+                                            <span class="perf-label">1 Hafta</span>
+                                            <span class="perf-value" id="perf1W">-</span>
+                                        </div>
+                                        <div class="perf-item">
+                                            <span class="perf-label">1 Ay</span>
+                                            <span class="perf-value" id="perf1M">-</span>
+                                        </div>
+                                        <div class="perf-item">
+                                            <span class="perf-label">3 Ay</span>
+                                            <span class="perf-value" id="perf3M">-</span>
+                                        </div>
+                                        <div class="perf-item">
+                                            <span class="perf-label">1 Yıl</span>
+                                            <span class="perf-value" id="perf1Y">-</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Technicals Tab -->
+                            <div class="stock-tab-content" data-tab-content="technicals">
+                                <div class="modal-section">
+                                    <h3><i class="fas fa-chart-bar"></i> Teknik Göstergeler</h3>
+                                    <div class="technical-indicators">
+                                        <div class="indicator-item">
+                                            <div class="indicator-header">
+                                                <span class="indicator-name">RSI (14)</span>
+                                                <span class="indicator-value" id="rsiValue">-</span>
+                                            </div>
+                                            <div class="indicator-bar">
+                                                <div class="indicator-fill" id="rsiFill" style="width: 50%"></div>
+                                                <div class="rsi-zones">
+                                                    <span class="zone oversold">30</span>
+                                                    <span class="zone overbought">70</span>
+                                                </div>
+                                            </div>
+                                            <div class="indicator-signal" id="rsiSignal">-</div>
+                                        </div>
+
+                                        <div class="indicator-item">
+                                            <div class="indicator-header">
+                                                <span class="indicator-name">MACD</span>
+                                                <span class="indicator-value" id="macdValue">-</span>
+                                            </div>
+                                            <div class="indicator-signal" id="macdSignal">-</div>
+                                        </div>
+
+                                        <div class="indicator-item">
+                                            <div class="indicator-header">
+                                                <span class="indicator-name">Hareketli Ortalamalar</span>
+                                            </div>
+                                            <div class="ma-grid">
+                                                <div class="ma-item">
+                                                    <span class="ma-period">MA(20)</span>
+                                                    <span class="ma-value" id="ma20">-</span>
+                                                    <span class="ma-signal" id="ma20Signal">-</span>
+                                                </div>
+                                                <div class="ma-item">
+                                                    <span class="ma-period">MA(50)</span>
+                                                    <span class="ma-value" id="ma50">-</span>
+                                                    <span class="ma-signal" id="ma50Signal">-</span>
+                                                </div>
+                                                <div class="ma-item">
+                                                    <span class="ma-period">MA(200)</span>
+                                                    <span class="ma-value" id="ma200">-</span>
+                                                    <span class="ma-signal" id="ma200Signal">-</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-section">
+                                    <h3><i class="fas fa-chart-pie"></i> Teknik Özet</h3>
+                                    <div class="technical-summary">
+                                        <div class="summary-card" id="technicalSummary">
+                                            <div class="summary-score">
+                                                <div class="score-label">Teknik Skor</div>
+                                                <div class="score-value" id="techScore">5/10</div>
+                                            </div>
+                                            <div class="summary-signal" id="techSignal">
+                                                <i class="fas fa-minus-circle"></i> Nötr
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fundamentals Tab -->
+                            <div class="stock-tab-content" data-tab-content="fundamentals">
+                                <div class="modal-section">
+                                    <h3><i class="fas fa-coins"></i> Değerleme Oranları</h3>
+                                    <div class="fundamentals-grid">
+                                        <div class="fund-item">
+                                            <div class="fund-label">
+                                                <i class="fas fa-chart-pie"></i> P/E Ratio
+                                                <span class="info-icon" title="Fiyat/Kazanç oranı">ⓘ</span>
+                                            </div>
+                                            <div class="fund-value" id="peRatio">-</div>
+                                        </div>
+                                        <div class="fund-item">
+                                            <div class="fund-label">
+                                                <i class="fas fa-book"></i> P/B Ratio
+                                                <span class="info-icon" title="Fiyat/Defter değeri">ⓘ</span>
+                                            </div>
+                                            <div class="fund-value" id="pbRatio">-</div>
+                                        </div>
+                                        <div class="fund-item">
+                                            <div class="fund-label">
+                                                <i class="fas fa-dollar-sign"></i> Piyasa Değeri
+                                            </div>
+                                            <div class="fund-value" id="marketCap">-</div>
+                                        </div>
+                                        <div class="fund-item">
+                                            <div class="fund-label">
+                                                <i class="fas fa-percentage"></i> Temettü Verimi
+                                            </div>
+                                            <div class="fund-value" id="dividendYield">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-section">
+                                    <div class="info-banner">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Detaylı finansal veriler için veri sağlayıcı API'si gereklidir.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Modal Footer with Actions -->
+                        <div class="stock-modal-footer">
+                            <button class="btn-secondary" onclick="window.open(`https://finance.yahoo.com/quote/${this.selectedStock?.symbol}`, '_blank')">
+                                <i class="fas fa-external-link-alt"></i> Yahoo Finance'de Aç
+                            </button>
+                            <button class="btn-primary" onclick="if(window.simulator) window.simulator.openBuyModal('${this.selectedStock?.symbol}')">
+                                <i class="fas fa-shopping-cart"></i> İşlem Yap
+                            </button>
                         </div>
                     </div>
                 </div>
