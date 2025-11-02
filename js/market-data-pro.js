@@ -78,10 +78,10 @@ class MarketDataPro {
             }
         };
 
-        // Cache Configuration
+        // Cache Configuration - LONGER TIMEOUT FOR BETTER UX
         this.cache = {
             memory: new Map(),
-            timeout: 300000, // 5 minutes
+            timeout: 900000, // 15 minutes (was 5min) - Markets don't change that fast!
             storageKey: 'finans_akademi_pro_cache_v3', // v3: Yahoo Finance update!
             version: 3 // Increment this on breaking changes to invalidate old cache
         };
@@ -93,7 +93,7 @@ class MarketDataPro {
             isMarketsUpdating: false,
             lastDashboardUpdate: 0,
             lastMarketsUpdate: 0,
-            updateInterval: 300000, // 5 minutes
+            updateInterval: 900000, // 15 minutes (was 5min) - Silent background refresh
             errors: []
         };
 
@@ -324,8 +324,11 @@ class MarketDataPro {
                 // Wait for all stocks in batch to complete
                 await Promise.all(batchPromises);
 
-                // Update UI progressively (but only every 2 batches to reduce renders)
-                if (batchNum % 2 === 0 || batchNum === batches) {
+                // Update UI progressively and SILENTLY (no full re-render, just update prices)
+                if (window.marketsManager && typeof window.marketsManager.updatePricesSilently === 'function') {
+                    window.marketsManager.updatePricesSilently(batchStocks);
+                } else if (batchNum % 2 === 0 || batchNum === batches) {
+                    // Fallback to full render if silent update not available
                     if (window.marketsManager && typeof window.marketsManager.renderStocks === 'function') {
                         window.marketsManager.renderStocks();
                         window.marketsManager.updateStats();

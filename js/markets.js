@@ -188,17 +188,19 @@ class MarketsManager {
         const changeClass = stock.change >= 0 ? 'positive' : 'negative';
         const changeIcon = stock.change >= 0 ? 'arrow-up' : 'arrow-down';
 
-        // Show loading state if price is 0
-        const priceDisplay = stock.price > 0
-            ? this.formatCurrency(stock.price, stock.market)
-            : '<span style="opacity: 0.5">Yükleniyor...</span>';
+        // Show skeleton loader if price is 0 or not loaded yet
+        const isLoading = !stock.price || stock.price === 0;
 
-        const changeDisplay = stock.price > 0 && stock.change !== undefined
+        const priceDisplay = !isLoading
+            ? this.formatCurrency(stock.price, stock.market)
+            : '<span class="skeleton-text skeleton-price"></span>';
+
+        const changeDisplay = !isLoading && stock.change !== undefined
             ? `<span class="change ${changeClass}">
                 <i class="fas fa-${changeIcon}"></i>
                 ${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%
                </span>`
-            : '<span style="opacity: 0.5">-</span>';
+            : '<span class="skeleton-text skeleton-change"></span>';
 
         return `
             <div class="stock-card" data-symbol="${stock.symbol}">
@@ -479,6 +481,46 @@ class MarketsManager {
                 }
             }
         });
+    }
+
+    /**
+     * Update prices silently without full re-render (for live updates)
+     */
+    updatePricesSilently(stocks) {
+        if (!stocks || stocks.length === 0) return;
+
+        stocks.forEach(stock => {
+            // Find all cards with this symbol
+            const cards = document.querySelectorAll(`.stock-card[data-symbol="${stock.symbol}"]`);
+
+            cards.forEach(card => {
+                // Update price
+                const priceEl = card.querySelector('.stock-price .price');
+                if (priceEl && stock.price > 0) {
+                    const currency = stock.market === 'bist' ? '₺' : '$';
+                    priceEl.textContent = `${currency}${stock.price.toFixed(2)}`;
+
+                    // Remove skeleton if present
+                    priceEl.classList.remove('skeleton-text', 'skeleton-price');
+                }
+
+                // Update change
+                const changeEl = card.querySelector('.stock-price .change');
+                if (changeEl && stock.change !== undefined) {
+                    const changeClass = stock.change >= 0 ? 'positive' : 'negative';
+                    const changeIcon = stock.change >= 0 ? 'arrow-up' : 'arrow-down';
+
+                    changeEl.className = `change ${changeClass}`;
+                    changeEl.innerHTML = `
+                        <i class="fas fa-${changeIcon}"></i>
+                        ${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%
+                    `;
+                }
+            });
+        });
+
+        // Update stats silently
+        this.updateStats();
     }
 
     updateStats() {

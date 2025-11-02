@@ -4448,3 +4448,46 @@ footer i {
         gap: 8px;
     }
 }
+
+/* ===================================
+   Skeleton Loaders
+   =================================== */
+
+.skeleton-text {
+    display: inline-block;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        rgba(255, 255, 255, 0.05) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: 4px;
+    color: transparent !important;
+}
+
+.skeleton-price {
+    width: 80px;
+    height: 24px;
+}
+
+.skeleton-change {
+    width: 60px;
+    height: 20px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Skeleton for stock cards */
+.stock-card.loading .stock-price {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    padding: 8px;
+}
