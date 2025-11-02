@@ -46,10 +46,18 @@ class ReportsManager {
      * Setup event listeners
      */
     setupEventListeners() {
+        console.log('📋 Setting up report event listeners...');
+
         // Report type switcher
-        document.querySelectorAll('.report-tab').forEach(tab => {
+        const reportTabs = document.querySelectorAll('.report-tab');
+        console.log(`📋 Found ${reportTabs.length} report tabs`);
+
+        reportTabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const reportType = e.currentTarget.dataset.report;
+                console.log(`📋 Tab clicked: ${reportType}`);
                 this.switchReport(reportType);
             });
         });
@@ -1535,28 +1543,20 @@ class ReportsManager {
 let reportsManager;
 
 function initReports() {
+    console.log('📋 initReports() called');
+
+    if (window.reportsManager) {
+        console.log('📋 ReportsManager already initialized, refreshing...');
+        window.reportsManager.generateAllReports();
+        return;
+    }
+
+    console.log('📋 Creating new ReportsManager...');
     reportsManager = new ReportsManager();
     window.reportsManager = reportsManager;
 }
 
-// Auto-initialize when reports page is active
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        // Only init when reports page is visited
-        const observer = new MutationObserver(() => {
-            const reportsPage = document.getElementById('raporlar');
-            if (reportsPage && reportsPage.classList.contains('active') && !window.reportsManager) {
-                initReports();
-            }
-        });
-
-        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
-    });
-} else {
-    const reportsPage = document.getElementById('raporlar');
-    if (reportsPage && reportsPage.classList.contains('active')) {
-        initReports();
-    }
-}
+// Export for app.js to call
+window.initReports = initReports;
 
 export { ReportsManager };
