@@ -431,7 +431,7 @@ class MarketsManager {
         }
     }
 
-    async renderModalChart(stock) {
+    async renderModalChart(stock, timeframe = '1M') {
         const ctx = document.getElementById('modalChart');
         if (!ctx) return;
 
@@ -439,26 +439,30 @@ class MarketsManager {
             this.modalChart.destroy();
         }
 
-        // Gerçek 30 günlük veriyi Finnhub'dan al
+        // Determine data points based on timeframe
+        const dataPoints = {
+            '1D': 24,   // 24 hours
+            '1W': 7,    // 7 days
+            '1M': 30,   // 30 days
+            '3M': 90,   // 90 days
+            '1Y': 365   // 365 days
+        };
+
+        const points = dataPoints[timeframe] || 30;
+
+        // Try to get real data first
         let chartData = { labels: [], prices: [] };
 
         if (window.marketData && typeof window.marketData.getChartData === 'function') {
             try {
-                chartData = await window.marketData.getChartData(stock.symbol);
+                chartData = await window.marketData.getChartData(stock.symbol, timeframe);
             } catch (error) {
-                console.error('Chart data error:', error);
-                // Fallback: Basit veri
-                chartData = {
-                    labels: Array.from({length: 30}, (_, i) => `${i + 1}`),
-                    prices: Array.from({length: 30}, () => stock.price)
-                };
+                console.warn('Chart data API failed, using simulated data:', error);
+                chartData = this.generateSimulatedChartData(stock, points, timeframe);
             }
         } else {
-            // Fallback: Basit veri
-            chartData = {
-                labels: Array.from({length: 30}, (_, i) => `${i + 1}`),
-                prices: Array.from({length: 30}, () => stock.price)
-            };
+            // Fallback: Generate realistic simulated data
+            chartData = this.generateSimulatedChartData(stock, points, timeframe);
         }
 
         const data = chartData.prices;
@@ -769,6 +773,59 @@ class MarketsManager {
             return '$' + (value / 1000000).toFixed(2) + 'M';
         }
         return '$' + value.toLocaleString();
+    }
+
+    /**
+     * Generate realistic simulated chart data with volatility
+     */
+    generateSimulatedChartData(stock, points, timeframe) {
+        const labels = [];
+        const prices = [];
+
+        // Calculate starting price based on current price and change
+        // Go backwards from current price
+        const currentPrice = stock.price;
+        const totalChange = stock.change / 100; // Convert to decimal
+
+        // Starting price (points ago)
+        const startPrice = currentPrice / (1 + totalChange);
+
+        // Generate realistic price movement
+        let price = startPrice;
+        const volatility = Math.abs(totalChange) / points; // Daily volatility
+        const trend = totalChange / points; // Daily trend
+
+        for (let i = 0; i < points; i++) {
+            // Add date label
+            const date = new Date();
+            if (timeframe === '1D') {
+                date.setHours(date.getHours() - (points - i));
+                labels.push(date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }));
+            } else if (timeframe === '1W') {
+                date.setDate(date.getDate() - (points - i));
+                labels.push(date.toLocaleDateString('tr-TR', { weekday: 'short' }));
+            } else {
+                date.setDate(date.getDate() - (points - i));
+                labels.push(date.toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' }));
+            }
+
+            // Add price with realistic movement
+            // Random walk with drift (trend)
+            const randomChange = (Math.random() - 0.5) * volatility * 2;
+            const change = trend + randomChange;
+            price = price * (1 + change);
+
+            prices.push(parseFloat(price.toFixed(2)));
+        }
+
+        // Ensure last price matches current price (smooth adjustment)
+        const lastPrice = prices[prices.length - 1];
+        const adjustment = currentPrice / lastPrice;
+        for (let i = 0; i < prices.length; i++) {
+            prices[i] = parseFloat((prices[i] * adjustment).toFixed(2));
+        }
+
+        return { labels, prices };
     }
 
     showError(message) {
