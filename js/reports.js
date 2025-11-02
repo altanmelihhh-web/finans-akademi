@@ -15,6 +15,8 @@ class ReportsManager {
         this.currentReport = null;
         this.reportHistory = [];
         this.autoRefreshInterval = null;
+        this.selectedStocks = []; // For custom reports
+        this.customFilters = {}; // For custom report preferences
 
         this.init();
     }
@@ -47,7 +49,7 @@ class ReportsManager {
         // Report type switcher
         document.querySelectorAll('.report-tab').forEach(tab => {
             tab.addEventListener('click', (e) => {
-                const reportType = e.target.dataset.report;
+                const reportType = e.currentTarget.dataset.report;
                 this.switchReport(reportType);
             });
         });
@@ -68,6 +70,60 @@ class ReportsManager {
         const emailSubBtn = document.getElementById('subscribeReportBtn');
         if (emailSubBtn) {
             emailSubBtn.addEventListener('click', () => this.subscribeToReports());
+        }
+
+        // Customize button - toggle custom filters
+        const customizeBtn = document.getElementById('customizeReportBtn');
+        if (customizeBtn) {
+            customizeBtn.addEventListener('click', () => this.toggleCustomFilters());
+        }
+
+        // Custom report - Apply button
+        const applyCustomBtn = document.getElementById('applyCustomReport');
+        if (applyCustomBtn) {
+            applyCustomBtn.addEventListener('click', () => this.generateCustomReport());
+        }
+
+        // Custom report - Cancel button
+        const cancelCustomBtn = document.getElementById('cancelCustomReport');
+        if (cancelCustomBtn) {
+            cancelCustomBtn.addEventListener('click', () => this.hideCustomFilters());
+        }
+
+        // Custom report - Save template button
+        const saveTemplateBtn = document.getElementById('saveCustomTemplate');
+        if (saveTemplateBtn) {
+            saveTemplateBtn.addEventListener('click', () => this.saveCustomTemplate());
+        }
+
+        // Stock search input
+        const stockSearchInput = document.getElementById('stockSearchInput');
+        if (stockSearchInput) {
+            stockSearchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.addStockToSelection(e.target.value.trim().toUpperCase());
+                    e.target.value = '';
+                }
+            });
+        }
+
+        // AI Analysis - Quick question buttons
+        document.querySelectorAll('.ai-quick-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const question = btn.dataset.question;
+                this.askAIAnalysis(question);
+            });
+        });
+
+        // AI Analysis - Custom question button
+        const askAiBtn = document.getElementById('askAiAnalysis');
+        if (askAiBtn) {
+            askAiBtn.addEventListener('click', () => {
+                const question = document.getElementById('aiCustomQuestion').value.trim();
+                if (question) {
+                    this.askAIAnalysis(question);
+                }
+            });
         }
     }
 
@@ -931,6 +987,16 @@ class ReportsManager {
             tab.classList.toggle('active', tab.dataset.report === type);
         });
 
+        // Hide all special inputs
+        this.hideCustomFilters();
+        this.hideAIAnalysis();
+
+        // Show report content area
+        const reportContent = document.getElementById('reportContent');
+        if (reportContent) {
+            reportContent.style.display = 'block';
+        }
+
         // Generate report
         switch (type) {
             case 'morning':
@@ -941,6 +1007,12 @@ class ReportsManager {
                 break;
             case 'weekly':
                 this.generateWeeklyReport();
+                break;
+            case 'custom':
+                this.showCustomFilters();
+                break;
+            case 'ai-analysis':
+                this.showAIAnalysis();
                 break;
         }
     }
@@ -1056,6 +1128,406 @@ class ReportsManager {
      */
     subscribeToReports() {
         alert('Email bildirimleri yakında aktif olacak! 📧');
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * CUSTOM REPORTS
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+
+    /**
+     * Toggle custom filters visibility
+     */
+    toggleCustomFilters() {
+        const filters = document.getElementById('customReportFilters');
+        if (filters) {
+            const isVisible = filters.style.display !== 'none';
+            if (isVisible) {
+                this.hideCustomFilters();
+            } else {
+                this.showCustomFilters();
+            }
+        }
+    }
+
+    /**
+     * Show custom filters
+     */
+    showCustomFilters() {
+        const filters = document.getElementById('customReportFilters');
+        const reportContent = document.getElementById('reportContent');
+
+        if (filters) filters.style.display = 'block';
+        if (reportContent) reportContent.style.display = 'none';
+
+        // Load saved template if exists
+        this.loadCustomTemplate();
+    }
+
+    /**
+     * Hide custom filters
+     */
+    hideCustomFilters() {
+        const filters = document.getElementById('customReportFilters');
+        if (filters) filters.style.display = 'none';
+    }
+
+    /**
+     * Add stock to selection
+     */
+    addStockToSelection(symbol) {
+        if (!symbol) return;
+
+        // Check if stock exists
+        const allStocks = [
+            ...window.STOCKS_DATA.us_stocks,
+            ...window.STOCKS_DATA.bist_stocks
+        ];
+
+        const stock = allStocks.find(s => s.symbol === symbol);
+        if (!stock) {
+            alert(`Hisse bulunamadı: ${symbol}`);
+            return;
+        }
+
+        // Check if already added
+        if (this.selectedStocks.includes(symbol)) {
+            alert(`${symbol} zaten eklendi!`);
+            return;
+        }
+
+        // Add to selection
+        this.selectedStocks.push(symbol);
+        this.renderSelectedStocks();
+    }
+
+    /**
+     * Remove stock from selection
+     */
+    removeStockFromSelection(symbol) {
+        this.selectedStocks = this.selectedStocks.filter(s => s !== symbol);
+        this.renderSelectedStocks();
+    }
+
+    /**
+     * Render selected stocks
+     */
+    renderSelectedStocks() {
+        const container = document.getElementById('selectedStocks');
+        if (!container) return;
+
+        if (this.selectedStocks.length === 0) {
+            container.innerHTML = '<p style="color: rgba(255,255,255,0.5);">Henüz hisse seçilmedi. Enter tuşu ile ekleyin.</p>';
+            return;
+        }
+
+        container.innerHTML = this.selectedStocks.map(symbol => `
+            <div class="stock-tag">
+                <span>${symbol}</span>
+                <span class="remove" onclick="reportsManager.removeStockFromSelection('${symbol}')">
+                    <i class="fas fa-times"></i>
+                </span>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Generate custom report
+     */
+    async generateCustomReport() {
+        if (this.selectedStocks.length === 0) {
+            alert('Lütfen en az bir hisse seçin!');
+            return;
+        }
+
+        // Get selected filters
+        const markets = Array.from(document.querySelectorAll('input[name="market"]:checked')).map(el => el.value);
+        const notifications = Array.from(document.querySelectorAll('input[name="notification"]:checked')).map(el => el.value);
+        const content = Array.from(document.querySelectorAll('input[name="content"]:checked')).map(el => el.value);
+
+        // Save filters
+        this.customFilters = { markets, notifications, content };
+
+        // Hide filters, show report
+        this.hideCustomFilters();
+        document.getElementById('reportContent').style.display = 'block';
+
+        // Generate report
+        const report = {
+            type: 'custom',
+            title: 'Özel Rapor',
+            subtitle: `${this.selectedStocks.join(', ')} için özelleştirilmiş analiz`,
+            timestamp: Date.now(),
+            date: new Date().toLocaleDateString('tr-TR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }),
+            sections: []
+        };
+
+        // Get stock data
+        const allStocks = [
+            ...window.STOCKS_DATA.us_stocks,
+            ...window.STOCKS_DATA.bist_stocks
+        ];
+
+        const selectedStockData = this.selectedStocks.map(symbol =>
+            allStocks.find(s => s.symbol === symbol)
+        ).filter(Boolean);
+
+        // 1. Performance Summary
+        if (content.includes('performance')) {
+            report.sections.push({
+                title: '📊 Performans Özeti',
+                icon: 'fa-chart-bar',
+                content: [{
+                    type: 'stocks',
+                    data: selectedStockData.map(s => ({
+                        symbol: s.symbol,
+                        name: s.name,
+                        price: s.price,
+                        change: s.change,
+                        market: s.market || 'us'
+                    }))
+                }]
+            });
+        }
+
+        // 2. Technical Indicators (if selected)
+        if (content.includes('technicals')) {
+            report.sections.push({
+                title: '📈 Teknik Göstergeler',
+                icon: 'fa-chart-line',
+                content: [{
+                    type: 'text',
+                    text: '💡 Seçili hisseler için teknik analiz özeti hazırlanıyor...'
+                }]
+            });
+        }
+
+        // 3. Notifications Summary
+        if (notifications.length > 0) {
+            const alerts = [];
+            selectedStockData.forEach(stock => {
+                if (notifications.includes('price-change') && Math.abs(stock.change) >= 5) {
+                    alerts.push(`⚠️ **${stock.symbol}**: Büyük fiyat hareketi (${stock.change.toFixed(2)}%)`);
+                }
+                if (notifications.includes('volume-spike') && stock.volume && stock.volume > 1000000) {
+                    alerts.push(`📊 **${stock.symbol}**: Yüksek işlem hacmi`);
+                }
+            });
+
+            if (alerts.length > 0) {
+                report.sections.push({
+                    title: '🔔 Bildirimler',
+                    icon: 'fa-bell',
+                    content: alerts.map(alert => ({ type: 'text', text: alert }))
+                });
+            }
+        }
+
+        // 4. AI Insights (if selected)
+        if (content.includes('ai-insights')) {
+            report.sections.push({
+                title: '🤖 AI Öngörüler',
+                icon: 'fa-robot',
+                content: [{
+                    type: 'text',
+                    text: '💡 AI destekli analiz için "AI Analiz" sekmesini kullanın!'
+                }]
+            });
+        }
+
+        this.currentReport = report;
+        this.renderReport(report);
+        this.saveToHistory(report);
+
+        console.log('✅ Custom report generated');
+    }
+
+    /**
+     * Save custom template
+     */
+    saveCustomTemplate() {
+        const template = {
+            selectedStocks: this.selectedStocks,
+            filters: this.customFilters
+        };
+
+        localStorage.setItem('customReportTemplate', JSON.stringify(template));
+        alert('✅ Şablon kaydedildi! Bir sonraki sefere otomatik yüklenecek.');
+    }
+
+    /**
+     * Load custom template
+     */
+    loadCustomTemplate() {
+        try {
+            const stored = localStorage.getItem('customReportTemplate');
+            if (stored) {
+                const template = JSON.parse(stored);
+                this.selectedStocks = template.selectedStocks || [];
+                this.customFilters = template.filters || {};
+
+                // Render stocks
+                this.renderSelectedStocks();
+
+                // Apply filters to checkboxes
+                if (this.customFilters.markets) {
+                    document.querySelectorAll('input[name="market"]').forEach(el => {
+                        el.checked = this.customFilters.markets.includes(el.value);
+                    });
+                }
+                if (this.customFilters.content) {
+                    document.querySelectorAll('input[name="content"]').forEach(el => {
+                        el.checked = this.customFilters.content.includes(el.value);
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error loading template:', error);
+        }
+    }
+
+    /**
+     * ═══════════════════════════════════════════════════════════════════════════
+     * AI ANALYSIS
+     * ═══════════════════════════════════════════════════════════════════════════
+     */
+
+    /**
+     * Show AI analysis input
+     */
+    showAIAnalysis() {
+        const aiInput = document.getElementById('aiAnalysisInput');
+        const reportContent = document.getElementById('reportContent');
+
+        if (aiInput) aiInput.style.display = 'block';
+        if (reportContent) reportContent.style.display = 'none';
+    }
+
+    /**
+     * Hide AI analysis
+     */
+    hideAIAnalysis() {
+        const aiInput = document.getElementById('aiAnalysisInput');
+        if (aiInput) aiInput.style.display = 'none';
+    }
+
+    /**
+     * Ask AI for market analysis
+     */
+    async askAIAnalysis(question) {
+        if (!question) return;
+
+        const resultDiv = document.getElementById('aiAnalysisResult');
+        const contentDiv = resultDiv.querySelector('.ai-response-content');
+        const timestampDiv = resultDiv.querySelector('.ai-timestamp');
+
+        // Show result area with loading
+        resultDiv.style.display = 'block';
+        contentDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> AI analiz hazırlıyor...</p>';
+
+        try {
+            // Build context from current market data
+            let context = 'Mevcut piyasa durumu:\n';
+
+            if (window.marketDataPro) {
+                const dashboardData = window.marketDataPro.cache.memory.get('dashboard');
+                if (dashboardData) {
+                    const { indices, forex, crypto } = dashboardData;
+
+                    context += `\nEndeksler:\n`;
+                    if (indices) {
+                        context += `- S&P 500: ${indices.sp500?.price?.toFixed(2)} (${indices.sp500?.changePercent?.toFixed(2)}%)\n`;
+                        context += `- NASDAQ: ${indices.nasdaq?.price?.toFixed(2)} (${indices.nasdaq?.changePercent?.toFixed(2)}%)\n`;
+                        context += `- BIST 100: ${indices.bist100?.price?.toFixed(2)} (${indices.bist100?.changePercent?.toFixed(2)}%)\n`;
+                    }
+
+                    context += `\nDöviz:\n`;
+                    if (forex) {
+                        context += `- USD/TRY: ${forex.USDTRY?.toFixed(4)}\n`;
+                        context += `- EUR/TRY: ${forex.EURTRY?.toFixed(4)}\n`;
+                    }
+
+                    if (crypto && crypto.bitcoin) {
+                        context += `\nKripto:\n`;
+                        context += `- Bitcoin: $${crypto.bitcoin.price?.toLocaleString()} (${crypto.bitcoin.change24h?.toFixed(2)}%)\n`;
+                    }
+                }
+            }
+
+            context += `\nSoru: ${question}`;
+
+            // Call Gemini AI (using existing chatbot functionality)
+            let aiResponse = '';
+
+            if (window.finansChatbot && typeof window.finansChatbot.sendMessage === 'function') {
+                // Use existing chatbot
+                aiResponse = await window.finansChatbot.sendMessage(context);
+            } else {
+                // Fallback to basic analysis
+                aiResponse = this.generateBasicAnalysis(question, context);
+            }
+
+            // Display response
+            contentDiv.innerHTML = this.formatAIResponse(aiResponse);
+            timestampDiv.textContent = new Date().toLocaleTimeString('tr-TR');
+
+            // Clear input
+            document.getElementById('aiCustomQuestion').value = '';
+
+        } catch (error) {
+            console.error('AI Analysis error:', error);
+            contentDiv.innerHTML = `
+                <p style="color: #ff6b6b;">
+                    ❌ AI analiz sırasında bir hata oluştu.
+                    ${error.message || 'Lütfen daha sonra tekrar deneyin.'}
+                </p>
+            `;
+        }
+    }
+
+    /**
+     * Generate basic analysis (fallback)
+     */
+    generateBasicAnalysis(question, context) {
+        // Parse market data from context
+        const analysis = [];
+
+        analysis.push('📊 **Piyasa Analizi**\n');
+
+        if (question.toLowerCase().includes('bist')) {
+            analysis.push('BIST 100 hakkında mevcut veriler context\'te mevcut.');
+        }
+
+        if (question.toLowerCase().includes('dolar') || question.toLowerCase().includes('döviz')) {
+            analysis.push('Döviz kurları için güncel veriler yukarıda gösterilmektedir.');
+        }
+
+        analysis.push('\n💡 **Öneri:** Daha detaylı AI analizi için Gemini API key\'i eklemeyi unutmayın!');
+
+        return analysis.join('\n');
+    }
+
+    /**
+     * Format AI response with markdown
+     */
+    formatAIResponse(text) {
+        if (!text) return '';
+
+        // Convert markdown-like syntax to HTML
+        let html = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+            .replace(/\n/g, '<br>') // Line breaks
+            .replace(/•/g, '&bull;'); // Bullets
+
+        return `<p>${html}</p>`;
     }
 }
 

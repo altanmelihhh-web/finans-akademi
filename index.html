@@ -1451,6 +1451,14 @@
                         <i class="fas fa-calendar-week"></i>
                         <span>Haftalık Rapor</span>
                     </button>
+                    <button class="report-tab" data-report="custom">
+                        <i class="fas fa-filter"></i>
+                        <span>Özel Rapor</span>
+                    </button>
+                    <button class="report-tab" data-report="ai-analysis">
+                        <i class="fas fa-robot"></i>
+                        <span>AI Analiz</span>
+                    </button>
                 </div>
 
                 <!-- Report Actions -->
@@ -1464,6 +1472,111 @@
                     <button id="subscribeReportBtn" class="btn-action">
                         <i class="fas fa-bell"></i> Email Bildirimi
                     </button>
+                    <button id="customizeReportBtn" class="btn-action">
+                        <i class="fas fa-cog"></i> Özelleştir
+                    </button>
+                </div>
+
+                <!-- Custom Report Filters (Hidden by default) -->
+                <div id="customReportFilters" class="custom-report-filters" style="display: none;">
+                    <h3><i class="fas fa-filter"></i> Özel Rapor Filtreleri</h3>
+
+                    <div class="filter-section">
+                        <label><i class="fas fa-chart-line"></i> Hisse Seçimi:</label>
+                        <div class="stock-selector">
+                            <input type="text" id="stockSearchInput" placeholder="Hisse ara (örn: AAPL, THYAO)..." class="filter-input">
+                            <div id="selectedStocks" class="selected-stocks"></div>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <label><i class="fas fa-layer-group"></i> Piyasa:</label>
+                        <div class="filter-checkboxes">
+                            <label><input type="checkbox" name="market" value="us" checked> ABD Hisseleri</label>
+                            <label><input type="checkbox" name="market" value="bist" checked> BIST Hisseleri</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <label><i class="fas fa-bell"></i> Bildirim Tercihleri:</label>
+                        <div class="filter-checkboxes">
+                            <label><input type="checkbox" name="notification" value="price-change"> Fiyat değişimi (%5+ hareket)</label>
+                            <label><input type="checkbox" name="notification" value="volume-spike"> Yüksek hacim (ortalamadan %50+ fazla)</label>
+                            <label><input type="checkbox" name="notification" value="news"> İlgili haberler</label>
+                            <label><input type="checkbox" name="notification" value="analyst-rating"> Analist tavsiyeleri</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <label><i class="fas fa-chart-bar"></i> Rapor İçeriği:</label>
+                        <div class="filter-checkboxes">
+                            <label><input type="checkbox" name="content" value="performance" checked> Performans Özeti</label>
+                            <label><input type="checkbox" name="content" value="technicals" checked> Teknik Göstergeler</label>
+                            <label><input type="checkbox" name="content" value="fundamentals"> Temel Analiz</label>
+                            <label><input type="checkbox" name="content" value="sentiment"> Piyasa Duygusu</label>
+                            <label><input type="checkbox" name="content" value="ai-insights"> AI Öngörüler</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button id="applyCustomReport" class="btn-primary">
+                            <i class="fas fa-check"></i> Rapor Oluştur
+                        </button>
+                        <button id="saveCustomTemplate" class="btn-secondary">
+                            <i class="fas fa-save"></i> Şablon Kaydet
+                        </button>
+                        <button id="cancelCustomReport" class="btn-secondary">
+                            <i class="fas fa-times"></i> İptal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Analysis Input (Hidden by default) -->
+                <div id="aiAnalysisInput" class="ai-analysis-input" style="display: none;">
+                    <h3><i class="fas fa-robot"></i> AI Piyasa Analizi</h3>
+                    <p class="ai-subtitle">Yapay zeka destekli piyasa yorumları ve öngörüler</p>
+
+                    <div class="ai-question-section">
+                        <label>Analiz türü seçin veya özel soru sorun:</label>
+                        <div class="ai-quick-questions">
+                            <button class="ai-quick-btn" data-question="Bugün piyasalarda neler oluyor? Genel bir özet ver.">
+                                <i class="fas fa-globe"></i> Genel Durum
+                            </button>
+                            <button class="ai-quick-btn" data-question="BIST 100'de öne çıkan hisseler hangileri? Neden yükseliyorlar?">
+                                <i class="fas fa-star"></i> BIST Öne Çıkanlar
+                            </button>
+                            <button class="ai-quick-btn" data-question="ABD piyasalarında bugün dikkat çeken gelişmeler neler?">
+                                <i class="fas fa-flag-usa"></i> ABD Piyasaları
+                            </button>
+                            <button class="ai-quick-btn" data-question="Döviz kurlarında bugünkü hareketler normal mi? Analiz et.">
+                                <i class="fas fa-dollar-sign"></i> Forex Analizi
+                            </button>
+                            <button class="ai-quick-btn" data-question="Kripto para piyasasında bugün neler oldu?">
+                                <i class="fas fa-bitcoin"></i> Kripto Durum
+                            </button>
+                            <button class="ai-quick-btn" data-question="Yarın için hangi hisselere dikkat etmeliyim?">
+                                <i class="fas fa-lightbulb"></i> Yarın İçin Tavsiye
+                            </button>
+                        </div>
+
+                        <div class="ai-custom-question">
+                            <textarea id="aiCustomQuestion" placeholder="Veya kendi sorunuzu yazın..." rows="3"></textarea>
+                            <button id="askAiAnalysis" class="btn-primary">
+                                <i class="fas fa-paper-plane"></i> AI'ya Sor
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="aiAnalysisResult" class="ai-analysis-result" style="display: none;">
+                        <div class="ai-response-header">
+                            <h4><i class="fas fa-robot"></i> AI Yanıtı</h4>
+                            <span class="ai-timestamp"></span>
+                        </div>
+                        <div class="ai-response-content"></div>
+                        <div class="ai-disclaimer">
+                            <i class="fas fa-info-circle"></i> Bu analiz AI tarafından üretilmiştir ve yatırım tavsiyesi değildir.
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Report Content -->
@@ -1483,6 +1596,8 @@
                             <li><strong>Sabah Raporu:</strong> Piyasa açılışı öncesi özet (08:00)</li>
                             <li><strong>Akşam Raporu:</strong> Günlük performans analizi (18:00)</li>
                             <li><strong>Haftalık Rapor:</strong> Geçen hafta özeti (Pazartesi)</li>
+                            <li><strong>Özel Rapor:</strong> Seçtiğiniz hisseler için özelleştirilmiş analiz</li>
+                            <li><strong>AI Analiz:</strong> Yapay zeka destekli piyasa yorumları</li>
                             <li><strong>Email Bildirimi:</strong> Raporları email ile alın (yakında)</li>
                         </ul>
                     </div>

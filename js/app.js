@@ -123,6 +123,16 @@ function initNavigation() {
                         // Setup news category tabs
                         initNewsTabNavigation();
                     }
+                } else if (pageName === 'raporlar') {
+                    // Initialize reports manager when reports page is opened
+                    if (typeof initReports === 'function' && !window.reportsManager) {
+                        console.log('🔄 Initializing Reports Manager...');
+                        initReports();
+                    } else if (window.reportsManager) {
+                        // If already initialized, just refresh
+                        console.log('🔄 Refreshing reports...');
+                        window.reportsManager.generateAllReports();
+                    }
                 }
             }
         });
