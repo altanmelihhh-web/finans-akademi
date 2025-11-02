@@ -26,27 +26,37 @@ class MarketsManager {
 
             // Combine US and BIST stocks (gerçek veriler real-time-stocks.js tarafından güncelleniyor)
             this.stocks = [
-                ...data.us_stocks.map(s => ({
-                    ...s,
-                    market: 'us',
-                    // Yahoo Finance gerçek verilerini kullan
-                    open: s.price,
-                    high: s.price * 1.02,
-                    low: s.price * 0.98,
-                    volume: s.volume || 1000000,
-                    high52w: s.high52w || s.price * 1.3,
-                    low52w: s.low52w || s.price * 0.7
-                })),
-                ...data.bist_stocks.map(s => ({
-                    ...s,
-                    market: 'bist',
-                    open: s.price,
-                    high: s.price * 1.02,
-                    low: s.price * 0.98,
-                    volume: s.volume || 1000000,
-                    high52w: s.high52w || s.price * 1.3,
-                    low52w: s.low52w || s.price * 0.7
-                }))
+                ...data.us_stocks.map(s => {
+                    const stock = {
+                        ...s,
+                        market: 'us',
+                        // Yahoo Finance gerçek verilerini kullan
+                        open: s.price,
+                        high: s.price * 1.02,
+                        low: s.price * 0.98,
+                        volume: s.volume || 1000000,
+                        high52w: s.high52w || s.price * 1.3,
+                        low52w: s.low52w || s.price * 0.7
+                    };
+                    // Calculate technical score
+                    stock.technicalScore = this.calculateTechnicalScore(stock);
+                    return stock;
+                }),
+                ...data.bist_stocks.map(s => {
+                    const stock = {
+                        ...s,
+                        market: 'bist',
+                        open: s.price,
+                        high: s.price * 1.02,
+                        low: s.price * 0.98,
+                        volume: s.volume || 1000000,
+                        high52w: s.high52w || s.price * 1.3,
+                        low52w: s.low52w || s.price * 0.7
+                    };
+                    // Calculate technical score
+                    stock.technicalScore = this.calculateTechnicalScore(stock);
+                    return stock;
+                })
             ];
 
             this.filteredStocks = [...this.stocks];
@@ -234,6 +244,23 @@ class MarketsManager {
                 <div class="stock-price">
                     <span class="price">${priceDisplay}</span>
                     ${changeDisplay}
+                </div>
+                ${this.renderTechnicalScoreBadge(stock)}
+            </div>
+        `;
+    }
+
+    renderTechnicalScoreBadge(stock) {
+        if (!stock.technicalScore) return '';
+
+        const signal = this.getTechnicalSignal(stock.technicalScore);
+        const scoreOut10 = Math.floor(stock.technicalScore / 10);
+
+        return `
+            <div class="tech-score-badge ${signal.class}">
+                <div class="score-value">${scoreOut10}/10</div>
+                <div class="score-label">
+                    <i class="fas fa-${signal.icon}"></i> ${signal.text}
                 </div>
             </div>
         `;
@@ -700,23 +727,17 @@ class MarketsManager {
         setMA(50, 'ma50', 'ma50Signal');
         setMA(200, 'ma200', 'ma200Signal');
 
-        // Technical Summary Score
-        const techScore = Math.floor(50 + (stock.change * 5));
+        // Technical Summary Score - NEW REALISTIC CALCULATION
+        const techScore = this.calculateTechnicalScore(stock);
+        const signal = this.getTechnicalSignal(techScore);
+
         const scoreEl = document.getElementById('techScore');
         const signalEl = document.getElementById('techSignal');
 
-        if (scoreEl) scoreEl.textContent = `${Math.min(10, Math.max(0, Math.floor(techScore / 10)))}/10`;
+        if (scoreEl) scoreEl.textContent = `${Math.floor(techScore / 10)}/10`;
         if (signalEl) {
-            if (techScore > 65) {
-                signalEl.innerHTML = '<i class="fas fa-arrow-up"></i> Güçlü Al';
-                signalEl.style.color = 'var(--success-color)';
-            } else if (techScore < 35) {
-                signalEl.innerHTML = '<i class="fas fa-arrow-down"></i> Güçlü Sat';
-                signalEl.style.color = 'var(--danger-color)';
-            } else {
-                signalEl.innerHTML = '<i class="fas fa-minus-circle"></i> Nötr';
-                signalEl.style.color = 'rgba(255,255,255,0.7)';
-            }
+            signalEl.innerHTML = `<i class="fas fa-${signal.icon}"></i> ${signal.text}`;
+            signalEl.style.color = signal.color;
         }
     }
 
@@ -745,6 +766,131 @@ class MarketsManager {
         const change = stock.change;
         const rsi = 50 + (change * 2); // Approximate
         return Math.min(100, Math.max(0, rsi));
+    }
+
+    /**
+     * Calculate comprehensive technical score (0-100)
+     * Uses multiple indicators for realistic scoring
+     */
+    calculateTechnicalScore(stock) {
+        let score = 0;
+        let weights = 0;
+
+        // 1. RSI Score (0-25 points)
+        const rsi = this.calculateRSI(stock);
+        let rsiScore = 0;
+        if (rsi < 30) {
+            rsiScore = 25; // Oversold = Strong Buy
+        } else if (rsi < 40) {
+            rsiScore = 20; // Approaching oversold
+        } else if (rsi < 50) {
+            rsiScore = 15; // Slightly bearish
+        } else if (rsi < 60) {
+            rsiScore = 15; // Slightly bullish
+        } else if (rsi < 70) {
+            rsiScore = 10; // Approaching overbought
+        } else {
+            rsiScore = 5; // Overbought = Risky
+        }
+        score += rsiScore;
+        weights += 25;
+
+        // 2. Price Momentum (0-25 points)
+        const momentum = stock.change;
+        let momentumScore = 0;
+        if (momentum > 5) {
+            momentumScore = 25; // Very strong
+        } else if (momentum > 2) {
+            momentumScore = 20; // Strong
+        } else if (momentum > 0) {
+            momentumScore = 15; // Positive
+        } else if (momentum > -2) {
+            momentumScore = 10; // Slightly negative
+        } else if (momentum > -5) {
+            momentumScore = 5; // Negative
+        } else {
+            momentumScore = 0; // Very negative
+        }
+        score += momentumScore;
+        weights += 25;
+
+        // 3. Volume Analysis (0-20 points)
+        const volume = stock.volume || 0;
+        const avgVolume = 1000000; // Baseline
+        const volumeRatio = volume / avgVolume;
+        let volumeScore = 0;
+        if (volumeRatio > 2 && momentum > 0) {
+            volumeScore = 20; // High volume + bullish = Strong signal
+        } else if (volumeRatio > 1.5) {
+            volumeScore = 15; // Above average volume
+        } else if (volumeRatio > 0.8) {
+            volumeScore = 10; // Normal volume
+        } else {
+            volumeScore = 5; // Low volume = Weak signal
+        }
+        score += volumeScore;
+        weights += 20;
+
+        // 4. Price Position vs 52W High/Low (0-15 points)
+        const price = stock.price;
+        const high52w = stock.high52w || price * 1.3;
+        const low52w = stock.low52w || price * 0.7;
+        const range52w = high52w - low52w;
+        const positionInRange = (price - low52w) / range52w;
+
+        let positionScore = 0;
+        if (positionInRange < 0.3) {
+            positionScore = 15; // Near 52W low = Potential buy
+        } else if (positionInRange < 0.5) {
+            positionScore = 12; // Below middle
+        } else if (positionInRange < 0.7) {
+            positionScore = 8; // Above middle
+        } else {
+            positionScore = 5; // Near 52W high = Risky
+        }
+        score += positionScore;
+        weights += 15;
+
+        // 5. Volatility Factor (0-15 points)
+        const volatility = Math.abs(stock.change);
+        let volatilityScore = 0;
+        if (volatility < 1) {
+            volatilityScore = 10; // Low volatility = Stable
+        } else if (volatility < 3) {
+            volatilityScore = 15; // Moderate volatility = Good
+        } else if (volatility < 5) {
+            volatilityScore = 12; // Higher volatility
+        } else {
+            volatilityScore = 5; // Very high volatility = Risky
+        }
+        score += volatilityScore;
+        weights += 15;
+
+        // Normalize to 0-100
+        const finalScore = Math.round((score / weights) * 100);
+
+        // Add some randomness for realism (±5 points)
+        const randomAdjustment = Math.floor(Math.random() * 11) - 5;
+        const adjustedScore = Math.min(100, Math.max(0, finalScore + randomAdjustment));
+
+        return adjustedScore;
+    }
+
+    /**
+     * Get technical signal from score
+     */
+    getTechnicalSignal(score) {
+        if (score >= 75) {
+            return { text: 'Güçlü Al', icon: 'arrow-up', color: 'var(--success-color)', class: 'strong-buy' };
+        } else if (score >= 60) {
+            return { text: 'Al', icon: 'arrow-up', color: '#10b981', class: 'buy' };
+        } else if (score >= 45) {
+            return { text: 'Nötr', icon: 'minus-circle', color: 'rgba(255,255,255,0.7)', class: 'neutral' };
+        } else if (score >= 30) {
+            return { text: 'Sat', icon: 'arrow-down', color: '#ef4444', class: 'sell' };
+        } else {
+            return { text: 'Güçlü Sat', icon: 'arrow-down', color: 'var(--danger-color)', class: 'strong-sell' };
+        }
     }
 
     /**
