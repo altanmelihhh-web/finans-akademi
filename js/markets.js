@@ -925,6 +925,8 @@ class MarketsManager {
      * Generate realistic simulated chart data with volatility
      */
     generateSimulatedChartData(stock, points, timeframe) {
+        console.log(`📊 Generating chart data: ${stock.symbol}, ${points} points, ${timeframe}`);
+
         const labels = [];
         const prices = [];
 
