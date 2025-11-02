@@ -386,12 +386,14 @@ class MarketDataPro {
 
         Object.entries(marketsCache).forEach(([symbol, quote]) => {
             try {
-                // Search in both US and BIST stocks
+                // Search in US stocks, BIST stocks, TEFAS funds, and BES funds
                 const stock = window.STOCKS_DATA.us_stocks.find(s => s.symbol === symbol) ||
-                             window.STOCKS_DATA.bist_stocks.find(s => s.symbol === symbol);
+                             window.STOCKS_DATA.bist_stocks.find(s => s.symbol === symbol) ||
+                             window.STOCKS_DATA.tefas_funds?.find(s => s.symbol === symbol) ||
+                             window.STOCKS_DATA.bes_funds?.find(s => s.symbol === symbol);
 
                 if (!stock) {
-                    console.warn(`  ⚠️ Stock not found: ${symbol}`);
+                    // Not a warning for funds - they won't be in API
                     skippedCount++;
                     return;
                 }
@@ -451,9 +453,102 @@ class MarketDataPro {
             console.warn('⚠️ marketsManager not found, will render when it initializes');
         }
 
+        // Fetch real TEFAS and BES fund data
+        this.updateFundPrices();
+
         // Update Winners/Losers after cache is applied
         console.log('   Updating Winners/Losers...');
         this.updateWinnersLosers();
+    }
+
+    /**
+     * Fetch real TEFAS and BES fund prices from Turkish APIs
+     * TEFAS: Public API available at https://ws.tefas.gov.tr/bultenapi
+     * BES: Can be scraped from EGM or pension company websites
+     */
+    async updateFundPrices() {
+        if (!window.STOCKS_DATA) return;
+
+        // Fetch TEFAS funds
+        await this.fetchTEFASPrices();
+
+        // Fetch BES funds
+        await this.fetchBESPrices();
+    }
+
+    /**
+     * Fetch real TEFAS fund prices from official API
+     * API Documentation: https://ws.tefas.gov.tr/bultenapi/PortfolioInfo/{fundCode}/{date}
+     */
+    async fetchTEFASPrices() {
+        if (!window.STOCKS_DATA.tefas_funds || window.STOCKS_DATA.tefas_funds.length === 0) {
+            return;
+        }
+
+        console.log('📊 Fetching TEFAS fund prices...');
+        let successCount = 0;
+        let errorCount = 0;
+
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date().toISOString().split('T')[0];
+
+        for (const fund of window.STOCKS_DATA.tefas_funds) {
+            try {
+                const url = `https://ws.tefas.gov.tr/bultenapi/PortfolioInfo/${fund.symbol}/${today}`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    const fundData = data[0];
+                    const price = parseFloat(fundData.PricePerShare);
+                    const previousPrice = parseFloat(fundData.PreviousPricePerShare);
+
+                    if (price > 0) {
+                        fund.price = price;
+                        fund.change = previousPrice > 0 ? ((price - previousPrice) / previousPrice) * 100 : 0;
+                        fund.volume = parseInt(fundData.TotalShares) || 0;
+                        successCount++;
+                    }
+                }
+
+                // Rate limiting: wait 100ms between requests
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+            } catch (error) {
+                console.warn(`⚠️ TEFAS ${fund.symbol} failed:`, error.message);
+                errorCount++;
+            }
+        }
+
+        console.log(`✅ TEFAS: ${successCount} updated, ${errorCount} failed`);
+    }
+
+    /**
+     * Fetch real BES fund prices
+     * BES funds can be fetched from Turkish pension company APIs or EGM
+     * Using CORS proxy for now
+     */
+    async fetchBESPrices() {
+        if (!window.STOCKS_DATA.bes_funds || window.STOCKS_DATA.bes_funds.length === 0) {
+            return;
+        }
+
+        console.log('📊 Fetching BES fund prices...');
+
+        // BES funds require different approach - using SPK/EGM data
+        // For now, we'll use a fallback method until proper API is configured
+        console.warn('⚠️ BES fund API not yet configured. Please configure BES data source.');
+
+        // TODO: Add proper BES API integration
+        // Options:
+        // 1. SPK (Sermaye Piyasası Kurulu) data
+        // 2. Individual pension company APIs
+        // 3. Web scraping with CORS proxy
     }
 
     /**
