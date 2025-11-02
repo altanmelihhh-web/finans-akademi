@@ -485,7 +485,15 @@ class MarketDataPro {
             return;
         }
 
+        // Check config
+        const config = window.FINANS_CONFIG?.tefas || {
+            useProxy: false,
+            directUrl: 'https://ws.tefas.gov.tr/bultenapi/PortfolioInfo',
+            requestDelay: 100
+        };
+
         console.log('📊 Fetching TEFAS fund prices...');
+        console.log(`   Using ${config.useProxy ? 'Cloudflare Proxy' : 'Direct API'}`);
         let successCount = 0;
         let errorCount = 0;
 
@@ -494,7 +502,16 @@ class MarketDataPro {
 
         for (const fund of window.STOCKS_DATA.tefas_funds) {
             try {
-                const url = `https://ws.tefas.gov.tr/bultenapi/PortfolioInfo/${fund.symbol}/${today}`;
+                // Build URL based on config
+                let url;
+                if (config.useProxy) {
+                    // Cloudflare Worker proxy: /tefas/{fundCode}/{date}
+                    url = `${config.proxyUrl}/${fund.symbol}/${today}`;
+                } else {
+                    // Direct API: /PortfolioInfo/{fundCode}/{date}
+                    url = `${config.directUrl}/${fund.symbol}/${today}`;
+                }
+
                 const response = await fetch(url);
 
                 if (!response.ok) {
@@ -513,19 +530,38 @@ class MarketDataPro {
                         fund.change = previousPrice > 0 ? ((price - previousPrice) / previousPrice) * 100 : 0;
                         fund.volume = parseInt(fundData.TotalShares) || 0;
                         successCount++;
+
+                        if (successCount <= 3) {
+                            console.log(`  ✓ ${fund.symbol}: ₺${fund.price.toFixed(2)} (${fund.change >= 0 ? '+' : ''}${fund.change.toFixed(2)}%)`);
+                        }
                     }
                 }
 
-                // Rate limiting: wait 100ms between requests
-                await new Promise(resolve => setTimeout(resolve, 100));
+                // Rate limiting
+                await new Promise(resolve => setTimeout(resolve, config.requestDelay));
 
             } catch (error) {
-                console.warn(`⚠️ TEFAS ${fund.symbol} failed:`, error.message);
+                console.warn(`  ⚠️ ${fund.symbol}: ${error.message}`);
                 errorCount++;
             }
         }
 
         console.log(`✅ TEFAS: ${successCount} updated, ${errorCount} failed`);
+
+        // If all failed with CORS error, suggest using proxy
+        if (errorCount === window.STOCKS_DATA.tefas_funds.length && !config.useProxy) {
+            console.error('');
+            console.error('════════════════════════════════════════════════════════════');
+            console.error('❌ TEFAS API CORS HATASI!');
+            console.error('');
+            console.error('Çözüm için Cloudflare Worker deploy edin:');
+            console.error('1. cloudflare-workers/README.md dosyasına bakın');
+            console.error('2. Worker URL\'ini alın');
+            console.error('3. js/config.js dosyasında useProxy: true yapın');
+            console.error('4. proxyUrl\'e kendi Worker URL\'inizi yazın');
+            console.error('════════════════════════════════════════════════════════════');
+            console.error('');
+        }
     }
 
     /**
