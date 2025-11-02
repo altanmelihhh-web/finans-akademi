@@ -23,12 +23,24 @@ class TradingSimulator {
     }
 
     init() {
-        this.updateAccountInfo();
+        console.log('📊 TradingSimulator.init() called');
+
+        // Check if simulator page elements exist
+        const simulatorPage = document.getElementById('simulator');
+        if (!simulatorPage) {
+            console.warn('⚠️ Simulator page not found, delaying init...');
+            setTimeout(() => this.init(), 500);
+            return;
+        }
+
+        this.setupEventListeners();
         this.loadStocksToSelect();
+        this.updateAccountInfo();
         this.renderPortfolio();
         this.renderTransactionHistory();
         this.renderPerformanceChart();
-        this.setupEventListeners();
+
+        console.log('✅ TradingSimulator initialized');
     }
 
     setupEventListeners() {
@@ -40,6 +52,24 @@ class TradingSimulator {
 
         // Tutorial button
         document.getElementById('showTutorial')?.addEventListener('click', () => this.showTutorial());
+
+        // Tutorial modal close button
+        const tutorialModal = document.getElementById('tutorialModal');
+        const modalClose = tutorialModal?.querySelector('.modal-close');
+        if (modalClose) {
+            modalClose.addEventListener('click', () => {
+                if (tutorialModal) tutorialModal.style.display = 'none';
+            });
+        }
+
+        // Close modal when clicking outside
+        if (tutorialModal) {
+            tutorialModal.addEventListener('click', (e) => {
+                if (e.target === tutorialModal) {
+                    tutorialModal.style.display = 'none';
+                }
+            });
+        }
 
         // Stock select
         document.getElementById('simStockSelect')?.addEventListener('change', (e) => this.onStockSelect(e));
@@ -109,30 +139,105 @@ class TradingSimulator {
 
     async loadStocksToSelect() {
         const select = document.getElementById('simStockSelect');
-        if (!select || !marketsManager) return;
+        if (!select) {
+            console.warn('⚠️ simStockSelect element not found');
+            return;
+        }
 
-        const stocks = marketsManager.stocks || [];
+        // Try multiple data sources
+        let stocks = [];
 
+        // Source 1: marketsManager (if ready)
+        if (marketsManager && marketsManager.stocks && marketsManager.stocks.length > 0) {
+            stocks = marketsManager.stocks;
+            console.log('📊 Loaded stocks from marketsManager:', stocks.length);
+        }
+        // Source 2: STOCKS_DATA (fallback)
+        else if (window.STOCKS_DATA) {
+            const data = window.STOCKS_DATA;
+            stocks = [
+                ...data.us_stocks.map(s => ({ ...s, market: 'us' })),
+                ...data.bist_stocks.map(s => ({ ...s, market: 'bist' }))
+            ];
+            console.log('📊 Loaded stocks from STOCKS_DATA:', stocks.length);
+        }
+        // Source 3: Wait for marketsManager
+        else {
+            console.log('⏳ Waiting for stock data...');
+            setTimeout(() => this.loadStocksToSelect(), 500);
+            return;
+        }
+
+        if (stocks.length === 0) {
+            select.innerHTML = '<option value="">Hisseler yükleniyor...</option>';
+            console.warn('⚠️ No stocks available yet');
+            return;
+        }
+
+        // Format price function
+        const formatPrice = (price, market) => {
+            if (!price || price === 0) return 'Fiyat yükleniyor...';
+            if (market === 'bist') return `${price.toFixed(2)} TL`;
+            return `$${price.toFixed(2)}`;
+        };
+
+        // Populate select with stocks
         select.innerHTML = '<option value="">-- Hisse Seçin --</option>' +
-            stocks.map(s => `<option value="${s.symbol}">${s.symbol} - ${s.name} (${marketsManager.formatCurrency(s.price, s.market)})</option>`).join('');
+            stocks.map(s => {
+                const priceText = formatPrice(s.price, s.market);
+                return `<option value="${s.symbol}">${s.symbol} - ${s.name} (${priceText})</option>`;
+            }).join('');
+
+        console.log(`✅ Loaded ${stocks.length} stocks to simulator select`);
+    }
+
+    // Helper: Find stock from multiple sources
+    findStock(symbol) {
+        if (!symbol) return null;
+
+        // Try marketsManager first (has real-time prices)
+        if (marketsManager && marketsManager.stocks) {
+            const stock = marketsManager.stocks.find(s => s.symbol === symbol);
+            if (stock) return stock;
+        }
+
+        // Fallback to STOCKS_DATA
+        if (window.STOCKS_DATA) {
+            const allStocks = [
+                ...window.STOCKS_DATA.us_stocks.map(s => ({ ...s, market: 'us' })),
+                ...window.STOCKS_DATA.bist_stocks.map(s => ({ ...s, market: 'bist' }))
+            ];
+            return allStocks.find(s => s.symbol === symbol);
+        }
+
+        return null;
+    }
+
+    // Helper: Format price for display
+    formatPrice(price, market) {
+        if (!price || price === 0) return 'Fiyat yükleniyor...';
+        if (market === 'bist') return `${price.toFixed(2)} TL`;
+        return `$${price.toFixed(2)}`;
     }
 
     onStockSelect(e) {
         const symbol = e.target.value;
-        if (!symbol || !marketsManager) return;
+        const stock = this.findStock(symbol);
 
-        const stock = marketsManager.stocks.find(s => s.symbol === symbol);
-        if (!stock) return;
+        if (!stock) {
+            console.warn('⚠️ Stock not found:', symbol);
+            return;
+        }
 
-        document.getElementById('simCurrentPrice').textContent = marketsManager.formatCurrency(stock.price, stock.market);
+        document.getElementById('simCurrentPrice').textContent = this.formatPrice(stock.price, stock.market);
         this.updateTradeInfo();
     }
 
     updateTradeInfo() {
         const symbol = document.getElementById('simStockSelect')?.value;
-        if (!symbol || !marketsManager) return;
+        if (!symbol) return;
 
-        const stock = marketsManager.stocks.find(s => s.symbol === symbol);
+        const stock = this.findStock(symbol);
         if (!stock) return;
 
         const quantity = parseInt(document.getElementById('simQuantity')?.value || 1);
@@ -140,8 +245,8 @@ class TradingSimulator {
         const commission = subtotal * 0.001; // 0.1% commission
         const total = subtotal + commission;
 
-        document.getElementById('simTotal').value = marketsManager.formatCurrency(total, stock.market);
-        document.getElementById('simCommission').textContent = marketsManager.formatCurrency(commission, stock.market);
+        document.getElementById('simTotal').value = this.formatPrice(total, stock.market);
+        document.getElementById('simCommission').textContent = this.formatPrice(commission, stock.market);
 
         if (this.currentAction === 'buy') {
             const afterBalance = this.cash - total;
@@ -169,13 +274,16 @@ class TradingSimulator {
 
     executeTrade() {
         const symbol = document.getElementById('simStockSelect')?.value;
-        if (!symbol || !marketsManager) {
+        if (!symbol) {
             alert('Lütfen bir hisse seçin');
             return;
         }
 
-        const stock = marketsManager.stocks.find(s => s.symbol === symbol);
-        if (!stock) return;
+        const stock = this.findStock(symbol);
+        if (!stock) {
+            alert('Hisse bilgisi bulunamadı. Lütfen tekrar deneyin.');
+            return;
+        }
 
         const quantity = parseInt(document.getElementById('simQuantity')?.value || 1);
         const subtotal = stock.price * quantity;
@@ -257,7 +365,7 @@ class TradingSimulator {
                 market: stock.market
             });
 
-            alert(`✅ ${quantity} adet ${symbol} başarıyla satıldı! ${profitLoss >= 0 ? 'Kar' : 'Zarar'}: ${marketsManager.formatCurrency(Math.abs(profitLoss), stock.market)}`);
+            alert(`✅ ${quantity} adet ${symbol} başarıyla satıldı! ${profitLoss >= 0 ? 'Kar' : 'Zarar'}: ${this.formatPrice(Math.abs(profitLoss), stock.market)}`);
         }
 
         // Save and update UI
@@ -277,12 +385,10 @@ class TradingSimulator {
     }
 
     updateAccountInfo() {
-        if (!marketsManager) return;
-
         let stockValue = 0;
         this.portfolio.forEach(holding => {
-            const stock = marketsManager.stocks.find(s => s.symbol === holding.symbol);
-            if (stock) {
+            const stock = this.findStock(holding.symbol);
+            if (stock && stock.price) {
                 stockValue += stock.price * holding.quantity;
             }
         });
@@ -291,20 +397,26 @@ class TradingSimulator {
         const profitLoss = totalBalance - this.initialBalance;
         const profitLossPercent = (profitLoss / this.initialBalance) * 100;
 
-        document.getElementById('simTotalBalance').textContent = '$' + totalBalance.toFixed(2);
-        document.getElementById('simCash').textContent = '$' + this.cash.toFixed(2);
-        document.getElementById('simStockValue').textContent = '$' + stockValue.toFixed(2);
+        // Safe DOM updates with null checks
+        const totalBalanceEl = document.getElementById('simTotalBalance');
+        if (totalBalanceEl) totalBalanceEl.textContent = '$' + totalBalance.toFixed(2);
+
+        const cashEl = document.getElementById('simCash');
+        if (cashEl) cashEl.textContent = '$' + this.cash.toFixed(2);
+
+        const stockValueEl = document.getElementById('simStockValue');
+        if (stockValueEl) stockValueEl.textContent = '$' + stockValue.toFixed(2);
 
         const plElement = document.getElementById('simProfitLoss');
-        plElement.textContent = `$${profitLoss.toFixed(2)} (${profitLossPercent >= 0 ? '+' : ''}${profitLossPercent.toFixed(2)}%)`;
-        plElement.style.color = profitLoss >= 0 ? '#10b981' : '#ef4444';
+        if (plElement) {
+            plElement.textContent = `$${profitLoss.toFixed(2)} (${profitLossPercent >= 0 ? '+' : ''}${profitLossPercent.toFixed(2)}%)`;
+            plElement.style.color = profitLoss >= 0 ? '#10b981' : '#ef4444';
+        }
 
         // Update balance in trade panel
-        document.getElementById('userBalance').textContent = '$' + this.cash.toFixed(2);
-
-        // Update modal balance
-        if (document.getElementById('userBalance')) {
-            document.getElementById('userBalance').textContent = '$' + this.cash.toFixed(2);
+        const userBalanceEl = document.getElementById('userBalance');
+        if (userBalanceEl) {
+            userBalanceEl.textContent = '$' + this.cash.toFixed(2);
         }
     }
 
@@ -312,19 +424,19 @@ class TradingSimulator {
         const container = document.getElementById('portfolioContainer');
         const emptyState = document.getElementById('emptyPortfolio');
 
-        if (!marketsManager) return;
-
         if (this.portfolio.length === 0) {
-            container.style.display = 'none';
-            emptyState.style.display = 'flex';
+            if (container) container.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'flex';
             return;
         }
 
-        container.style.display = 'grid';
-        emptyState.style.display = 'none';
+        if (container) container.style.display = 'grid';
+        if (emptyState) emptyState.style.display = 'none';
+
+        if (!container) return;
 
         container.innerHTML = this.portfolio.map(holding => {
-            const stock = marketsManager.stocks.find(s => s.symbol === holding.symbol);
+            const stock = this.findStock(holding.symbol);
             if (!stock) return '';
 
             const currentValue = stock.price * holding.quantity;
@@ -350,20 +462,20 @@ class TradingSimulator {
                         </div>
                         <div class="stat">
                             <span class="label">Ort. Maliyet</span>
-                            <span class="value">${marketsManager.formatCurrency(holding.avgPrice, holding.market)}</span>
+                            <span class="value">${this.formatPrice(holding.avgPrice, holding.market)}</span>
                         </div>
                         <div class="stat">
                             <span class="label">Güncel Fiyat</span>
-                            <span class="value">${marketsManager.formatCurrency(stock.price, stock.market)}</span>
+                            <span class="value">${this.formatPrice(stock.price, stock.market)}</span>
                         </div>
                         <div class="stat">
                             <span class="label">Toplam Değer</span>
-                            <span class="value">${marketsManager.formatCurrency(currentValue, holding.market)}</span>
+                            <span class="value">${this.formatPrice(currentValue, holding.market)}</span>
                         </div>
                         <div class="stat">
                             <span class="label">Kar/Zarar</span>
                             <span class="value ${profitLoss >= 0 ? 'positive' : 'negative'}">
-                                ${marketsManager.formatCurrency(Math.abs(profitLoss), holding.market)} (${profitLossPercent >= 0 ? '+' : ''}${profitLossPercent.toFixed(2)}%)
+                                ${this.formatPrice(Math.abs(profitLoss), holding.market)} (${profitLossPercent >= 0 ? '+' : ''}${profitLossPercent.toFixed(2)}%)
                             </span>
                         </div>
                     </div>
@@ -395,7 +507,7 @@ class TradingSimulator {
 
     renderTransactionHistory() {
         const tbody = document.getElementById('historyTableBody');
-        if (!tbody || !marketsManager) return;
+        if (!tbody) return;
 
         if (this.transactionHistory.length === 0) {
             tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Henüz işlem yapmadınız</td></tr>';
@@ -413,11 +525,11 @@ class TradingSimulator {
                     <td><span class="badge ${actionClass}">${actionText}</span></td>
                     <td><strong>${tx.symbol}</strong></td>
                     <td>${tx.quantity}</td>
-                    <td>${marketsManager.formatCurrency(tx.price, tx.market)}</td>
-                    <td>${marketsManager.formatCurrency(tx.total, tx.market)}</td>
-                    <td>${marketsManager.formatCurrency(tx.commission, tx.market)}</td>
+                    <td>${this.formatPrice(tx.price, tx.market)}</td>
+                    <td>${this.formatPrice(tx.total, tx.market)}</td>
+                    <td>${this.formatPrice(tx.commission, tx.market)}</td>
                     <td class="${tx.profitLoss >= 0 ? 'positive' : 'negative'}">
-                        ${tx.profitLoss !== undefined ? marketsManager.formatCurrency(Math.abs(tx.profitLoss), tx.market) : '-'}
+                        ${tx.profitLoss !== undefined ? this.formatPrice(Math.abs(tx.profitLoss), tx.market) : '-'}
                     </td>
                 </tr>
             `;
@@ -590,3 +702,31 @@ class TradingSimulator {
 
 // Initialize simulator
 let simulator = null;
+
+// Wait for both DOM and marketsManager to be ready
+function initSimulator() {
+    if (typeof marketsManager !== 'undefined' && marketsManager !== null) {
+        simulator = new TradingSimulator();
+        simulator.init();
+        window.simulator = simulator; // Export to window
+        console.log('✅ Trading Simulator initialized successfully');
+    } else {
+        // marketsManager not ready yet, wait a bit
+        console.log('⏳ Waiting for marketsManager...');
+        setTimeout(initSimulator, 100);
+    }
+}
+
+// Start initialization when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('📊 Initializing Trading Simulator...');
+    initSimulator();
+});
+
+// Also initialize when markets page becomes active (in case marketsManager loads later)
+document.addEventListener('click', (e) => {
+    if (e.target.matches('[data-page="simulator"]') && !simulator) {
+        console.log('🔄 Simulator page activated, retrying initialization...');
+        initSimulator();
+    }
+});

@@ -356,32 +356,51 @@ class MarketsManager {
         if (!modal) return;
         modal.style.display = 'block';
 
-        // Update modal content
-        document.getElementById('modalStockName').textContent = `${stock.name} (${stock.symbol})`;
-        document.getElementById('modalPrice').textContent = this.formatCurrency(stock.price, stock.market);
-        document.getElementById('modalSector').textContent = stock.sector;
-        document.getElementById('modalOpen').textContent = this.formatCurrency(stock.open, stock.market);
-        document.getElementById('modalHigh').textContent = this.formatCurrency(stock.high, stock.market);
-        document.getElementById('modalLow').textContent = this.formatCurrency(stock.low, stock.market);
-        document.getElementById('modal52High').textContent = this.formatCurrency(stock.high52w, stock.market);
-        document.getElementById('modal52Low').textContent = this.formatCurrency(stock.low52w, stock.market);
+        // Update modal content with null checks
+        const modalStockName = document.getElementById('modalStockName');
+        if (modalStockName) modalStockName.textContent = `${stock.name} (${stock.symbol})`;
+
+        const modalPrice = document.getElementById('modalPrice');
+        if (modalPrice) modalPrice.textContent = this.formatCurrency(stock.price, stock.market);
+
+        const modalSector = document.getElementById('modalSector');
+        if (modalSector) modalSector.textContent = stock.sector;
+
+        const modalOpen = document.getElementById('modalOpen');
+        if (modalOpen) modalOpen.textContent = this.formatCurrency(stock.open, stock.market);
+
+        const modalHigh = document.getElementById('modalHigh');
+        if (modalHigh) modalHigh.textContent = this.formatCurrency(stock.high, stock.market);
+
+        const modalLow = document.getElementById('modalLow');
+        if (modalLow) modalLow.textContent = this.formatCurrency(stock.low, stock.market);
+
+        const modal52High = document.getElementById('modal52High');
+        if (modal52High) modal52High.textContent = this.formatCurrency(stock.high52w, stock.market);
+
+        const modal52Low = document.getElementById('modal52Low');
+        if (modal52Low) modal52Low.textContent = this.formatCurrency(stock.low52w, stock.market);
 
         const changeEl = document.getElementById('modalChange');
-        const changeClass = stock.change >= 0 ? 'positive' : 'negative';
-        changeEl.className = `price-change ${changeClass}`;
-        changeEl.innerHTML = `
-            <span class="change-value">${stock.change > 0 ? '+' : ''}${this.formatCurrency(stock.price * stock.change / 100, stock.market)}</span>
-            <span class="change-percent">(${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%)</span>
-        `;
+        if (changeEl) {
+            const changeClass = stock.change >= 0 ? 'positive' : 'negative';
+            changeEl.className = `price-change ${changeClass}`;
+            changeEl.innerHTML = `
+                <span class="change-value">${stock.change > 0 ? '+' : ''}${this.formatCurrency(stock.price * stock.change / 100, stock.market)}</span>
+                <span class="change-percent">(${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%)</span>
+            `;
+        }
 
         // Render chart
         this.renderModalChart(stock);
 
         // Update watchlist button
         const watchlistBtn = document.getElementById('modalWatchlistBtn');
-        const isInWatchlist = this.watchlist.includes(stock.symbol);
-        watchlistBtn.innerHTML = `<i class="${isInWatchlist ? 'fas' : 'far'} fa-star"></i>`;
-        watchlistBtn.onclick = () => this.toggleWatchlist(stock.symbol);
+        if (watchlistBtn) {
+            const isInWatchlist = this.watchlist.includes(stock.symbol);
+            watchlistBtn.innerHTML = `<i class="${isInWatchlist ? 'fas' : 'far'} fa-star"></i>`;
+            watchlistBtn.onclick = () => this.toggleWatchlist(stock.symbol);
+        }
     }
 
     closeModal() {
@@ -498,8 +517,12 @@ class MarketsManager {
 
 // Initialize when page loads
 let marketsManager = null;
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     marketsManager = new MarketsManager();
     window.marketsManager = marketsManager; // Export to window for market-data-pro.js
     console.log('✅ marketsManager exported to window');
+
+    // Initialize marketsManager
+    await marketsManager.init();
+    console.log('✅ marketsManager initialized');
 });
