@@ -468,6 +468,12 @@ class MarketDataPro {
         // Fetch real TEFAS and BES fund data (AWAIT it!)
         await this.updateFundPrices();
 
+        // CRITICAL: Reload marketsManager to pick up updated TEFAS/BES prices
+        if (window.marketsManager && typeof window.marketsManager.loadStocks === 'function') {
+            console.log('   🔄 Reloading marketsManager with updated TEFAS/BES prices...');
+            await window.marketsManager.loadStocks();
+        }
+
         // Update Winners/Losers after cache is applied
         console.log('   Updating Winners/Losers...');
         this.updateWinnersLosers();
