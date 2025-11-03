@@ -666,6 +666,12 @@ class MarketDataPro {
         }
 
         console.log(`✅ Updated from JSON: TEFAS=${tefasCount}, BES=${besCount}`);
+
+        // Reload marketsManager to pick up the updated TEFAS/BES prices
+        if (window.marketsManager && typeof window.marketsManager.loadStocks === 'function') {
+            console.log('   🔄 Reloading marketsManager with updated TEFAS/BES prices...');
+            await window.marketsManager.loadStocks();
+        }
     }
 
     /**
