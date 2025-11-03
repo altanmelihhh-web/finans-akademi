@@ -19,10 +19,9 @@ window.FINANS_CONFIG = {
      */
     tefas: {
         // CORS olmadan çalışması için Cloudflare Worker kullan
-        // Şimdilik direkt API'yi deniyoruz, CORS hatası alırsan Worker'a geç
-        useProxy: false, // true yapınca Cloudflare Worker kullanır
+        useProxy: true, // Cloudflare Worker kullanılıyor
         directUrl: 'https://ws.tefas.gov.tr/bultenapi/PortfolioInfo',
-        proxyUrl: 'https://finans-akademi-tefas.YOUR-SUBDOMAIN.workers.dev/tefas',
+        proxyUrl: 'https://finans-akademi-api.altanmelihhh.workers.dev/tefas',
 
         // Rate limiting (ms between requests)
         requestDelay: 100
@@ -30,19 +29,20 @@ window.FINANS_CONFIG = {
 
     /**
      * BES API Configuration
-     * BES fonları için henüz API yok
+     * BES fonları Cloudflare Worker üzerinden çalışıyor
      */
     bes: {
-        enabled: false,
-        message: 'BES fon verileri için API entegrasyonu bekleniyor'
+        enabled: true,
+        proxyUrl: 'https://finans-akademi-api.altanmelihhh.workers.dev/bes',
+        message: 'BES fon verileri Cloudflare Worker üzerinden'
     },
 
     /**
      * Feature Flags - Hangi varlık sınıflarını gösterelim?
      */
     features: {
-        showTEFAS: false, // TEFAS fonlarını göster (Cloudflare Worker deploy edilince true yap)
-        showBES: false,   // BES fonlarını göster (API bulununca true yap)
+        showTEFAS: true,  // TEFAS fonlarını göster - Cloudflare Worker aktif!
+        showBES: true,    // BES fonlarını göster - Cloudflare Worker aktif!
         showUS: true,     // US hisselerini göster
         showBIST: true    // BIST hisselerini göster
     },

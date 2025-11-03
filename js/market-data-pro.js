@@ -574,17 +574,55 @@ class MarketDataPro {
             return;
         }
 
-        console.log('📊 Fetching BES fund prices...');
+        const config = window.FINANS_CONFIG?.bes || { enabled: false };
 
-        // BES funds require different approach - using SPK/EGM data
-        // For now, we'll use a fallback method until proper API is configured
-        console.warn('⚠️ BES fund API not yet configured. Please configure BES data source.');
+        if (!config.enabled) {
+            console.log('⏸️ BES funds disabled in config');
+            return;
+        }
 
-        // TODO: Add proper BES API integration
-        // Options:
-        // 1. SPK (Sermaye Piyasası Kurulu) data
-        // 2. Individual pension company APIs
-        // 3. Web scraping with CORS proxy
+        console.log('📊 Fetching BES fund prices from Cloudflare Worker...');
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const fund of window.STOCKS_DATA.bes_funds) {
+            try {
+                const url = `${config.proxyUrl}/${fund.symbol}`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    const fundData = data[0];
+                    const price = parseFloat(fundData.Price);
+                    const changePercent = parseFloat(fundData.ChangePercent);
+
+                    if (price > 0) {
+                        fund.price = price;
+                        fund.change = changePercent;
+                        fund.volume = 0; // BES funds don't have volume
+                        successCount++;
+
+                        if (successCount <= 3) {
+                            console.log(`  ✓ ${fund.symbol}: ₺${fund.price.toFixed(4)} (${fund.change >= 0 ? '+' : ''}${fund.change}%)`);
+                        }
+                    }
+                }
+
+                // Rate limiting
+                await new Promise(resolve => setTimeout(resolve, 200));
+
+            } catch (error) {
+                console.warn(`  ⚠️ ${fund.symbol}: ${error.message}`);
+                errorCount++;
+            }
+        }
+
+        console.log(`✅ BES: ${successCount} updated, ${errorCount} failed`);
     }
 
     /**
