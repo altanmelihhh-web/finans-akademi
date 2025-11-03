@@ -33,12 +33,12 @@ def fetch_tefas_fund(fund_code, date):
 
 def fetch_all_tefas_funds():
     """Fetch all TEFAS funds"""
-    # TEFAS fon kodları (stocks-data.js'den)
+    # TEFAS fon kodları (stocks-data.js'den - GERÇEK KODLAR)
     tefas_funds = [
-        'AFH', 'GAH', 'IAH', 'VAH', 'YAH', 'ZAH',
-        'ADE', 'ADN', 'GDE', 'IDE', 'VDE', 'YDE', 'ZDE',
-        'APR', 'GPR', 'IPR', 'VPR', 'YPR', 'ZPR',
-        'APY', 'GPY'
+        'AFH', 'AKE', 'AZE', 'GAH', 'GEF', 'GYE',
+        'HFA', 'HYB', 'IAH', 'IEF', 'IPD', 'KYA',
+        'TBH', 'TEU', 'YAH', 'YAS', 'ZPX', 'ZRE',
+        'APE', 'GHE'
     ]
 
     today = datetime.now().strftime('%Y-%m-%d')
@@ -76,17 +76,17 @@ def fetch_all_tefas_funds():
 def generate_tefas_mock_data():
     """Generate TEFAS mock data (fallback when API fails)"""
     tefas_funds = [
-        'AFH', 'GAH', 'IAH', 'VAH', 'YAH', 'ZAH',
-        'ADE', 'ADN', 'GDE', 'IDE', 'VDE', 'YDE', 'ZDE',
-        'APR', 'GPR', 'IPR', 'VPR', 'YPR', 'ZPR',
-        'APY', 'GPY'
+        'AFH', 'AKE', 'AZE', 'GAH', 'GEF', 'GYE',
+        'HFA', 'HYB', 'IAH', 'IEF', 'IPD', 'KYA',
+        'TBH', 'TEU', 'YAH', 'YAS', 'ZPX', 'ZRE',
+        'APE', 'GHE'
     ]
 
     base_prices = {
-        'AFH': 125.45, 'GAH': 98.32, 'IAH': 112.78, 'VAH': 89.67, 'YAH': 134.21, 'ZAH': 101.56,
-        'ADE': 45.23, 'ADN': 52.89, 'GDE': 48.76, 'IDE': 51.34, 'VDE': 49.12, 'YDE': 46.78, 'ZDE': 50.45,
-        'APR': 78.34, 'GPR': 82.45, 'IPR': 75.89, 'VPR': 80.23, 'YPR': 79.67, 'ZPR': 81.12,
-        'APY': 156.78, 'GPY': 142.34
+        'AFH': 125.45, 'AKE': 52.34, 'AZE': 78.90, 'GAH': 98.32, 'GEF': 89.12, 'GYE': 45.67,
+        'HFA': 112.78, 'HYB': 56.23, 'IAH': 134.56, 'IEF': 92.45, 'IPD': 38.90, 'KYA': 67.34,
+        'TBH': 89.23, 'TEU': 102.45, 'YAH': 145.67, 'YAS': 178.90, 'ZPX': 156.23, 'ZRE': 95.34,
+        'APE': 234.56, 'GHE': 87.65
     }
 
     results = []
