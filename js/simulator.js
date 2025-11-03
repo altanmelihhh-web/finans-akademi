@@ -1,456 +1,1289 @@
 /**
- * ===================================
- * TRADING SIMULATOR V2
- * ===================================
+ * ================================================================================
+ * PROFESSIONAL TRADING SIMULATOR v3.0
+ * ================================================================================
  *
- * Robust multi-currency trading simulator with:
- * - Separate USD and TRY accounts
- * - Comprehensive validation
- * - Proper error handling
- * - Clean data persistence
- * - Accurate P&L tracking
+ * Enterprise-grade trading simulator with advanced features:
+ * - Multi-currency accounts (USD, TRY) with real-time exchange rates
+ * - Market orders, limit orders, and stop-loss orders
+ * - Real-time P&L tracking with commission calculations
+ * - Advanced portfolio analytics and risk metrics
+ * - Technical indicators and charting
+ * - Comprehensive transaction history
+ * - Data persistence with automatic backup/restore
+ * - Error-free validation and edge case handling
+ *
+ * @version 3.0.0
+ * @author Finans Akademi
+ * @license MIT
  */
 
-class TradingSimulator {
-    constructor() {
-        // Initial balances
-        this.initialBalances = {
-            usd: 10000,
-            try: 300000
-        };
+'use strict';
 
-        // Commission rates per market
-        this.commissionRates = {
-            us: 0.001,      // 0.1%
-            bist: 0.00188,  // 0.188% (Turkish rate)
-            tefas: 0,       // No commission
-            bes: 0          // No commission
-        };
+// ================================================================================
+// CONSTANTS & CONFIGURATION
+// ================================================================================
 
-        // Exchange rate for combined reporting (will be updated from API)
-        this.exchangeRate = 35; // USD/TRY
+const SIMULATOR_CONFIG = {
+    VERSION: '3.0.0',
 
-        // Retry counters
-        this.initRetries = 0;
-        this.stockLoadRetries = 0;
-        this.maxRetries = 10;
+    // Initial account balances
+    INITIAL_BALANCES: {
+        USD: 10000,
+        TRY: 300000
+    },
 
-        // Performance tracking
-        this.performanceChart = null;
-        this.lastPerformanceRecord = 0; // Timestamp to prevent over-recording
+    // Commission rates by market
+    COMMISSIONS: {
+        US: 0.001,      // 0.1% for US stocks
+        BIST: 0.00188,  // 0.188% for BIST stocks
+        TEFAS: 0,       // No commission for funds
+        BES: 0          // No commission for pension funds
+    },
 
-        // Debug mode (set to false in production)
-        this.debug = false; // PRODUCTION MODE
+    // Order types
+    ORDER_TYPES: {
+        MARKET: 'market',
+        LIMIT: 'limit',
+        STOP_LOSS: 'stop_loss'
+    },
 
-        // Check version and auto-reset if old data
-        this.checkAndMigrateVersion();
+    // Validation limits
+    LIMITS: {
+        MIN_QUANTITY: 1,
+        MAX_QUANTITY: 1000000,
+        MIN_PRICE: 0.01,
+        MAX_PRICE: 1000000,
+        MAX_TRANSACTION_HISTORY: 1000,
+        MAX_PERFORMANCE_RECORDS: 365
+    },
 
-        // Load data with validation
-        this.loadAllData();
-    }
+    // localStorage keys
+    STORAGE_KEYS: {
+        VERSION: 'sim_version',
+        ACCOUNTS: 'sim_accounts',
+        PORTFOLIO: 'sim_portfolio',
+        HISTORY: 'sim_history',
+        ORDERS: 'sim_pending_orders',
+        PERFORMANCE: 'sim_performance',
+        SETTINGS: 'sim_settings'
+    },
 
+    // Performance recording interval (1 hour)
+    PERFORMANCE_INTERVAL: 3600000,
+
+    // Exchange rate API
+    EXCHANGE_RATE_API: 'https://api.exchangerate-api.com/v4/latest/USD',
+    EXCHANGE_RATE_CACHE_DURATION: 3600000, // 1 hour
+
+    // Debug mode
+    DEBUG: false
+};
+
+// ================================================================================
+// UTILITY FUNCTIONS
+// ================================================================================
+
+const Utils = {
     /**
-     * Check version and migrate
+     * Validate and parse number
      */
-    checkAndMigrateVersion() {
-        const currentVersion = '2.0';
-        const storedVersion = localStorage.getItem('simulatorVersion');
-
-        if (storedVersion !== currentVersion) {
-            console.log('🔄 Simulator V2.0 - Resetting all data...');
-
-            // Clear ALL old data
-            localStorage.removeItem('simCash');
-            localStorage.removeItem('simAccounts');
-            localStorage.removeItem('simPortfolio');
-            localStorage.removeItem('simHistory');
-            localStorage.removeItem('simPerformance');
-
-            // Set version
-            localStorage.setItem('simulatorVersion', currentVersion);
-
-            console.log('✅ Data reset for V2.0');
-        }
-    }
-
-    /**
-     * Logging helper
-     */
-    log(...args) {
-        if (this.debug) {
-            console.log(...args);
-        }
-    }
-
-    /**
-     * Load and validate all data from localStorage
-     */
-    loadAllData() {
-        // Load accounts
-        const defaultAccounts = {
-            usd: { balance: this.initialBalances.usd, currency: 'USD', symbol: '$' },
-            try: { balance: this.initialBalances.try, currency: 'TRY', symbol: '₺' }
-        };
-        this.accounts = this.loadData('simAccounts', defaultAccounts);
-
-        // Validate and migrate accounts
-        this.validateAccounts();
-
-        // Load portfolio with validation
-        this.portfolio = this.loadData('simPortfolio', []);
-        this.validatePortfolio();
-
-        // Load transaction history with validation
-        this.transactionHistory = this.loadData('simHistory', []);
-        this.validateTransactionHistory();
-
-        // Load performance data with validation
-        this.performanceData = this.loadData('simPerformance', []);
-        this.validatePerformanceData();
-
-        // Trading state
-        this.currentAction = 'buy';
-
-        this.log('💳 Data loaded:', {
-            accounts: this.accounts,
-            portfolioCount: this.portfolio.length,
-            transactionCount: this.transactionHistory.length,
-            performancePoints: this.performanceData.length
-        });
-    }
-
-    /**
-     * Load data from localStorage with JSON parsing
-     */
-    loadData(key, defaultValue) {
-        try {
-            const stored = localStorage.getItem(key);
-            return stored ? JSON.parse(stored) : defaultValue;
-        } catch (error) {
-            console.error(`❌ Error loading ${key}:`, error);
-            return defaultValue;
-        }
-    }
-
-    /**
-     * Save data to localStorage with quota handling
-     */
-    saveData(key, value) {
-        try {
-            localStorage.setItem(key, JSON.stringify(value));
-            return true;
-        } catch (error) {
-            if (error.name === 'QuotaExceededError') {
-                console.error('❌ localStorage quota exceeded!');
-
-                // Try to free up space
-                if (key === 'simHistory' && Array.isArray(value)) {
-                    const limitedHistory = value.slice(0, 50);
-                    localStorage.setItem(key, JSON.stringify(limitedHistory));
-                    this.transactionHistory = limitedHistory;
-                    alert('⚠️ Depolama alanı dolu! Eski işlemler temizlendi.');
-                    return true;
-                }
-
-                alert('⚠️ Veri kaydedilemedi! Tarayıcı depolama alanı dolu.');
-                return false;
-            }
-            console.error(`❌ Error saving ${key}:`, error);
-            return false;
-        }
-    }
-
-    /**
-     * Validate and migrate account structure
-     */
-    validateAccounts() {
-        let needsSave = false;
-
-        // Check USD account
-        if (!this.accounts.usd || typeof this.accounts.usd.balance !== 'number' || isNaN(this.accounts.usd.balance)) {
-            console.warn('⚠️ Invalid USD account, resetting');
-            this.accounts.usd = {
-                balance: this.initialBalances.usd,
-                currency: 'USD',
-                symbol: '$'
-            };
-            needsSave = true;
-        }
-
-        // Check TRY account
-        if (!this.accounts.try || typeof this.accounts.try.balance !== 'number' || isNaN(this.accounts.try.balance)) {
-            console.warn('⚠️ Invalid TRY account, resetting');
-            this.accounts.try = {
-                balance: this.initialBalances.try,
-                currency: 'TRY',
-                symbol: '₺'
-            };
-            needsSave = true;
-        }
-
-        // Migrate old single-currency data
-        const oldCash = localStorage.getItem('simCash');
-        if (oldCash) {
-            const cash = parseFloat(oldCash);
-            if (!isNaN(cash)) {
-                console.log('📦 Migrating old cash to USD account');
-                this.accounts.usd.balance = cash;
-                needsSave = true;
-            }
-            localStorage.removeItem('simCash');
-        }
-
-        if (needsSave) {
-            this.saveData('simAccounts', this.accounts);
-        }
-    }
-
-    /**
-     * Validate portfolio structure
-     */
-    validatePortfolio() {
-        let needsSave = false;
-
-        this.portfolio = this.portfolio.filter(holding => {
-            // Check required fields
-            if (!holding.symbol || !holding.quantity || !holding.avgPrice) {
-                console.warn('⚠️ Invalid portfolio entry, removing:', holding);
-                needsSave = true;
-                return false;
-            }
-
-            // Add market field if missing
-            if (!holding.market) {
-                console.warn(`⚠️ Adding missing market field for ${holding.symbol}`);
-                holding.market = 'us'; // Default to US
-                needsSave = true;
-            }
-
-            // Validate numeric values
-            holding.quantity = parseInt(holding.quantity);
-            holding.avgPrice = parseFloat(holding.avgPrice);
-
-            if (isNaN(holding.quantity) || isNaN(holding.avgPrice) || holding.quantity <= 0 || holding.avgPrice <= 0) {
-                console.warn('⚠️ Invalid numeric values, removing:', holding);
-                needsSave = true;
-                return false;
-            }
-
-            return true;
-        });
-
-        if (needsSave) {
-            this.saveData('simPortfolio', this.portfolio);
-        }
-    }
-
-    /**
-     * Validate transaction history
-     */
-    validateTransactionHistory() {
-        let needsSave = false;
-
-        this.transactionHistory = this.transactionHistory.filter(tx => {
-            // Check required fields
-            if (!tx.symbol || !tx.date || !tx.action) {
-                console.warn('⚠️ Invalid transaction, removing:', tx);
-                needsSave = true;
-                return false;
-            }
-
-            // Add market field if missing
-            if (!tx.market) {
-                console.warn(`⚠️ Adding missing market field for transaction ${tx.symbol}`);
-                tx.market = 'us';
-                needsSave = true;
-            }
-
-            return true;
-        });
-
-        if (needsSave) {
-            this.saveData('simHistory', this.transactionHistory);
-        }
-    }
-
-    /**
-     * Validate performance data
-     */
-    validatePerformanceData() {
-        let needsSave = false;
-
-        this.performanceData = this.performanceData.filter(entry => {
-            // Check required fields
-            if (!entry.date || typeof entry.balance !== 'number') {
-                console.warn('⚠️ Invalid performance entry, removing:', entry);
-                needsSave = true;
-                return false;
-            }
-
-            // Add USD/TRY fields if missing
-            if (typeof entry.usd !== 'number' || typeof entry.try !== 'number') {
-                console.warn('⚠️ Adding missing currency fields to performance data');
-                entry.usd = entry.balance || 0;
-                entry.try = 0;
-                needsSave = true;
-            }
-
-            return true;
-        });
-
-        // Keep only last 90 days
-        const ninetyDaysAgo = Date.now() - (90 * 24 * 60 * 60 * 1000);
-        const beforeCount = this.performanceData.length;
-        this.performanceData = this.performanceData.filter(entry =>
-            new Date(entry.date).getTime() >= ninetyDaysAgo
-        );
-
-        if (this.performanceData.length < beforeCount) {
-            needsSave = true;
-        }
-
-        if (needsSave) {
-            this.saveData('simPerformance', this.performanceData);
-        }
-    }
-
-    /**
-     * Get account key for a market
-     */
-    getAccountKey(market) {
-        // Turkish markets use TRY
-        if (market === 'bist' || market === 'tefas' || market === 'bes') {
-            return 'try';
-        }
-        // US and others use USD
-        return 'usd';
-    }
-
-    /**
-     * Get account for a market
-     */
-    getAccount(market) {
-        const key = this.getAccountKey(market);
-        return this.accounts[key];
-    }
-
-    /**
-     * Calculate commission for a market
-     */
-    calculateCommission(subtotal, market) {
-        const rate = this.commissionRates[market] || 0.001;
-        return subtotal * rate;
-    }
-
-    /**
-     * Format price with currency
-     */
-    formatPrice(price, market) {
-        if (price === undefined || price === null || isNaN(price)) {
-            return 'N/A';
-        }
-
-        const account = this.getAccount(market);
-        return `${account.symbol}${price.toFixed(2)}`;
-    }
-
-    /**
-     * Validate price
-     */
-    isValidPrice(price) {
-        return price !== undefined &&
-               price !== null &&
-               !isNaN(price) &&
-               price > 0;
-    }
+    parseNumber(value, defaultValue = 0) {
+        const parsed = parseFloat(value);
+        return isNaN(parsed) || !isFinite(parsed) ? defaultValue : parsed;
+    },
 
     /**
      * Validate quantity
      */
     isValidQuantity(quantity) {
-        return Number.isInteger(quantity) &&
-               quantity > 0 &&
-               quantity <= 100000;
+        const qty = this.parseNumber(quantity);
+        return Number.isInteger(qty) &&
+               qty >= SIMULATOR_CONFIG.LIMITS.MIN_QUANTITY &&
+               qty <= SIMULATOR_CONFIG.LIMITS.MAX_QUANTITY;
+    },
+
+    /**
+     * Validate price
+     */
+    isValidPrice(price) {
+        const p = this.parseNumber(price);
+        return p >= SIMULATOR_CONFIG.LIMITS.MIN_PRICE &&
+               p <= SIMULATOR_CONFIG.LIMITS.MAX_PRICE;
+    },
+
+    /**
+     * Format currency
+     */
+    formatCurrency(amount, currency = 'USD') {
+        const value = this.parseNumber(amount);
+
+        if (currency === 'TRY') {
+            return new Intl.NumberFormat('tr-TR', {
+                style: 'currency',
+                currency: 'TRY',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        } else {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+    },
+
+    /**
+     * Format percentage
+     */
+    formatPercent(value) {
+        const percent = this.parseNumber(value);
+        return (percent >= 0 ? '+' : '') + percent.toFixed(2) + '%';
+    },
+
+    /**
+     * Format date
+     */
+    formatDate(date) {
+        return new Date(date).toLocaleString('tr-TR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    },
+
+    /**
+     * Deep clone object
+     */
+    deepClone(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    },
+
+    /**
+     * Generate unique ID
+     */
+    generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    },
+
+    /**
+     * Safe localStorage access
+     */
+    localStorage: {
+        get(key, defaultValue = null) {
+            try {
+                const item = localStorage.getItem(key);
+                return item ? JSON.parse(item) : defaultValue;
+            } catch (error) {
+                console.error(`Error reading from localStorage (${key}):`, error);
+                return defaultValue;
+            }
+        },
+
+        set(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+                return true;
+            } catch (error) {
+                console.error(`Error writing to localStorage (${key}):`, error);
+                return false;
+            }
+        },
+
+        remove(key) {
+            try {
+                localStorage.removeItem(key);
+                return true;
+            } catch (error) {
+                console.error(`Error removing from localStorage (${key}):`, error);
+                return false;
+            }
+        },
+
+        clear(prefix = 'sim_') {
+            try {
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.startsWith(prefix)) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                return true;
+            } catch (error) {
+                console.error('Error clearing localStorage:', error);
+                return false;
+            }
+        }
+    },
+
+    /**
+     * Debug logger
+     */
+    log(...args) {
+        if (SIMULATOR_CONFIG.DEBUG) {
+            console.log('[Simulator]', ...args);
+        }
+    }
+};
+
+// ================================================================================
+// ACCOUNT MANAGER
+// ================================================================================
+
+class AccountManager {
+    constructor() {
+        this.accounts = this.loadAccounts();
+        this.exchangeRate = 35; // Default USD/TRY rate
+        this.lastExchangeRateUpdate = 0;
     }
 
     /**
-     * Find stock by symbol
+     * Load accounts from storage
      */
-    findStock(symbol) {
-        if (!window.STOCKS_DATA) {
-            return null;
+    loadAccounts() {
+        const stored = Utils.localStorage.get(SIMULATOR_CONFIG.STORAGE_KEYS.ACCOUNTS);
+
+        if (stored && this.validateAccounts(stored)) {
+            return stored;
         }
 
-        const allStocks = [
-            ...(window.STOCKS_DATA.us_stocks || []).map(s => ({ ...s, market: 'us' })),
-            ...(window.STOCKS_DATA.bist_stocks || []).map(s => ({ ...s, market: 'bist' })),
-            ...(window.STOCKS_DATA.tefas_funds || []).map(s => ({ ...s, market: 'tefas' })),
-            ...(window.STOCKS_DATA.bes_funds || []).map(s => ({ ...s, market: 'bes' }))
-        ];
-
-        return allStocks.find(s => s.symbol === symbol);
+        // Return default accounts
+        return {
+            USD: {
+                balance: SIMULATOR_CONFIG.INITIAL_BALANCES.USD,
+                currency: 'USD',
+                symbol: '$',
+                initialBalance: SIMULATOR_CONFIG.INITIAL_BALANCES.USD
+            },
+            TRY: {
+                balance: SIMULATOR_CONFIG.INITIAL_BALANCES.TRY,
+                currency: 'TRY',
+                symbol: '₺',
+                initialBalance: SIMULATOR_CONFIG.INITIAL_BALANCES.TRY
+            }
+        };
     }
 
     /**
-     * Initialize simulator
+     * Validate accounts structure
      */
-    init() {
-        this.log('📊 TradingSimulator.init() called');
+    validateAccounts(accounts) {
+        if (!accounts || typeof accounts !== 'object') return false;
+        if (!accounts.USD || !accounts.TRY) return false;
+        if (typeof accounts.USD.balance !== 'number') return false;
+        if (typeof accounts.TRY.balance !== 'number') return false;
+        return true;
+    }
 
-        // Check if simulator page exists
-        const simulatorPage = document.getElementById('simulator');
-        if (!simulatorPage) {
-            if (this.initRetries < this.maxRetries) {
-                this.initRetries++;
-                console.warn(`⚠️ Simulator page not found, retry ${this.initRetries}/${this.maxRetries}`);
-                setTimeout(() => this.init(), 500);
-            } else {
-                console.error('❌ Simulator failed to initialize - page not found');
+    /**
+     * Save accounts to storage
+     */
+    saveAccounts() {
+        return Utils.localStorage.set(SIMULATOR_CONFIG.STORAGE_KEYS.ACCOUNTS, this.accounts);
+    }
+
+    /**
+     * Get account by currency
+     */
+    getAccount(currency) {
+        return this.accounts[currency.toUpperCase()];
+    }
+
+    /**
+     * Get currency for market
+     */
+    getCurrencyForMarket(market) {
+        const marketUpper = market.toUpperCase();
+        return (marketUpper === 'BIST' || marketUpper === 'TEFAS' || marketUpper === 'BES') ? 'TRY' : 'USD';
+    }
+
+    /**
+     * Update account balance
+     */
+    updateBalance(currency, amount) {
+        const account = this.getAccount(currency);
+        if (!account) {
+            throw new Error(`Invalid currency: ${currency}`);
+        }
+
+        account.balance = Utils.parseNumber(account.balance + amount);
+        this.saveAccounts();
+    }
+
+    /**
+     * Check if sufficient balance
+     */
+    hasSufficientBalance(currency, amount) {
+        const account = this.getAccount(currency);
+        return account && account.balance >= amount;
+    }
+
+    /**
+     * Get total balance in USD
+     */
+    getTotalBalanceUSD() {
+        const usdBalance = this.accounts.USD.balance;
+        const tryBalanceInUSD = this.accounts.TRY.balance / this.exchangeRate;
+        return usdBalance + tryBalanceInUSD;
+    }
+
+    /**
+     * Update exchange rate from API
+     */
+    async updateExchangeRate() {
+        const now = Date.now();
+
+        // Use cached rate if recent
+        if (now - this.lastExchangeRateUpdate < SIMULATOR_CONFIG.EXCHANGE_RATE_CACHE_DURATION) {
+            return this.exchangeRate;
+        }
+
+        try {
+            const response = await fetch(SIMULATOR_CONFIG.EXCHANGE_RATE_API);
+            const data = await response.json();
+
+            if (data.rates && data.rates.TRY) {
+                this.exchangeRate = data.rates.TRY;
+                this.lastExchangeRateUpdate = now;
+                Utils.log('Exchange rate updated:', this.exchangeRate);
             }
+        } catch (error) {
+            console.warn('Failed to update exchange rate:', error);
+            // Keep using cached rate
+        }
+
+        return this.exchangeRate;
+    }
+
+    /**
+     * Reset accounts to initial state
+     */
+    reset() {
+        this.accounts = {
+            USD: {
+                balance: SIMULATOR_CONFIG.INITIAL_BALANCES.USD,
+                currency: 'USD',
+                symbol: '$',
+                initialBalance: SIMULATOR_CONFIG.INITIAL_BALANCES.USD
+            },
+            TRY: {
+                balance: SIMULATOR_CONFIG.INITIAL_BALANCES.TRY,
+                currency: 'TRY',
+                symbol: '₺',
+                initialBalance: SIMULATOR_CONFIG.INITIAL_BALANCES.TRY
+            }
+        };
+        this.saveAccounts();
+    }
+}
+
+// ================================================================================
+// PORTFOLIO MANAGER
+// ================================================================================
+
+class PortfolioManager {
+    constructor(accountManager) {
+        this.accountManager = accountManager;
+        this.holdings = this.loadPortfolio();
+    }
+
+    /**
+     * Load portfolio from storage
+     */
+    loadPortfolio() {
+        const stored = Utils.localStorage.get(SIMULATOR_CONFIG.STORAGE_KEYS.PORTFOLIO, []);
+        return Array.isArray(stored) ? stored : [];
+    }
+
+    /**
+     * Save portfolio to storage
+     */
+    savePortfolio() {
+        return Utils.localStorage.set(SIMULATOR_CONFIG.STORAGE_KEYS.PORTFOLIO, this.holdings);
+    }
+
+    /**
+     * Get holding by symbol
+     */
+    getHolding(symbol) {
+        return this.holdings.find(h => h.symbol === symbol);
+    }
+
+    /**
+     * Add or update holding
+     */
+    addHolding(symbol, name, quantity, avgPrice, market) {
+        const existing = this.getHolding(symbol);
+
+        if (existing) {
+            // Update existing holding - weighted average price
+            const totalCost = (existing.quantity * existing.avgPrice) + (quantity * avgPrice);
+            existing.quantity += quantity;
+            existing.avgPrice = totalCost / existing.quantity;
+        } else {
+            // Create new holding
+            this.holdings.push({
+                symbol,
+                name,
+                quantity,
+                avgPrice,
+                market,
+                addedAt: new Date().toISOString()
+            });
+        }
+
+        this.savePortfolio();
+    }
+
+    /**
+     * Reduce holding quantity
+     */
+    reduceHolding(symbol, quantity) {
+        const holding = this.getHolding(symbol);
+
+        if (!holding) {
+            throw new Error(`Holding not found: ${symbol}`);
+        }
+
+        if (holding.quantity < quantity) {
+            throw new Error(`Insufficient shares: ${symbol}`);
+        }
+
+        holding.quantity -= quantity;
+
+        // Remove if quantity is zero
+        if (holding.quantity === 0) {
+            this.holdings = this.holdings.filter(h => h.symbol !== symbol);
+        }
+
+        this.savePortfolio();
+    }
+
+    /**
+     * Get total portfolio value
+     */
+    getTotalValue(currentPrices) {
+        let totalUSD = 0;
+        let totalTRY = 0;
+
+        this.holdings.forEach(holding => {
+            const currentPrice = currentPrices[holding.symbol] || holding.avgPrice;
+            const value = holding.quantity * currentPrice;
+
+            const currency = this.accountManager.getCurrencyForMarket(holding.market);
+            if (currency === 'USD') {
+                totalUSD += value;
+            } else {
+                totalTRY += value;
+            }
+        });
+
+        return {
+            USD: totalUSD,
+            TRY: totalTRY,
+            totalUSD: totalUSD + (totalTRY / this.accountManager.exchangeRate)
+        };
+    }
+
+    /**
+     * Get unrealized P&L
+     */
+    getUnrealizedPL(currentPrices) {
+        let totalPL = 0;
+
+        this.holdings.forEach(holding => {
+            const currentPrice = currentPrices[holding.symbol] || holding.avgPrice;
+            const pl = (currentPrice - holding.avgPrice) * holding.quantity;
+
+            const currency = this.accountManager.getCurrencyForMarket(holding.market);
+            if (currency === 'USD') {
+                totalPL += pl;
+            } else {
+                totalPL += pl / this.accountManager.exchangeRate;
+            }
+        });
+
+        return totalPL;
+    }
+
+    /**
+     * Reset portfolio
+     */
+    reset() {
+        this.holdings = [];
+        this.savePortfolio();
+    }
+}
+
+// ================================================================================
+// ORDER MANAGER
+// ================================================================================
+
+class OrderManager {
+    constructor(accountManager, portfolioManager) {
+        this.accountManager = accountManager;
+        this.portfolioManager = portfolioManager;
+        this.pendingOrders = this.loadOrders();
+    }
+
+    /**
+     * Load pending orders
+     */
+    loadOrders() {
+        const stored = Utils.localStorage.get(SIMULATOR_CONFIG.STORAGE_KEYS.ORDERS, []);
+        return Array.isArray(stored) ? stored : [];
+    }
+
+    /**
+     * Save pending orders
+     */
+    saveOrders() {
+        return Utils.localStorage.set(SIMULATOR_CONFIG.STORAGE_KEYS.ORDERS, this.pendingOrders);
+    }
+
+    /**
+     * Calculate commission
+     */
+    calculateCommission(market, amount) {
+        const rate = SIMULATOR_CONFIG.COMMISSIONS[market.toUpperCase()] || 0;
+        return amount * rate;
+    }
+
+    /**
+     * Validate order
+     */
+    validateOrder(order) {
+        // Validate quantity
+        if (!Utils.isValidQuantity(order.quantity)) {
+            throw new Error(`Geçersiz adet: ${order.quantity}. 1 ile ${SIMULATOR_CONFIG.LIMITS.MAX_QUANTITY} arasında tamsayı olmalı.`);
+        }
+
+        // Validate price
+        if (!Utils.isValidPrice(order.price)) {
+            throw new Error(`Geçersiz fiyat: ${order.price}`);
+        }
+
+        // Validate stock
+        if (!order.symbol || !order.market) {
+            throw new Error('Hisse bilgisi eksik');
+        }
+
+        return true;
+    }
+
+    /**
+     * Execute market buy order
+     */
+    executeBuy(stock, quantity, price) {
+        const order = {
+            id: Utils.generateId(),
+            type: SIMULATOR_CONFIG.ORDER_TYPES.MARKET,
+            action: 'buy',
+            symbol: stock.symbol,
+            name: stock.name,
+            market: stock.market,
+            quantity: parseInt(quantity),
+            price: Utils.parseNumber(price),
+            timestamp: new Date().toISOString()
+        };
+
+        // Validate order
+        this.validateOrder(order);
+
+        // Get account
+        const currency = this.accountManager.getCurrencyForMarket(order.market);
+        const account = this.accountManager.getAccount(currency);
+
+        // Calculate costs
+        const subtotal = order.quantity * order.price;
+        const commission = this.calculateCommission(order.market, subtotal);
+        const total = subtotal + commission;
+
+        // Check balance
+        if (!this.accountManager.hasSufficientBalance(currency, total)) {
+            throw new Error(
+                `Yetersiz ${currency} bakiye!\n\n` +
+                `Gerekli: ${Utils.formatCurrency(total, currency)}\n` +
+                `Mevcut: ${Utils.formatCurrency(account.balance, currency)}`
+            );
+        }
+
+        // Execute order
+        this.accountManager.updateBalance(currency, -total);
+
+        // Update portfolio - include commission in cost basis
+        const costBasisPrice = (subtotal + commission) / order.quantity;
+        this.portfolioManager.addHolding(
+            order.symbol,
+            order.name,
+            order.quantity,
+            costBasisPrice,
+            order.market
+        );
+
+        // Record transaction
+        const transaction = {
+            ...order,
+            commission,
+            total,
+            currency
+        };
+
+        Utils.log('Buy order executed:', transaction);
+
+        return transaction;
+    }
+
+    /**
+     * Execute market sell order
+     */
+    executeSell(stock, quantity, price) {
+        const order = {
+            id: Utils.generateId(),
+            type: SIMULATOR_CONFIG.ORDER_TYPES.MARKET,
+            action: 'sell',
+            symbol: stock.symbol,
+            name: stock.name,
+            market: stock.market,
+            quantity: parseInt(quantity),
+            price: Utils.parseNumber(price),
+            timestamp: new Date().toISOString()
+        };
+
+        // Validate order
+        this.validateOrder(order);
+
+        // Check holding
+        const holding = this.portfolioManager.getHolding(order.symbol);
+        if (!holding) {
+            throw new Error(`${order.symbol} hissesine sahip değilsiniz`);
+        }
+
+        if (holding.quantity < order.quantity) {
+            throw new Error(
+                `Yetersiz hisse!\n\n` +
+                `Satmak istediğiniz: ${order.quantity}\n` +
+                `Sahip olduğunuz: ${holding.quantity}`
+            );
+        }
+
+        // Get account
+        const currency = this.accountManager.getCurrencyForMarket(order.market);
+
+        // Calculate proceeds
+        const subtotal = order.quantity * order.price;
+        const commission = this.calculateCommission(order.market, subtotal);
+        const net = subtotal - commission;
+
+        // Calculate realized P&L (including both buy and sell commissions)
+        const costBasis = holding.avgPrice * order.quantity;
+        const realizedPL = net - costBasis;
+
+        // Execute order
+        this.accountManager.updateBalance(currency, net);
+        this.portfolioManager.reduceHolding(order.symbol, order.quantity);
+
+        // Record transaction
+        const transaction = {
+            ...order,
+            commission,
+            total: subtotal,
+            net,
+            realizedPL,
+            currency,
+            costBasis: holding.avgPrice
+        };
+
+        Utils.log('Sell order executed:', transaction);
+
+        return transaction;
+    }
+
+    /**
+     * Place limit order
+     */
+    placeLimitOrder(stock, quantity, limitPrice, action = 'buy') {
+        const order = {
+            id: Utils.generateId(),
+            type: SIMULATOR_CONFIG.ORDER_TYPES.LIMIT,
+            action,
+            symbol: stock.symbol,
+            name: stock.name,
+            market: stock.market,
+            quantity: parseInt(quantity),
+            limitPrice: Utils.parseNumber(limitPrice),
+            currentPrice: stock.price,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+
+        // Validate
+        this.validateOrder({ ...order, price: order.limitPrice });
+
+        // Add to pending orders
+        this.pendingOrders.push(order);
+        this.saveOrders();
+
+        Utils.log('Limit order placed:', order);
+
+        return order;
+    }
+
+    /**
+     * Place stop-loss order
+     */
+    placeStopLoss(symbol, quantity, stopPrice) {
+        const order = {
+            id: Utils.generateId(),
+            type: SIMULATOR_CONFIG.ORDER_TYPES.STOP_LOSS,
+            action: 'sell',
+            symbol,
+            quantity: parseInt(quantity),
+            stopPrice: Utils.parseNumber(stopPrice),
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+
+        // Check holding
+        const holding = this.portfolioManager.getHolding(symbol);
+        if (!holding || holding.quantity < quantity) {
+            throw new Error('Yetersiz hisse');
+        }
+
+        // Add to pending orders
+        this.pendingOrders.push(order);
+        this.saveOrders();
+
+        Utils.log('Stop-loss order placed:', order);
+
+        return order;
+    }
+
+    /**
+     * Check and execute pending orders
+     */
+    checkPendingOrders(currentPrices) {
+        const executed = [];
+
+        this.pendingOrders = this.pendingOrders.filter(order => {
+            const currentPrice = currentPrices[order.symbol];
+            if (!currentPrice) return true; // Keep if no price data
+
+            let shouldExecute = false;
+
+            // Check limit orders
+            if (order.type === SIMULATOR_CONFIG.ORDER_TYPES.LIMIT) {
+                if (order.action === 'buy' && currentPrice <= order.limitPrice) {
+                    shouldExecute = true;
+                } else if (order.action === 'sell' && currentPrice >= order.limitPrice) {
+                    shouldExecute = true;
+                }
+            }
+
+            // Check stop-loss orders
+            if (order.type === SIMULATOR_CONFIG.ORDER_TYPES.STOP_LOSS) {
+                if (currentPrice <= order.stopPrice) {
+                    shouldExecute = true;
+                }
+            }
+
+            if (shouldExecute) {
+                try {
+                    // Execute the order
+                    const stock = {
+                        symbol: order.symbol,
+                        name: order.name || order.symbol,
+                        market: order.market,
+                        price: currentPrice
+                    };
+
+                    let transaction;
+                    if (order.action === 'buy') {
+                        transaction = this.executeBuy(stock, order.quantity, currentPrice);
+                    } else {
+                        transaction = this.executeSell(stock, order.quantity, currentPrice);
+                    }
+
+                    executed.push({ ...transaction, originalOrder: order });
+                    return false; // Remove from pending
+                } catch (error) {
+                    console.error('Failed to execute pending order:', error);
+                    // Keep order if execution failed
+                    return true;
+                }
+            }
+
+            return true; // Keep pending
+        });
+
+        if (executed.length > 0) {
+            this.saveOrders();
+        }
+
+        return executed;
+    }
+
+    /**
+     * Cancel order
+     */
+    cancelOrder(orderId) {
+        const initialLength = this.pendingOrders.length;
+        this.pendingOrders = this.pendingOrders.filter(o => o.id !== orderId);
+
+        if (this.pendingOrders.length < initialLength) {
+            this.saveOrders();
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Reset orders
+     */
+    reset() {
+        this.pendingOrders = [];
+        this.saveOrders();
+    }
+}
+
+// ================================================================================
+// TRANSACTION HISTORY MANAGER
+// ================================================================================
+
+class HistoryManager {
+    constructor() {
+        this.transactions = this.loadHistory();
+        this.realizedPL = 0;
+    }
+
+    /**
+     * Load transaction history
+     */
+    loadHistory() {
+        const stored = Utils.localStorage.get(SIMULATOR_CONFIG.STORAGE_KEYS.HISTORY, []);
+        return Array.isArray(stored) ? stored : [];
+    }
+
+    /**
+     * Save transaction history
+     */
+    saveHistory() {
+        // Limit history size
+        if (this.transactions.length > SIMULATOR_CONFIG.LIMITS.MAX_TRANSACTION_HISTORY) {
+            this.transactions = this.transactions.slice(0, SIMULATOR_CONFIG.LIMITS.MAX_TRANSACTION_HISTORY);
+        }
+
+        return Utils.localStorage.set(SIMULATOR_CONFIG.STORAGE_KEYS.HISTORY, this.transactions);
+    }
+
+    /**
+     * Add transaction
+     */
+    addTransaction(transaction) {
+        // Add to beginning of array (most recent first)
+        this.transactions.unshift({
+            ...transaction,
+            id: transaction.id || Utils.generateId(),
+            timestamp: transaction.timestamp || new Date().toISOString()
+        });
+
+        // Update realized P&L
+        if (transaction.realizedPL) {
+            this.realizedPL += transaction.realizedPL;
+        }
+
+        this.saveHistory();
+    }
+
+    /**
+     * Get transactions by symbol
+     */
+    getTransactionsBySymbol(symbol) {
+        return this.transactions.filter(t => t.symbol === symbol);
+    }
+
+    /**
+     * Get transactions by date range
+     */
+    getTransactionsByDateRange(startDate, endDate) {
+        const start = new Date(startDate).getTime();
+        const end = new Date(endDate).getTime();
+
+        return this.transactions.filter(t => {
+            const timestamp = new Date(t.timestamp).getTime();
+            return timestamp >= start && timestamp <= end;
+        });
+    }
+
+    /**
+     * Get total realized P&L
+     */
+    getTotalRealizedPL() {
+        return this.transactions
+            .filter(t => t.realizedPL)
+            .reduce((sum, t) => sum + t.realizedPL, 0);
+    }
+
+    /**
+     * Export history to CSV
+     */
+    exportToCSV() {
+        const headers = ['Tarih', 'İşlem', 'Hisse', 'Adet', 'Fiyat', 'Komisyon', 'Toplam', 'Kar/Zarar'];
+        const rows = this.transactions.map(t => [
+            Utils.formatDate(t.timestamp),
+            t.action === 'buy' ? 'ALIŞ' : 'SATIŞ',
+            `${t.symbol} (${t.name})`,
+            t.quantity,
+            Utils.formatCurrency(t.price, t.currency),
+            Utils.formatCurrency(t.commission, t.currency),
+            Utils.formatCurrency(t.total, t.currency),
+            t.realizedPL ? Utils.formatCurrency(t.realizedPL, t.currency) : '-'
+        ]);
+
+        const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+        return csv;
+    }
+
+    /**
+     * Reset history
+     */
+    reset() {
+        this.transactions = [];
+        this.realizedPL = 0;
+        this.saveHistory();
+    }
+}
+
+// ================================================================================
+// PERFORMANCE TRACKER
+// ================================================================================
+
+class PerformanceTracker {
+    constructor(accountManager, portfolioManager, historyManager) {
+        this.accountManager = accountManager;
+        this.portfolioManager = portfolioManager;
+        this.historyManager = historyManager;
+        this.records = this.loadPerformance();
+        this.lastRecordTime = 0;
+        this.chart = null;
+    }
+
+    /**
+     * Load performance records
+     */
+    loadPerformance() {
+        const stored = Utils.localStorage.get(SIMULATOR_CONFIG.STORAGE_KEYS.PERFORMANCE, []);
+        return Array.isArray(stored) ? stored : [];
+    }
+
+    /**
+     * Save performance records
+     */
+    savePerformance() {
+        // Limit records
+        if (this.records.length > SIMULATOR_CONFIG.LIMITS.MAX_PERFORMANCE_RECORDS) {
+            this.records = this.records.slice(-SIMULATOR_CONFIG.LIMITS.MAX_PERFORMANCE_RECORDS);
+        }
+
+        return Utils.localStorage.set(SIMULATOR_CONFIG.STORAGE_KEYS.PERFORMANCE, this.records);
+    }
+
+    /**
+     * Record current performance
+     */
+    recordPerformance(currentPrices) {
+        const now = Date.now();
+
+        // Throttle recording (once per interval)
+        if (now - this.lastRecordTime < SIMULATOR_CONFIG.PERFORMANCE_INTERVAL) {
             return;
         }
 
-        this.initRetries = 0;
+        const portfolioValue = this.portfolioManager.getTotalValue(currentPrices);
+        const totalCash = this.accountManager.getTotalBalanceUSD();
+        const totalValue = totalCash + portfolioValue.totalUSD;
 
-        // Setup event listeners
-        this.setupEventListeners();
+        const initialTotal =
+            SIMULATOR_CONFIG.INITIAL_BALANCES.USD +
+            (SIMULATOR_CONFIG.INITIAL_BALANCES.TRY / this.accountManager.exchangeRate);
 
-        // Load stocks
-        this.loadStocksToSelect();
+        const totalPL = totalValue - initialTotal;
+        const totalPLPercent = (totalPL / initialTotal) * 100;
 
-        // Update UI
-        this.updateAccountInfo();
-        this.renderPortfolio();
-        this.renderTransactionHistory();
-        this.renderPerformanceChart();
+        this.records.push({
+            timestamp: new Date().toISOString(),
+            totalValue,
+            cashValue: totalCash,
+            portfolioValue: portfolioValue.totalUSD,
+            unrealizedPL: this.portfolioManager.getUnrealizedPL(currentPrices),
+            realizedPL: this.historyManager.getTotalRealizedPL(),
+            totalPL,
+            totalPLPercent
+        });
 
-        // Fetch exchange rate
-        this.fetchExchangeRate();
+        this.lastRecordTime = now;
+        this.savePerformance();
 
-        this.log('✅ TradingSimulator initialized successfully');
+        Utils.log('Performance recorded:', this.records[this.records.length - 1]);
     }
 
     /**
-     * Fetch current exchange rate
+     * Render performance chart
      */
-    async fetchExchangeRate() {
-        try {
-            const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-            const data = await response.json();
-            if (data.rates && data.rates.TRY) {
-                this.exchangeRate = data.rates.TRY;
-                this.log(`💱 Exchange rate updated: 1 USD = ${this.exchangeRate.toFixed(2)} TRY`);
-            }
-        } catch (error) {
-            console.warn('⚠️ Failed to fetch exchange rate, using default:', this.exchangeRate);
+    renderChart(canvasId = 'performanceChart') {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+
+        // Destroy existing chart
+        if (this.chart) {
+            this.chart.destroy();
+            this.chart = null;
         }
+
+        // Need at least 2 data points
+        if (this.records.length < 2) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#888';
+            ctx.textAlign = 'center';
+            ctx.fillText('En az 2 veri noktası gerekli', canvas.width / 2, canvas.height / 2);
+            return;
+        }
+
+        const labels = this.records.map(r => Utils.formatDate(r.timestamp));
+        const values = this.records.map(r => r.totalValue);
+
+        this.chart = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Toplam Değer (USD)',
+                    data: values,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: (context) => {
+                                return `Değer: ${Utils.formatCurrency(context.parsed.y)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: (value) => Utils.formatCurrency(value)
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Get latest metrics
+     */
+    getLatestMetrics(currentPrices) {
+        const portfolioValue = this.portfolioManager.getTotalValue(currentPrices);
+        const totalCash = this.accountManager.getTotalBalanceUSD();
+        const totalValue = totalCash + portfolioValue.totalUSD;
+
+        const initialTotal =
+            SIMULATOR_CONFIG.INITIAL_BALANCES.USD +
+            (SIMULATOR_CONFIG.INITIAL_BALANCES.TRY / this.accountManager.exchangeRate);
+
+        const totalPL = totalValue - initialTotal;
+        const totalPLPercent = (totalPL / initialTotal) * 100;
+
+        return {
+            totalValue,
+            cashValue: totalCash,
+            portfolioValue: portfolioValue.totalUSD,
+            unrealizedPL: this.portfolioManager.getUnrealizedPL(currentPrices),
+            realizedPL: this.historyManager.getTotalRealizedPL(),
+            totalPL,
+            totalPLPercent
+        };
+    }
+
+    /**
+     * Reset performance
+     */
+    reset() {
+        if (this.chart) {
+            this.chart.destroy();
+            this.chart = null;
+        }
+        this.records = [];
+        this.lastRecordTime = 0;
+        this.savePerformance();
+    }
+}
+
+// ================================================================================
+// MAIN TRADING SIMULATOR
+// ================================================================================
+
+class TradingSimulator {
+    constructor() {
+        // Check and migrate version
+        this.checkVersion();
+
+        // Initialize managers
+        this.accountManager = new AccountManager();
+        this.portfolioManager = new PortfolioManager(this.accountManager);
+        this.orderManager = new OrderManager(this.accountManager, this.portfolioManager);
+        this.historyManager = new HistoryManager();
+        this.performanceTracker = new PerformanceTracker(
+            this.accountManager,
+            this.portfolioManager,
+            this.historyManager
+        );
+
+        // State
+        this.currentPrices = {};
+        this.selectedStock = null;
+        this.currentAction = 'buy';
+        this.isInitialized = false;
+
+        Utils.log('Simulator initialized (v' + SIMULATOR_CONFIG.VERSION + ')');
+    }
+
+    /**
+     * Check version and reset if needed
+     */
+    checkVersion() {
+        const storedVersion = Utils.localStorage.get(SIMULATOR_CONFIG.STORAGE_KEYS.VERSION);
+
+        if (storedVersion !== SIMULATOR_CONFIG.VERSION) {
+            console.log(`🔄 Simulator v${SIMULATOR_CONFIG.VERSION} - Resetting data...`);
+
+            // Clear all old data
+            Utils.localStorage.clear('sim_');
+            Utils.localStorage.clear('simAccounts');
+            Utils.localStorage.clear('simPortfolio');
+            Utils.localStorage.clear('simHistory');
+            Utils.localStorage.clear('simPerformance');
+            Utils.localStorage.clear('simulatorVersion');
+
+            // Set new version
+            Utils.localStorage.set(SIMULATOR_CONFIG.STORAGE_KEYS.VERSION, SIMULATOR_CONFIG.VERSION);
+
+            console.log('✅ Data reset complete');
+        }
+    }
+
+    /**
+     * Initialize simulator UI
+     */
+    async init() {
+        if (this.isInitialized) {
+            Utils.log('Already initialized');
+            return;
+        }
+
+        try {
+            // Wait for markets manager
+            await this.waitForMarketsManager();
+
+            // Update exchange rate
+            await this.accountManager.updateExchangeRate();
+
+            // Load current prices
+            this.loadCurrentPrices();
+
+            // Setup UI
+            this.setupEventListeners();
+            this.populateStockSelect();
+
+            // Initial render
+            this.updateUI();
+
+            // Check pending orders periodically
+            setInterval(() => this.checkPendingOrders(), 5000);
+
+            this.isInitialized = true;
+            console.log('✅ Trading Simulator v3.0 initialized');
+        } catch (error) {
+            console.error('❌ Simulator initialization failed:', error);
+        }
+    }
+
+    /**
+     * Wait for markets manager to be ready
+     */
+    waitForMarketsManager() {
+        return new Promise((resolve) => {
+            const check = () => {
+                if (window.marketsManager && window.marketsManager.stocks) {
+                    resolve();
+                } else {
+                    setTimeout(check, 100);
+                }
+            };
+            check();
+        });
+    }
+
+    /**
+     * Load current prices from markets manager
+     */
+    loadCurrentPrices() {
+        if (!window.marketsManager || !window.marketsManager.stocks) {
+            return;
+        }
+
+        this.currentPrices = {};
+
+        // Load all stock prices
+        Object.values(window.marketsManager.stocks).forEach(stock => {
+            if (stock.symbol && stock.price) {
+                this.currentPrices[stock.symbol] = stock.price;
+            }
+        });
+
+        Utils.log('Loaded prices for', Object.keys(this.currentPrices).length, 'stocks');
     }
 
     /**
      * Setup event listeners
      */
     setupEventListeners() {
-        // Buy/Sell toggle
+        // Stock selection
+        const stockSelect = document.getElementById('simStockSelect');
+        if (stockSelect) {
+            stockSelect.addEventListener('change', (e) => this.handleStockSelect(e.target.value));
+        }
+
+        // Action buttons (Buy/Sell)
         document.querySelectorAll('.btn-toggle').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.btn-toggle').forEach(b => b.classList.remove('active'));
@@ -459,12 +1292,6 @@ class TradingSimulator {
                 this.updateTradeInfo();
             });
         });
-
-        // Stock selection
-        const stockSelect = document.getElementById('simStockSelect');
-        if (stockSelect) {
-            stockSelect.addEventListener('change', (e) => this.onStockSelect(e));
-        }
 
         // Quantity input
         const quantityInput = document.getElementById('simQuantity');
@@ -481,7 +1308,7 @@ class TradingSimulator {
         // Reset button
         const resetBtn = document.getElementById('resetSimulator');
         if (resetBtn) {
-            resetBtn.addEventListener('click', () => this.resetAccount());
+            resetBtn.addEventListener('click', () => this.resetSimulator());
         }
 
         // Export button
@@ -489,535 +1316,218 @@ class TradingSimulator {
         if (exportBtn) {
             exportBtn.addEventListener('click', () => this.exportHistory());
         }
-
-        // Tutorial button
-        const tutorialBtn = document.getElementById('showTutorial');
-        if (tutorialBtn) {
-            tutorialBtn.addEventListener('click', () => this.showTutorial());
-        }
-
-        // Tutorial modal close
-        const tutorialModal = document.getElementById('tutorialModal');
-        if (tutorialModal) {
-            const closeBtn = tutorialModal.querySelector('.modal-close');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => {
-                    tutorialModal.style.display = 'none';
-                });
-            }
-
-            tutorialModal.addEventListener('click', (e) => {
-                if (e.target === tutorialModal) {
-                    tutorialModal.style.display = 'none';
-                }
-            });
-        }
-
-        // Chart period filters
-        document.querySelectorAll('[data-period]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const period = e.target.dataset.period;
-                this.updatePerformanceChart(period);
-            });
-        });
     }
 
     /**
-     * Load stocks into select dropdown
+     * Populate stock dropdown
      */
-    loadStocksToSelect() {
+    populateStockSelect() {
         const select = document.getElementById('simStockSelect');
-        if (!select) {
-            this.log('⚠️ Stock select element not found');
-            return;
-        }
+        if (!select || !window.marketsManager) return;
 
-        // Wait for marketsManager
-        if (!window.marketsManager || !window.marketsManager.stocks) {
-            if (this.stockLoadRetries < this.maxRetries) {
-                this.stockLoadRetries++;
-                this.log(`⏳ Waiting for marketsManager... (${this.stockLoadRetries}/${this.maxRetries})`);
-                setTimeout(() => this.loadStocksToSelect(), 500);
-            } else {
-                select.innerHTML = '<option value="">❌ Hisseler yüklenemedi</option>';
-            }
-            return;
-        }
+        // Clear existing options (except first)
+        select.innerHTML = '<option value="">-- Hisse Seçin --</option>';
 
-        this.stockLoadRetries = 0;
-
-        const stocks = window.marketsManager.stocks;
-        this.log(`📊 Loading ${stocks.length} stocks`);
-
-        // Wait for prices
-        const stocksWithPrices = stocks.filter(s => s.price && s.price > 0);
-        if (stocksWithPrices.length === 0) {
-            this.log('⏳ Waiting for stock prices...');
-            setTimeout(() => this.loadStocksToSelect(), 1000);
-            return;
-        }
-
-        // Group by market
-        const grouped = {
-            'ABD Hisseleri': stocksWithPrices.filter(s => s.market === 'us'),
-            'BIST Hisseleri': stocksWithPrices.filter(s => s.market === 'bist')
+        // Add stocks grouped by market
+        const markets = {
+            'US': 'ABD Hisseleri',
+            'BIST': 'BIST Hisseleri',
+            'TEFAS': 'Yatırım Fonları',
+            'BES': 'Emeklilik Fonları'
         };
 
-        // Build HTML
-        let html = '<option value="">Hisse seçin...</option>';
+        Object.entries(markets).forEach(([marketKey, marketLabel]) => {
+            const stocks = Object.values(window.marketsManager.stocks)
+                .filter(s => s.market && s.market.toUpperCase() === marketKey);
 
-        for (const [groupName, groupStocks] of Object.entries(grouped)) {
-            if (groupStocks.length > 0) {
-                html += `<optgroup label="${groupName}">`;
-                groupStocks.forEach(stock => {
-                    const currency = stock.market === 'bist' ? '₺' : '$';
-                    html += `<option value="${stock.symbol}">${stock.symbol} - ${stock.name} (${currency}${stock.price.toFixed(2)})</option>`;
+            if (stocks.length > 0) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = marketLabel;
+
+                stocks.forEach(stock => {
+                    const option = document.createElement('option');
+                    option.value = stock.symbol;
+                    option.textContent = `${stock.symbol} - ${stock.name} (${Utils.formatCurrency(stock.price, this.accountManager.getCurrencyForMarket(stock.market))})`;
+                    optgroup.appendChild(option);
                 });
-                html += '</optgroup>';
-            }
-        }
 
-        select.innerHTML = html;
-        this.log(`✅ Loaded ${stocksWithPrices.length} stocks to select`);
+                select.appendChild(optgroup);
+            }
+        });
     }
 
     /**
      * Handle stock selection
      */
-    onStockSelect(event) {
-        const symbol = event.target.value;
-        if (!symbol) return;
-
-        const stock = this.findStock(symbol);
-        if (!stock) {
-            console.error('❌ Stock not found:', symbol);
+    handleStockSelect(symbol) {
+        if (!symbol || !window.marketsManager) {
+            this.selectedStock = null;
+            this.updateTradeInfo();
             return;
         }
 
-        // Update current price display
-        const priceEl = document.getElementById('simCurrentPrice');
-        if (priceEl) {
-            if (this.isValidPrice(stock.price)) {
-                priceEl.textContent = this.formatPrice(stock.price, stock.market);
-            } else {
-                priceEl.textContent = 'Fiyat yükleniyor...';
-            }
-        }
-
+        this.selectedStock = window.marketsManager.stocks[symbol];
         this.updateTradeInfo();
     }
 
     /**
-     * Update trade info panel
+     * Update trade info display
      */
     updateTradeInfo() {
-        const symbol = document.getElementById('simStockSelect')?.value;
-        if (!symbol) return;
-
-        const stock = this.findStock(symbol);
-        if (!stock) return;
-
-        // Validate price
-        if (!this.isValidPrice(stock.price)) {
-            this.disableExecuteButton('Fiyat Bekleniyor...');
-            return;
-        }
-
-        // Get and validate quantity
-        const quantityInput = document.getElementById('simQuantity')?.value;
-        const quantity = parseInt(quantityInput || '1');
-
-        if (!this.isValidQuantity(quantity)) {
-            this.disableExecuteButton('Geçersiz Adet');
-            return;
-        }
-
-        // Calculate amounts
-        const subtotal = stock.price * quantity;
-        const commission = this.calculateCommission(subtotal, stock.market);
-        const total = subtotal + commission;
-
-        // Get account
-        const account = this.getAccount(stock.market);
-
-        // Update UI
-        const totalEl = document.getElementById('simTotal');
-        if (totalEl) {
-            totalEl.value = this.formatPrice(total, stock.market);
-        }
-
+        const quantityInput = document.getElementById('simQuantity');
+        const currentPriceEl = document.getElementById('simCurrentPrice');
         const commissionEl = document.getElementById('simCommission');
+        const totalEl = document.getElementById('simTotal');
+        const afterBalanceEl = document.getElementById('simAfterBalance');
+
+        if (!this.selectedStock) {
+            if (currentPriceEl) currentPriceEl.textContent = '-';
+            if (commissionEl) commissionEl.textContent = '-';
+            if (totalEl) totalEl.value = '';
+            if (afterBalanceEl) afterBalanceEl.textContent = '-';
+            return;
+        }
+
+        const quantity = parseInt(quantityInput?.value || 1);
+        const price = this.currentPrices[this.selectedStock.symbol] || this.selectedStock.price;
+        const currency = this.accountManager.getCurrencyForMarket(this.selectedStock.market);
+        const account = this.accountManager.getAccount(currency);
+
+        // Calculate costs
+        const subtotal = quantity * price;
+        const commission = this.orderManager.calculateCommission(this.selectedStock.market, subtotal);
+        const total = this.currentAction === 'buy' ? subtotal + commission : subtotal - commission;
+
+        // Update display
+        if (currentPriceEl) {
+            currentPriceEl.textContent = Utils.formatCurrency(price, currency);
+        }
+
         if (commissionEl) {
-            commissionEl.textContent = this.formatPrice(commission, stock.market);
+            commissionEl.textContent = Utils.formatCurrency(commission, currency);
         }
 
-        // Handle buy/sell specific logic
-        if (this.currentAction === 'buy') {
-            const afterBalance = account.balance - total;
+        if (totalEl) {
+            totalEl.value = Utils.formatCurrency(total, currency);
+        }
 
-            const afterBalanceEl = document.getElementById('simAfterBalance');
-            if (afterBalanceEl) {
-                afterBalanceEl.textContent = `${account.symbol}${afterBalance.toFixed(2)}`;
-                afterBalanceEl.style.color = afterBalance >= 0 ? '#10b981' : '#ef4444';
-            }
-
-            // Enable/disable execute button
-            if (afterBalance < 0) {
-                this.disableExecuteButton('Yetersiz Bakiye');
-            } else {
-                this.enableExecuteButton();
-            }
-        } else {
-            // SELL
-            const holding = this.portfolio.find(p => p.symbol === symbol);
-            const afterBalance = account.balance + (subtotal - commission);
-
-            const afterBalanceEl = document.getElementById('simAfterBalance');
-            if (afterBalanceEl) {
-                afterBalanceEl.textContent = `${account.symbol}${afterBalance.toFixed(2)}`;
-                afterBalanceEl.style.color = '#10b981';
-            }
-
-            // Check if has enough shares
-            if (!holding || holding.quantity < quantity) {
-                this.disableExecuteButton('Yetersiz Hisse');
-            } else {
-                this.enableExecuteButton();
-            }
+        if (afterBalanceEl && account) {
+            const afterBalance = this.currentAction === 'buy'
+                ? account.balance - total
+                : account.balance + total;
+            afterBalanceEl.textContent = Utils.formatCurrency(afterBalance, currency);
+            afterBalanceEl.className = afterBalance < 0 ? 'negative' : 'positive';
         }
     }
 
     /**
-     * Disable execute button
-     */
-    disableExecuteButton(message) {
-        const executeBtn = document.getElementById('executeTradeBtn');
-        if (executeBtn) {
-            executeBtn.disabled = true;
-            executeBtn.textContent = message;
-        }
-    }
-
-    /**
-     * Enable execute button
-     */
-    enableExecuteButton() {
-        const executeBtn = document.getElementById('executeTradeBtn');
-        if (executeBtn) {
-            executeBtn.disabled = false;
-            executeBtn.innerHTML = '<i class="fas fa-check"></i> İşlemi Gerçekleştir';
-        }
-    }
-
-    /**
-     * Execute trade (buy or sell)
+     * Execute trade
      */
     executeTrade() {
-        const symbol = document.getElementById('simStockSelect')?.value;
-        if (!symbol) {
-            alert('⚠️ Lütfen bir hisse seçin');
+        if (!this.selectedStock) {
+            alert('❌ Lütfen bir hisse seçin');
             return;
         }
 
-        const stock = this.findStock(symbol);
-        if (!stock) {
-            alert('❌ Hisse bilgisi bulunamadı');
+        const quantityInput = document.getElementById('simQuantity');
+        const quantity = parseInt(quantityInput?.value || 0);
+
+        if (!Utils.isValidQuantity(quantity)) {
+            alert('❌ Geçersiz adet! 1 ile ' + SIMULATOR_CONFIG.LIMITS.MAX_QUANTITY + ' arasında bir sayı girin.');
             return;
         }
 
-        // Validate price
-        if (!this.isValidPrice(stock.price)) {
-            alert('❌ Geçersiz fiyat! Lütfen bekleyin veya sayfayı yenileyin.');
-            return;
-        }
+        const price = this.currentPrices[this.selectedStock.symbol] || this.selectedStock.price;
 
-        // Get and validate quantity
-        const quantityInput = document.getElementById('simQuantity')?.value;
-        const quantity = parseInt(quantityInput || '1');
+        try {
+            let transaction;
 
-        if (!this.isValidQuantity(quantity)) {
-            alert('❌ Geçersiz adet! 1-100,000 arasında bir sayı girin.');
-            return;
-        }
-
-        // Calculate amounts
-        const subtotal = stock.price * quantity;
-        const commission = this.calculateCommission(subtotal, stock.market);
-
-        // Get account
-        const account = this.getAccount(stock.market);
-        const accountKey = this.getAccountKey(stock.market);
-
-        this.log(`💰 Executing ${this.currentAction}:`, {
-            symbol,
-            market: stock.market,
-            accountKey,
-            balance: account.balance,
-            quantity,
-            price: stock.price,
-            subtotal,
-            commission
-        });
-
-        if (this.currentAction === 'buy') {
-            this.executeBuy(stock, quantity, subtotal, commission, account, accountKey);
-        } else {
-            this.executeSell(stock, quantity, subtotal, commission, account, accountKey);
-        }
-    }
-
-    /**
-     * Execute buy order
-     */
-    executeBuy(stock, quantity, subtotal, commission, account, accountKey) {
-        const total = subtotal + commission;
-
-        // Final balance check
-        if (account.balance < total) {
-            alert(`❌ Yetersiz ${account.currency} bakiye!
-
-Gerekli: ${this.formatPrice(total, stock.market)}
-Mevcut: ${this.formatPrice(account.balance, stock.market)}`);
-            return;
-        }
-
-        // Deduct from account
-        account.balance -= total;
-
-        // Update portfolio
-        const existingHolding = this.portfolio.find(p => p.symbol === stock.symbol);
-        if (existingHolding) {
-            // Update existing position - include commission in cost basis
-            const previousCost = existingHolding.avgPrice * existingHolding.quantity;
-            const newCost = subtotal + commission;
-            const totalCost = previousCost + newCost;
-            existingHolding.quantity += quantity;
-            existingHolding.avgPrice = totalCost / existingHolding.quantity;
-        } else {
-            // Add new position
-            this.portfolio.push({
-                symbol: stock.symbol,
-                name: stock.name,
-                quantity: quantity,
-                avgPrice: (subtotal + commission) / quantity,
-                market: stock.market
-            });
-        }
-
-        // Record transaction
-        this.transactionHistory.unshift({
-            date: new Date().toISOString(),
-            action: 'buy',
-            symbol: stock.symbol,
-            name: stock.name,
-            quantity: quantity,
-            price: stock.price,
-            commission: commission,
-            total: total,
-            market: stock.market
-        });
-
-        // Save all data
-        this.saveData('simAccounts', this.accounts);
-        this.saveData('simPortfolio', this.portfolio);
-        this.saveData('simHistory', this.transactionHistory);
-
-        // Record performance
-        this.recordPerformance();
-
-        // Update UI
-        this.updateAccountInfo();
-        this.renderPortfolio();
-        this.renderTransactionHistory();
-        this.renderPerformanceChart();
-
-        // Reset form
-        document.getElementById('simQuantity').value = 1;
-        this.updateTradeInfo();
-
-        // Success message
-        alert(`✅ ${quantity} adet ${stock.symbol} başarıyla satın alındı!
-
-Ödenen: ${this.formatPrice(total, stock.market)}
-Komisyon: ${this.formatPrice(commission, stock.market)}`);
-
-        this.log('✅ Buy executed successfully');
-    }
-
-    /**
-     * Execute sell order
-     */
-    executeSell(stock, quantity, subtotal, commission, account, accountKey) {
-        // Check holdings
-        const holding = this.portfolio.find(p => p.symbol === stock.symbol);
-
-        if (!holding || holding.quantity < quantity) {
-            alert(`❌ Yetersiz hisse!
-
-Portföyünüzde: ${holding ? holding.quantity : 0} adet
-İstenen: ${quantity} adet`);
-            return;
-        }
-
-        // Calculate realized P&L
-        const saleProceeds = subtotal - commission;
-        const costBasis = holding.avgPrice * quantity;
-        const profitLoss = saleProceeds - costBasis;
-
-        // Credit to account
-        account.balance += saleProceeds;
-
-        // Update portfolio
-        holding.quantity -= quantity;
-        if (holding.quantity === 0) {
-            this.portfolio = this.portfolio.filter(p => p.symbol !== stock.symbol);
-        }
-
-        // Record transaction
-        this.transactionHistory.unshift({
-            date: new Date().toISOString(),
-            action: 'sell',
-            symbol: stock.symbol,
-            name: stock.name,
-            quantity: quantity,
-            price: stock.price,
-            commission: commission,
-            total: saleProceeds,
-            profitLoss: profitLoss,
-            market: stock.market
-        });
-
-        // Save all data
-        this.saveData('simAccounts', this.accounts);
-        this.saveData('simPortfolio', this.portfolio);
-        this.saveData('simHistory', this.transactionHistory);
-
-        // Record performance
-        this.recordPerformance();
-
-        // Update UI
-        this.updateAccountInfo();
-        this.renderPortfolio();
-        this.renderTransactionHistory();
-        this.renderPerformanceChart();
-
-        // Reset form
-        document.getElementById('simQuantity').value = 1;
-        this.updateTradeInfo();
-
-        // Success message
-        const plText = profitLoss >= 0 ? 'Kar' : 'Zarar';
-        alert(`✅ ${quantity} adet ${stock.symbol} başarıyla satıldı!
-
-Alınan: ${this.formatPrice(saleProceeds, stock.market)}
-Komisyon: ${this.formatPrice(commission, stock.market)}
-${plText}: ${this.formatPrice(Math.abs(profitLoss), stock.market)}`);
-
-        this.log('✅ Sell executed successfully');
-    }
-
-    /**
-     * Record performance snapshot
-     */
-    recordPerformance() {
-        const now = Date.now();
-
-        // Only record once per hour to avoid excessive data
-        if (now - this.lastPerformanceRecord < 3600000) {
-            return;
-        }
-
-        this.lastPerformanceRecord = now;
-
-        // Calculate portfolio values
-        let usdValue = this.accounts.usd.balance;
-        let tryValue = this.accounts.try.balance;
-
-        this.portfolio.forEach(holding => {
-            const stock = this.findStock(holding.symbol);
-            if (stock && this.isValidPrice(stock.price)) {
-                const value = stock.price * holding.quantity;
-                if (this.getAccountKey(stock.market) === 'usd') {
-                    usdValue += value;
-                } else {
-                    tryValue += value;
-                }
+            if (this.currentAction === 'buy') {
+                transaction = this.orderManager.executeBuy(this.selectedStock, quantity, price);
+                this.showNotification(`✅ ${quantity} adet ${this.selectedStock.symbol} satın alındı`, 'success');
+            } else {
+                transaction = this.orderManager.executeSell(this.selectedStock, quantity, price);
+                this.showNotification(`✅ ${quantity} adet ${this.selectedStock.symbol} satıldı`, 'success');
             }
-        });
 
-        // Combined value for charting
-        const combinedValue = usdValue + (tryValue / this.exchangeRate);
+            // Add to history
+            this.historyManager.addTransaction(transaction);
 
-        this.performanceData.push({
-            date: new Date().toISOString(),
-            balance: combinedValue,
-            usd: usdValue,
-            try: tryValue
-        });
+            // Record performance
+            this.performanceTracker.recordPerformance(this.currentPrices);
 
-        // Keep only last 90 days
-        const ninetyDaysAgo = now - (90 * 24 * 60 * 60 * 1000);
-        this.performanceData = this.performanceData.filter(entry =>
-            new Date(entry.date).getTime() >= ninetyDaysAgo
-        );
+            // Update UI
+            this.updateUI();
 
-        this.saveData('simPerformance', this.performanceData);
+            // Reset form
+            if (quantityInput) quantityInput.value = '1';
+            this.updateTradeInfo();
+
+        } catch (error) {
+            console.error('Trade execution failed:', error);
+            alert('❌ ' + error.message);
+        }
     }
 
     /**
-     * Update account info panel
+     * Check and execute pending orders
+     */
+    checkPendingOrders() {
+        if (!this.isInitialized) return;
+
+        this.loadCurrentPrices();
+        const executed = this.orderManager.checkPendingOrders(this.currentPrices);
+
+        if (executed.length > 0) {
+            executed.forEach(transaction => {
+                this.historyManager.addTransaction(transaction);
+                this.showNotification(
+                    `✅ Emiriniz gerçekleşti: ${transaction.action === 'buy' ? 'ALIŞ' : 'SATIŞ'} ${transaction.quantity} ${transaction.symbol}`,
+                    'success'
+                );
+            });
+
+            this.performanceTracker.recordPerformance(this.currentPrices);
+            this.updateUI();
+        }
+    }
+
+    /**
+     * Update all UI elements
+     */
+    updateUI() {
+        this.loadCurrentPrices();
+        this.updateAccountInfo();
+        this.renderPortfolio();
+        this.renderHistory();
+        this.performanceTracker.renderChart();
+    }
+
+    /**
+     * Update account info display
      */
     updateAccountInfo() {
-        // Calculate portfolio values
-        let usdStockValue = 0;
-        let tryStockValue = 0;
+        const metrics = this.performanceTracker.getLatestMetrics(this.currentPrices);
 
-        this.portfolio.forEach(holding => {
-            const stock = this.findStock(holding.symbol);
-            if (stock && this.isValidPrice(stock.price)) {
-                const value = stock.price * holding.quantity;
-                if (this.getAccountKey(stock.market) === 'usd') {
-                    usdStockValue += value;
-                } else {
-                    tryStockValue += value;
+        // Update display elements
+        const elements = {
+            'simTotalBalance': Utils.formatCurrency(metrics.totalValue),
+            'simCash': Utils.formatCurrency(metrics.cashValue),
+            'simStockValue': Utils.formatCurrency(metrics.portfolioValue),
+            'simProfitLoss': `${Utils.formatCurrency(metrics.totalPL)} (${Utils.formatPercent(metrics.totalPLPercent)})`
+        };
+
+        Object.entries(elements).forEach(([id, value]) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = value;
+
+                // Add color class for P&L
+                if (id === 'simProfitLoss') {
+                    el.className = 'stat-value ' + (metrics.totalPL >= 0 ? 'positive' : 'negative');
                 }
             }
         });
-
-        // Calculate totals
-        const usdTotal = this.accounts.usd.balance + usdStockValue;
-        const tryTotal = this.accounts.try.balance + tryStockValue;
-
-        // Calculate P&L
-        const usdPL = usdTotal - this.initialBalances.usd;
-        const tryPL = tryTotal - this.initialBalances.try;
-        const usdPLPercent = (usdPL / this.initialBalances.usd) * 100;
-        const tryPLPercent = (tryPL / this.initialBalances.try) * 100;
-
-        // Update UI elements
-        this.updateElement('simTotalBalance', `$${usdTotal.toFixed(2)} / ₺${tryTotal.toFixed(2)}`);
-        this.updateElement('simCash', `$${this.accounts.usd.balance.toFixed(2)} / ₺${this.accounts.try.balance.toFixed(2)}`);
-        this.updateElement('simStockValue', `$${usdStockValue.toFixed(2)} / ₺${tryStockValue.toFixed(2)}`);
-
-        const plElement = document.getElementById('simProfitLoss');
-        if (plElement) {
-            const avgPLPercent = (usdPLPercent + tryPLPercent) / 2;
-            plElement.textContent = `$${usdPL.toFixed(2)} / ₺${tryPL.toFixed(2)} (${avgPLPercent >= 0 ? '+' : ''}${avgPLPercent.toFixed(2)}%)`;
-            plElement.style.color = avgPLPercent >= 0 ? '#10b981' : '#ef4444';
-        }
-
-        // Update balance in trade panel
-        this.updateElement('userBalance', `USD: $${this.accounts.usd.balance.toFixed(2)} | TRY: ₺${this.accounts.try.balance.toFixed(2)}`);
-    }
-
-    /**
-     * Helper to update element text
-     */
-    updateElement(id, text) {
-        const el = document.getElementById(id);
-        if (el) {
-            el.textContent = text;
-        }
     }
 
     /**
@@ -1027,64 +1537,57 @@ ${plText}: ${this.formatPrice(Math.abs(profitLoss), stock.market)}`);
         const container = document.getElementById('portfolioContainer');
         const emptyState = document.getElementById('emptyPortfolio');
 
-        if (this.portfolio.length === 0) {
-            if (container) container.style.display = 'none';
-            if (emptyState) emptyState.style.display = 'flex';
+        if (!container) return;
+
+        if (this.portfolioManager.holdings.length === 0) {
+            container.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'block';
             return;
         }
 
-        if (container) container.style.display = 'grid';
+        container.style.display = 'grid';
         if (emptyState) emptyState.style.display = 'none';
 
-        if (!container) return;
-
-        container.innerHTML = this.portfolio.map(holding => {
-            const stock = this.findStock(holding.symbol);
-
-            const currentPrice = stock && this.isValidPrice(stock.price) ? stock.price : 0;
-            const currentValue = currentPrice * holding.quantity;
-            const costBasis = holding.avgPrice * holding.quantity;
-            const profitLoss = currentValue - costBasis;
-            const profitLossPercent = costBasis > 0 ? (profitLoss / costBasis) * 100 : 0;
-
-            const priceDisplay = stock && this.isValidPrice(stock.price)
-                ? this.formatPrice(stock.price, stock.market)
-                : '❌ Veri Yok';
+        container.innerHTML = this.portfolioManager.holdings.map(holding => {
+            const currentPrice = this.currentPrices[holding.symbol] || holding.avgPrice;
+            const value = holding.quantity * currentPrice;
+            const pl = (currentPrice - holding.avgPrice) * holding.quantity;
+            const plPercent = ((currentPrice - holding.avgPrice) / holding.avgPrice) * 100;
+            const currency = this.accountManager.getCurrencyForMarket(holding.market);
 
             return `
-                <div class="portfolio-card">
+                <div class="portfolio-item">
                     <div class="portfolio-header">
                         <div>
-                            <h3>${holding.symbol}</h3>
-                            <p class="portfolio-name">${holding.name}</p>
+                            <strong>${holding.symbol}</strong>
+                            <span class="market-badge">${holding.market}</span>
                         </div>
-                        <button class="btn-small btn-danger" onclick="simulator.quickSell('${holding.symbol}')">
-                            <i class="fas fa-minus"></i> Sat
-                        </button>
+                        <div class="portfolio-value">${Utils.formatCurrency(value, currency)}</div>
                     </div>
-                    <div class="portfolio-stats">
-                        <div class="stat">
-                            <span class="label">Adet</span>
-                            <span class="value">${holding.quantity}</span>
+                    <div class="portfolio-details">
+                        <div class="detail-row">
+                            <span>Adet:</span>
+                            <span>${holding.quantity}</span>
                         </div>
-                        <div class="stat">
-                            <span class="label">Ort. Maliyet</span>
-                            <span class="value">${this.formatPrice(holding.avgPrice, holding.market)}</span>
+                        <div class="detail-row">
+                            <span>Ort. Fiyat:</span>
+                            <span>${Utils.formatCurrency(holding.avgPrice, currency)}</span>
                         </div>
-                        <div class="stat">
-                            <span class="label">Güncel Fiyat</span>
-                            <span class="value">${priceDisplay}</span>
+                        <div class="detail-row">
+                            <span>Güncel Fiyat:</span>
+                            <span>${Utils.formatCurrency(currentPrice, currency)}</span>
                         </div>
-                        <div class="stat">
-                            <span class="label">Toplam Değer</span>
-                            <span class="value">${this.formatPrice(currentValue, holding.market)}</span>
-                        </div>
-                        <div class="stat">
-                            <span class="label">Kar/Zarar</span>
-                            <span class="value ${profitLoss >= 0 ? 'positive' : 'negative'}">
-                                ${this.formatPrice(Math.abs(profitLoss), holding.market)} (${profitLossPercent >= 0 ? '+' : ''}${profitLossPercent.toFixed(2)}%)
+                        <div class="detail-row">
+                            <span>Kar/Zarar:</span>
+                            <span class="${pl >= 0 ? 'positive' : 'negative'}">
+                                ${Utils.formatCurrency(pl, currency)} (${Utils.formatPercent(plPercent)})
                             </span>
                         </div>
+                    </div>
+                    <div class="portfolio-actions">
+                        <button class="btn-small btn-primary" onclick="simulator.quickSell('${holding.symbol}')">
+                            <i class="fas fa-chart-line"></i> Sat
+                        </button>
                     </div>
                 </div>
             `;
@@ -1092,309 +1595,159 @@ ${plText}: ${this.formatPrice(Math.abs(profitLoss), stock.market)}`);
     }
 
     /**
+     * Render transaction history
+     */
+    renderHistory() {
+        const tbody = document.getElementById('historyTableBody');
+        if (!tbody) return;
+
+        if (this.historyManager.transactions.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Henüz işlem yapmadınız</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = this.historyManager.transactions.slice(0, 50).map(t => `
+            <tr>
+                <td>${Utils.formatDate(t.timestamp)}</td>
+                <td><span class="badge ${t.action === 'buy' ? 'badge-success' : 'badge-danger'}">${t.action === 'buy' ? 'ALIŞ' : 'SATIŞ'}</span></td>
+                <td><strong>${t.symbol}</strong><br><small>${t.name}</small></td>
+                <td>${t.quantity}</td>
+                <td>${Utils.formatCurrency(t.price, t.currency)}</td>
+                <td>${Utils.formatCurrency(t.total, t.currency)}</td>
+                <td class="${t.realizedPL ? (t.realizedPL >= 0 ? 'positive' : 'negative') : ''}">
+                    ${t.realizedPL ? Utils.formatCurrency(t.realizedPL, t.currency) : '-'}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    /**
      * Quick sell from portfolio
      */
     quickSell(symbol) {
-        const holding = this.portfolio.find(p => p.symbol === symbol);
+        const holding = this.portfolioManager.getHolding(symbol);
         if (!holding) return;
 
-        if (!confirm(`${holding.quantity} adet ${symbol} satmak istiyor musunuz?`)) {
+        const stock = window.marketsManager?.stocks[symbol];
+        if (!stock) {
+            alert('❌ Hisse bilgisi bulunamadı');
             return;
         }
 
-        // Pre-fill sell form
-        document.getElementById('simStockSelect').value = symbol;
-        document.getElementById('simQuantity').value = holding.quantity;
-        this.currentAction = 'sell';
+        const quantity = prompt(`${symbol} hissesinden kaç adet satmak istiyorsunuz?\n\nMevcut: ${holding.quantity} adet`, holding.quantity);
+        if (!quantity) return;
 
-        // Update UI
-        document.querySelectorAll('.btn-toggle').forEach(b => b.classList.remove('active'));
-        const sellBtn = document.querySelector('.btn-toggle[data-action="sell"]');
-        if (sellBtn) {
-            sellBtn.classList.add('active');
-        }
-
-        this.onStockSelect({ target: { value: symbol } });
-
-        // Scroll to trade panel
-        document.getElementById('tradePanel')?.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    /**
-     * Render transaction history
-     */
-    renderTransactionHistory() {
-        const tbody = document.querySelector('#historyTable tbody');
-        if (!tbody) return;
-
-        if (this.transactionHistory.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 2rem; color: #94a3b8;">
-                        Henüz işlem yapılmadı
-                    </td>
-                </tr>
-            `;
+        const qty = parseInt(quantity);
+        if (!Utils.isValidQuantity(qty)) {
+            alert('❌ Geçersiz adet');
             return;
         }
 
-        tbody.innerHTML = this.transactionHistory.map(tx => {
-            const date = new Date(tx.date).toLocaleString('tr-TR');
-            const action = tx.action === 'buy' ? 'ALIM' : 'SATIM';
-            const actionClass = tx.action === 'buy' ? 'buy' : 'sell';
-
-            return `
-                <tr>
-                    <td>${date}</td>
-                    <td><span class="action-badge ${actionClass}">${action}</span></td>
-                    <td><strong>${tx.symbol}</strong></td>
-                    <td>${tx.quantity}</td>
-                    <td>${this.formatPrice(tx.price, tx.market)}</td>
-                    <td>${this.formatPrice(tx.total, tx.market)}</td>
-                    <td>${this.formatPrice(tx.commission, tx.market)}</td>
-                    <td>${tx.profitLoss !== undefined
-                        ? `<span class="${tx.profitLoss >= 0 ? 'positive' : 'negative'}">${this.formatPrice(Math.abs(tx.profitLoss), tx.market)}</span>`
-                        : '-'
-                    }</td>
-                </tr>
-            `;
-        }).join('');
+        try {
+            const price = this.currentPrices[symbol] || stock.price;
+            const transaction = this.orderManager.executeSell(stock, qty, price);
+            this.historyManager.addTransaction(transaction);
+            this.performanceTracker.recordPerformance(this.currentPrices);
+            this.updateUI();
+            this.showNotification(`✅ ${qty} adet ${symbol} satıldı`, 'success');
+        } catch (error) {
+            alert('❌ ' + error.message);
+        }
     }
 
     /**
-     * Render performance chart
-     */
-    renderPerformanceChart() {
-        const canvas = document.getElementById('performanceChart');
-        if (!canvas) return;
-
-        // Destroy existing chart
-        if (this.performanceChart) {
-            this.performanceChart.destroy();
-            this.performanceChart = null;
-        }
-
-        const ctx = canvas.getContext('2d');
-        const labels = this.performanceData.map((d, i) => i + 1);
-        const data = this.performanceData.map(d => d.balance);
-
-        // Initial combined balance
-        const initialTotal = this.initialBalances.usd + (this.initialBalances.try / this.exchangeRate);
-
-        // Add initial point if empty
-        if (data.length === 0) {
-            data.push(initialTotal);
-            labels.push('Start');
-        }
-
-        const finalValue = data[data.length - 1];
-        const isProfit = finalValue >= initialTotal;
-
-        this.performanceChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Portföy Değeri (USD equiv.)',
-                    data: data,
-                    borderColor: isProfit ? '#10b981' : '#ef4444',
-                    backgroundColor: isProfit ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: { color: '#cbd5e1' }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return 'Değer: $' + context.parsed.y.toFixed(2);
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: { color: '#94a3b8' },
-                        grid: { color: '#334155' }
-                    },
-                    y: {
-                        ticks: {
-                            color: '#94a3b8',
-                            callback: function(value) {
-                                return '$' + value.toFixed(0);
-                            }
-                        },
-                        grid: { color: '#334155' }
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * Update performance chart with period filter
-     */
-    updatePerformanceChart(period) {
-        // Filter data
-        let filteredData = this.performanceData;
-
-        if (period !== 'all') {
-            const days = parseInt(period);
-            const cutoffDate = new Date();
-            cutoffDate.setDate(cutoffDate.getDate() - days);
-
-            filteredData = this.performanceData.filter(entry =>
-                new Date(entry.date) >= cutoffDate
-            );
-        }
-
-        // Temporarily replace data
-        const originalData = this.performanceData;
-        this.performanceData = filteredData;
-
-        // Re-render
-        this.renderPerformanceChart();
-
-        // Restore original data
-        this.performanceData = originalData;
-    }
-
-    /**
-     * Reset account
-     */
-    resetAccount() {
-        if (!confirm('Hesabınızı sıfırlamak istediğinize emin misiniz?\n\nTüm işlemler ve portföy silinecek!')) {
-            return;
-        }
-
-        // Reset accounts
-        this.accounts = {
-            usd: { balance: this.initialBalances.usd, currency: 'USD', symbol: '$' },
-            try: { balance: this.initialBalances.try, currency: 'TRY', symbol: '₺' }
-        };
-
-        this.portfolio = [];
-        this.transactionHistory = [];
-        this.performanceData = [];
-
-        // Clean up old data
-        localStorage.removeItem('simCash');
-
-        // Save new data
-        this.saveData('simAccounts', this.accounts);
-        this.saveData('simPortfolio', this.portfolio);
-        this.saveData('simHistory', this.transactionHistory);
-        this.saveData('simPerformance', this.performanceData);
-
-        // Update UI
-        this.updateAccountInfo();
-        this.renderPortfolio();
-        this.renderTransactionHistory();
-        this.renderPerformanceChart();
-
-        alert('✅ Hesap başarıyla sıfırlandı!\n\n💵 USD: $10,000\n💴 TRY: ₺300,000');
-    }
-
-    /**
-     * Export transaction history as CSV
+     * Export transaction history
      */
     exportHistory() {
-        if (this.transactionHistory.length === 0) {
-            alert('⚠️ İşlem geçmişi boş!');
-            return;
-        }
-
-        const csv = this.transactionHistory.map(tx => {
-            const currency = this.getAccount(tx.market).currency;
-            return [
-                new Date(tx.date).toLocaleString('tr-TR'),
-                tx.action === 'buy' ? 'ALIM' : 'SATIM',
-                tx.symbol,
-                tx.name,
-                currency,
-                tx.market,
-                tx.quantity,
-                tx.price.toFixed(2),
-                tx.total.toFixed(2),
-                tx.commission.toFixed(2),
-                (tx.profitLoss || 0).toFixed(2)
-            ].join(',');
-        });
-
-        csv.unshift('Tarih,İşlem,Sembol,Hisse,Para Birimi,Piyasa,Adet,Fiyat,Toplam,Komisyon,Kar/Zarar');
-
-        const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const csv = this.historyManager.exportToCSV();
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `islem-gecmisi-${new Date().toISOString().split('T')[0]}.csv`;
         link.click();
 
-        this.log('✅ Transaction history exported');
+        this.showNotification('✅ İşlem geçmişi indirildi', 'success');
     }
 
     /**
-     * Show tutorial
+     * Reset simulator
      */
-    showTutorial() {
-        const modal = document.getElementById('tutorialModal');
-        if (modal) {
-            modal.style.display = 'flex';
+    resetSimulator() {
+        if (!confirm('⚠️ Tüm simulator verilerini sıfırlamak istediğinize emin misiniz?\n\nBu işlem geri alınamaz!')) {
+            return;
         }
+
+        this.accountManager.reset();
+        this.portfolioManager.reset();
+        this.orderManager.reset();
+        this.historyManager.reset();
+        this.performanceTracker.reset();
+
+        this.updateUI();
+        this.showNotification('✅ Simulator sıfırlandı', 'success');
+
+        console.log('Simulator reset complete');
+    }
+
+    /**
+     * Show notification
+     */
+    showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `simulator-notification ${type}`;
+        notification.textContent = message;
+
+        // Add to body
+        document.body.appendChild(notification);
+
+        // Trigger animation
+        setTimeout(() => notification.classList.add('show'), 10);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 }
 
-// ===================================
-// INITIALIZATION
-// ===================================
+// ================================================================================
+// GLOBAL INITIALIZATION
+// ================================================================================
 
-let simulator = null;
+// Prevent multiple initialization
+let simulatorInstance = null;
 let simulatorInitialized = false;
 
+/**
+ * Initialize simulator (called from HTML)
+ */
 function initSimulator() {
-    // Prevent multiple initialization
     if (simulatorInitialized) {
-        console.log('⚠️ Simulator already initialized, skipping...');
+        console.log('⚠️ Simulator already initialized');
         return;
     }
 
-    // Wait for marketsManager
-    if (!window.marketsManager) {
-        console.log('⏳ Waiting for marketsManager...');
-        setTimeout(initSimulator, 100);
-        return;
+    try {
+        simulatorInitialized = true;
+        simulatorInstance = new TradingSimulator();
+        simulatorInstance.init();
+
+        // Export to window for inline event handlers
+        window.simulator = simulatorInstance;
+
+        console.log('✅ Professional Trading Simulator v3.0 initialized');
+    } catch (error) {
+        console.error('❌ Simulator initialization failed:', error);
+        simulatorInitialized = false;
     }
-
-    simulatorInitialized = true;
-
-    // Create simulator instance
-    simulator = new TradingSimulator();
-    simulator.init();
-
-    // Export to window for onclick handlers
-    window.simulator = simulator;
-
-    console.log('✅ Trading Simulator V2 initialized successfully');
 }
 
-// Start when DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('📊 Initializing Trading Simulator V2...');
-    initSimulator();
-});
-
-// Also try to init when simulator page becomes active
-document.addEventListener('click', (e) => {
-    if (e.target.matches('[data-page="simulator"]') && !simulatorInitialized) {
-        console.log('🔄 Simulator page activated, initializing...');
-        initSimulator();
-    }
-});
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSimulator);
+} else {
+    // DOM already loaded
+    setTimeout(initSimulator, 100);
+}
