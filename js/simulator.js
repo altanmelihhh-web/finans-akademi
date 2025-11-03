@@ -1039,9 +1039,19 @@ class PerformanceTracker {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
 
-        // Destroy existing chart
+        // Destroy ALL existing charts on this canvas
+        const existingChart = Chart.getChart(canvas);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        // Also destroy our reference
         if (this.chart) {
-            this.chart.destroy();
+            try {
+                this.chart.destroy();
+            } catch (e) {
+                // Ignore if already destroyed
+            }
             this.chart = null;
         }
 
@@ -1336,7 +1346,12 @@ class TradingSimulator {
         // Execute trade button
         const executeBtn = document.getElementById('executeTradeBtn');
         if (executeBtn) {
-            executeBtn.addEventListener('click', () => this.executeTrade());
+            // Remove any existing listeners by cloning
+            const newExecuteBtn = executeBtn.cloneNode(true);
+            executeBtn.parentNode.replaceChild(newExecuteBtn, executeBtn);
+
+            // Add fresh listener
+            newExecuteBtn.addEventListener('click', () => this.executeTrade());
         }
 
         // Reset button
