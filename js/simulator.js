@@ -1267,6 +1267,11 @@ class TradingSimulator {
                 const stocksWithPrices = stocksArray.filter(s => s && s.price && s.price > 0).length;
                 const totalStocks = stocksArray.length;
 
+                // Debug: Show sample stock
+                if (attempts === 1 && stocksArray.length > 0) {
+                    console.log('📋 Sample stock:', stocksArray[0]);
+                }
+
                 console.log(`⏳ Waiting for prices... ${stocksWithPrices}/${totalStocks} stocks have prices`);
 
                 // Wait until at least 50% of stocks have prices, or timeout
@@ -1494,6 +1499,12 @@ class TradingSimulator {
         const quantityInput = document.getElementById('simQuantity');
         const quantity = parseInt(quantityInput?.value || 0);
 
+        console.log('🔍 executeTrade() called:');
+        console.log('  - Input value:', quantityInput?.value);
+        console.log('  - Parsed quantity:', quantity);
+        console.log('  - Action:', this.currentAction);
+        console.log('  - Stock:', this.selectedStock.symbol);
+
         if (!Utils.isValidQuantity(quantity)) {
             alert('❌ Geçersiz adet! 1 ile ' + SIMULATOR_CONFIG.LIMITS.MAX_QUANTITY + ' arasında bir sayı girin.');
             return;
@@ -1501,14 +1512,21 @@ class TradingSimulator {
 
         const price = this.currentPrices[this.selectedStock.symbol] || this.selectedStock.price;
 
+        console.log('  - Price:', price);
+        console.log('  - Total cost:', quantity * price);
+
         try {
             let transaction;
 
             if (this.currentAction === 'buy') {
+                console.log('💰 Executing BUY:', quantity, 'shares at', price);
                 transaction = this.orderManager.executeBuy(this.selectedStock, quantity, price);
+                console.log('✅ BUY transaction:', transaction);
                 this.showNotification(`✅ ${quantity} adet ${this.selectedStock.symbol} satın alındı`, 'success');
             } else {
+                console.log('💸 Executing SELL:', quantity, 'shares at', price);
                 transaction = this.orderManager.executeSell(this.selectedStock, quantity, price);
+                console.log('✅ SELL transaction:', transaction);
                 this.showNotification(`✅ ${quantity} adet ${this.selectedStock.symbol} satıldı`, 'success');
             }
 
