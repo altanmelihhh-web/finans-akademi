@@ -25,6 +25,9 @@ class TradingSimulator {
 
         // Backward compatibility: migrate old single-currency data
         this.migrateOldData();
+
+        // Log accounts for debugging
+        console.log('💳 Accounts initialized:', this.accounts);
     }
 
     loadData(key, defaultValue) {
@@ -355,8 +358,20 @@ class TradingSimulator {
             const accountKey = this.getAccountKey(stock.market);
             const account = this.accounts[accountKey];
 
+            console.log('💰 Buy check:', {
+                symbol: symbol,
+                market: stock.market,
+                accountKey: accountKey,
+                accountBalance: account.balance,
+                total: total,
+                sufficient: account.balance >= total
+            });
+
             if (account.balance < total) {
-                alert(`Yetersiz ${account.currency} bakiye! İşlem gerçekleştirilemedi.`);
+                alert(`Yetersiz ${account.currency} bakiye!
+
+Gerekli: ${this.formatPrice(total, stock.market)}
+Mevcut: ${this.formatPrice(account.balance, stock.market)}`);
                 return;
             }
 
@@ -398,8 +413,20 @@ class TradingSimulator {
         } else {
             // SELL
             const holding = this.portfolio.find(p => p.symbol === symbol);
+
+            console.log('📤 Sell check:', {
+                symbol: symbol,
+                holding: holding,
+                requestedQuantity: quantity,
+                availableQuantity: holding?.quantity,
+                sufficient: holding && holding.quantity >= quantity
+            });
+
             if (!holding || holding.quantity < quantity) {
-                alert('Yetersiz hisse! Satış gerçekleştirilemedi.');
+                alert(`Yetersiz hisse! Satış gerçekleştirilemedi.
+
+Portföyünüzde: ${holding ? holding.quantity : 0} adet
+İstenen: ${quantity} adet`);
                 return;
             }
 
