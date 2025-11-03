@@ -22,8 +22,8 @@ window.FINANS_CONFIG = {
      * Feature Flags - Hangi varlık sınıflarını gösterelim?
      */
     features: {
-        showTEFAS: true,   // TEFAS fonlarını göster - Statik JSON'dan
-        showBES: true,     // BES fonlarını göster - Statik JSON'dan
+        showTEFAS: false,  // TEFAS - Kapalı (API erişim sorunu)
+        showBES: false,    // BES - Kapalı (API erişim sorunu)
         showUS: true,      // US hisselerini göster
         showBIST: true     // BIST hisselerini göster
     },
