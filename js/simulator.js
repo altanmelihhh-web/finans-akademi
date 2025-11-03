@@ -664,14 +664,30 @@ Portföyünüzde: ${holding ? holding.quantity : 0} adet
     }
 
     recordPerformance() {
-        const totalBalance = this.cash + this.portfolio.reduce((sum, holding) => {
+        // Calculate total portfolio value in USD equivalent for charting
+        let totalUSDValue = this.accounts.usd.balance;
+        let totalTRYValue = this.accounts.try.balance;
+
+        this.portfolio.forEach(holding => {
             const stock = marketsManager?.stocks.find(s => s.symbol === holding.symbol);
-            return sum + (stock ? stock.price * holding.quantity : 0);
-        }, 0);
+            if (stock && stock.price) {
+                const value = stock.price * holding.quantity;
+                if (stock.market === 'bist') {
+                    totalTRYValue += value;
+                } else {
+                    totalUSDValue += value;
+                }
+            }
+        });
+
+        // For charting, convert to a single value (use USD + TRY/30 as approximation)
+        const approximateUSDTotal = totalUSDValue + (totalTRYValue / 30);
 
         this.performanceData.push({
             date: new Date().toISOString(),
-            balance: totalBalance
+            balance: approximateUSDTotal,
+            usd: totalUSDValue,
+            try: totalTRYValue
         });
 
         // Keep only last 90 days
@@ -683,19 +699,25 @@ Portföyünüzde: ${holding ? holding.quantity : 0} adet
     }
 
     renderPerformanceChart() {
-        const ctx = document.getElementById('performanceChart');
-        if (!ctx) return;
+        const canvas = document.getElementById('performanceChart');
+        if (!canvas) return;
 
+        // Destroy existing chart if it exists
         if (this.performanceChart) {
             this.performanceChart.destroy();
+            this.performanceChart = null;
         }
 
+        const ctx = canvas.getContext('2d');
         const labels = this.performanceData.map((d, i) => i + 1);
         const data = this.performanceData.map(d => d.balance);
 
+        // Initial total in USD equivalent (10000 USD + 300000 TRY / 30)
+        const initialTotal = this.initialBalances.usd + (this.initialBalances.try / 30);
+
         // Add initial balance if empty
         if (data.length === 0) {
-            data.push(this.initialBalance);
+            data.push(initialTotal);
             labels.push(1);
         }
 
@@ -704,10 +726,10 @@ Portföyünüzde: ${holding ? holding.quantity : 0} adet
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Portföy Değeri',
+                    label: 'Portföy Değeri (USD equiv.)',
                     data: data,
-                    borderColor: data[data.length - 1] >= this.initialBalance ? '#10b981' : '#ef4444',
-                    backgroundColor: data[data.length - 1] >= this.initialBalance ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    borderColor: data[data.length - 1] >= initialTotal ? '#10b981' : '#ef4444',
+                    backgroundColor: data[data.length - 1] >= initialTotal ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                     borderWidth: 2,
                     fill: true,
                     tension: 0.4
