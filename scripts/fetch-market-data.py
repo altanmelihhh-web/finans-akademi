@@ -118,18 +118,18 @@ def generate_bes_mock_data():
     ]
 
     base_prices = {
-        'AAK': 0.1834, 'AEG': 0.2145, 'GAG': 0.1956, 'HEM': 0.2234,
-        'IAG': 0.1789, 'VAG': 0.2012, 'YAG': 0.1923, 'ZAG': 0.2087,
-        'AHD': 0.1645, 'AYE': 0.1534, 'AKD': 0.1723, 'GDN': 0.1612,
-        'HDN': 0.1567, 'IDN': 0.1698, 'VDN': 0.1589, 'YDE': 0.1634, 'ZDE': 0.1701,
-        'AKH': 0.2345, 'GHH': 0.2456, 'IHE': 0.2123
+        'AAK': 183.4, 'AEG': 214.5, 'GAG': 195.6, 'HEM': 223.4,
+        'IAG': 178.9, 'VAG': 201.2, 'YAG': 192.3, 'ZAG': 208.7,
+        'AHD': 164.5, 'AYE': 153.4, 'AKD': 172.3, 'GDN': 161.2,
+        'HDN': 156.7, 'IDN': 169.8, 'VDN': 158.9, 'YDE': 163.4, 'ZDE': 170.1,
+        'AKH': 234.5, 'GHH': 245.6, 'IHE': 212.3
     }
 
     results = []
     print(f"📊 Generating {len(bes_funds)} BES funds (mock data)...")
 
     for fund_code in bes_funds:
-        base_price = base_prices.get(fund_code, 0.15)
+        base_price = base_prices.get(fund_code, 150.0)
         # Simulate daily change: -1% to +1%
         import random
         daily_change = (random.random() - 0.5) * 2
@@ -137,8 +137,8 @@ def generate_bes_mock_data():
 
         results.append({
             'code': fund_code,
-            'price': round(current_price, 4),
-            'previousPrice': round(base_price, 4),
+            'price': round(current_price, 2),
+            'previousPrice': round(base_price, 2),
             'change': round(daily_change, 2),
             'name': f'{fund_code} Emeklilik Yatırım Fonu',
             'date': datetime.now().strftime('%Y-%m-%d')
