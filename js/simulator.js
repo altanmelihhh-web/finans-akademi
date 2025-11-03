@@ -39,11 +39,38 @@ class TradingSimulator {
         this.performanceChart = null;
         this.lastPerformanceRecord = 0; // Timestamp to prevent over-recording
 
+        // Debug mode (set to false in production)
+        this.debug = false; // PRODUCTION MODE
+
+        // Check version and auto-reset if old data
+        this.checkAndMigrateVersion();
+
         // Load data with validation
         this.loadAllData();
+    }
 
-        // Debug mode (set to false in production)
-        this.debug = true;
+    /**
+     * Check version and migrate
+     */
+    checkAndMigrateVersion() {
+        const currentVersion = '2.0';
+        const storedVersion = localStorage.getItem('simulatorVersion');
+
+        if (storedVersion !== currentVersion) {
+            console.log('🔄 Simulator V2.0 - Resetting all data...');
+
+            // Clear ALL old data
+            localStorage.removeItem('simCash');
+            localStorage.removeItem('simAccounts');
+            localStorage.removeItem('simPortfolio');
+            localStorage.removeItem('simHistory');
+            localStorage.removeItem('simPerformance');
+
+            // Set version
+            localStorage.setItem('simulatorVersion', currentVersion);
+
+            console.log('✅ Data reset for V2.0');
+        }
     }
 
     /**
@@ -1330,14 +1357,23 @@ ${plText}: ${this.formatPrice(Math.abs(profitLoss), stock.market)}`);
 // ===================================
 
 let simulator = null;
+let simulatorInitialized = false;
 
 function initSimulator() {
+    // Prevent multiple initialization
+    if (simulatorInitialized) {
+        console.log('⚠️ Simulator already initialized, skipping...');
+        return;
+    }
+
     // Wait for marketsManager
     if (!window.marketsManager) {
         console.log('⏳ Waiting for marketsManager...');
         setTimeout(initSimulator, 100);
         return;
     }
+
+    simulatorInitialized = true;
 
     // Create simulator instance
     simulator = new TradingSimulator();
@@ -1357,7 +1393,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Also try to init when simulator page becomes active
 document.addEventListener('click', (e) => {
-    if (e.target.matches('[data-page="simulator"]') && !simulator) {
+    if (e.target.matches('[data-page="simulator"]') && !simulatorInitialized) {
         console.log('🔄 Simulator page activated, initializing...');
         initSimulator();
     }
