@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simulator Verilerini Temizle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1e293b;
+            color: white;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #dc2626;
+        }
+        .success {
+            background: #10b981;
+        }
+        .success:hover {
+            background: #059669;
+        }
+        pre {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧹 Simulator Verilerini Temizle</h1>
+
+    <h2>Mevcut Veriler:</h2>
+    <pre id="currentData">Yükleniyor...</pre>
+
+    <h2>İşlemler:</h2>
+    <button onclick="clearAll()">🗑️ Tüm Simulator Verilerini Sil</button>
+    <button onclick="resetToDefaults()" class="success">♻️ Varsayılana Sıfırla</button>
+    <button onclick="location.href='index.html'" class="success">↩️ Ana Sayfaya Dön</button>
+
+    <div id="result" style="margin-top: 20px;"></div>
+
+    <script>
+        function showCurrentData() {
+            const data = {
+                simAccounts: localStorage.getItem('simAccounts'),
+                simPortfolio: localStorage.getItem('simPortfolio'),
+                simHistory: localStorage.getItem('simHistory'),
+                simPerformance: localStorage.getItem('simPerformance'),
+                simCash: localStorage.getItem('simCash'), // Eski format
+            };
+
+            document.getElementById('currentData').textContent = JSON.stringify(data, null, 2);
+        }
+
+        function clearAll() {
+            if (!confirm('Tüm simulator verilerini silmek istediğinize emin misiniz?')) {
+                return;
+            }
+
+            localStorage.removeItem('simAccounts');
+            localStorage.removeItem('simPortfolio');
+            localStorage.removeItem('simHistory');
+            localStorage.removeItem('simPerformance');
+            localStorage.removeItem('simCash');
+
+            document.getElementById('result').innerHTML = '<p style="color: #10b981;">✅ Tüm veriler silindi!</p>';
+            showCurrentData();
+        }
+
+        function resetToDefaults() {
+            const defaultAccounts = {
+                usd: { balance: 10000, currency: 'USD', symbol: '$' },
+                try: { balance: 300000, currency: 'TRY', symbol: '₺' }
+            };
+
+            // Clear old data
+            localStorage.removeItem('simCash');
+
+            // Set new data
+            localStorage.setItem('simAccounts', JSON.stringify(defaultAccounts));
+            localStorage.setItem('simPortfolio', JSON.stringify([]));
+            localStorage.setItem('simHistory', JSON.stringify([]));
+            localStorage.setItem('simPerformance', JSON.stringify([]));
+
+            document.getElementById('result').innerHTML = `
+                <p style="color: #10b981;">✅ Varsayılan değerlere sıfırlandı!</p>
+                <p>💵 USD: $10,000</p>
+                <p>💴 TRY: ₺300,000</p>
+                <p>📊 Portföy: Boş</p>
+                <p>📜 İşlem Geçmişi: Boş</p>
+            `;
+            showCurrentData();
+        }
+
+        // Show current data on load
+        showCurrentData();
+    </script>
+</body>
+</html>
