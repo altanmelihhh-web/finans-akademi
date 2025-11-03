@@ -360,8 +360,10 @@ class MarketDataPro {
 
             // Final render and update of Winners/Losers
             if (window.marketsManager) {
-                if (typeof window.marketsManager.renderStocks === 'function') {
-                    window.marketsManager.renderStocks();
+                // CRITICAL: Reload stocks from updated STOCKS_DATA
+                if (typeof window.marketsManager.loadStocks === 'function') {
+                    console.log('   🔄 Reloading marketsManager after TEFAS/BES update...');
+                    await window.marketsManager.loadStocks();
                 }
                 if (typeof window.marketsManager.updateStats === 'function') {
                     window.marketsManager.updateStats();
