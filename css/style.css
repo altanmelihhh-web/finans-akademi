@@ -5915,8 +5915,8 @@ footer i {
     border-radius: 16px;
     padding: 24px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
 }
 
 .account-stat {

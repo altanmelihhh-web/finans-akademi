@@ -1509,12 +1509,13 @@ class TradingSimulator {
     updateAccountInfo() {
         const metrics = this.performanceTracker.getLatestMetrics(this.currentPrices);
 
-        // Update display elements
+        // Update display elements - now with separate USD and TRY balances
         const elements = {
-            'simTotalBalance': Utils.formatCurrency(metrics.totalValue),
-            'simCash': Utils.formatCurrency(metrics.cashValue),
-            'simStockValue': Utils.formatCurrency(metrics.portfolioValue),
-            'simProfitLoss': `${Utils.formatCurrency(metrics.totalPL)} (${Utils.formatPercent(metrics.totalPLPercent)})`
+            'simUsdBalance': Utils.formatCurrency(this.accountManager.accounts.USD.balance, 'USD'),
+            'simTryBalance': Utils.formatCurrency(this.accountManager.accounts.TRY.balance, 'TRY'),
+            'simTotalBalance': Utils.formatCurrency(metrics.totalValue, 'USD'),
+            'simStockValue': Utils.formatCurrency(metrics.portfolioValue, 'USD'),
+            'simProfitLoss': `${Utils.formatCurrency(metrics.totalPL, 'USD')} (${Utils.formatPercent(metrics.totalPLPercent)})`
         };
 
         Object.entries(elements).forEach(([id, value]) => {
