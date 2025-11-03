@@ -9870,7 +9870,7 @@ Pasif gelirin: 25.000 TL
                         <i class="fas fa-briefcase" style="font-size: 4rem; opacity: 0.3;"></i>
                         <h3>Portföyünüz boş</h3>
                         <p>İlk hisse alımınızı yapın</p>
-                        <button class="btn-primary" onclick="document.querySelector('[data-page=markets]').click()">
+                        <button class="btn-primary" onclick="document.getElementById('simStockSelect')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); document.getElementById('simStockSelect')?.focus();">
                             <i class="fas fa-shopping-cart"></i> Hisse Satın Al
                         </button>
                     </div>

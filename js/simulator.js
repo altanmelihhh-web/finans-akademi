@@ -155,9 +155,18 @@ class TradingSimulator {
         // Source 2: STOCKS_DATA (fallback)
         else if (window.STOCKS_DATA) {
             const data = window.STOCKS_DATA;
+            const features = window.FINANS_CONFIG?.features || {
+                showUS: true,
+                showBIST: true,
+                showTEFAS: false,
+                showBES: false
+            };
+
             stocks = [
-                ...data.us_stocks.map(s => ({ ...s, market: 'us' })),
-                ...data.bist_stocks.map(s => ({ ...s, market: 'bist' }))
+                ...(features.showUS ? data.us_stocks.map(s => ({ ...s, market: 'us' })) : []),
+                ...(features.showBIST ? data.bist_stocks.map(s => ({ ...s, market: 'bist' })) : []),
+                ...(features.showTEFAS ? (data.tefas_funds || []).map(s => ({ ...s, market: 'tefas' })) : []),
+                ...(features.showBES ? (data.bes_funds || []).map(s => ({ ...s, market: 'bes' })) : [])
             ];
             console.log('📊 Loaded stocks from STOCKS_DATA:', stocks.length);
         }
@@ -174,21 +183,33 @@ class TradingSimulator {
             return;
         }
 
+        // Filter out stocks with no price (still loading)
+        const stocksWithPrices = stocks.filter(s => s.price && s.price > 0);
+
+        if (stocksWithPrices.length === 0) {
+            select.innerHTML = '<option value="">Fiyatlar yükleniyor...</option>';
+            console.log('⏳ Stocks loaded but prices not ready yet, retrying...');
+            // Retry after 1 second
+            setTimeout(() => this.loadStocksToSelect(), 1000);
+            return;
+        }
+
         // Format price function
         const formatPrice = (price, market) => {
-            if (!price || price === 0) return 'Fiyat yükleniyor...';
-            if (market === 'bist') return `${price.toFixed(2)} TL`;
+            if (market === 'bist' || market === 'tefas' || market === 'bes') {
+                return `₺${price.toFixed(2)}`;
+            }
             return `$${price.toFixed(2)}`;
         };
 
-        // Populate select with stocks
+        // Populate select with stocks that have prices
         select.innerHTML = '<option value="">-- Hisse Seçin --</option>' +
-            stocks.map(s => {
+            stocksWithPrices.map(s => {
                 const priceText = formatPrice(s.price, s.market);
                 return `<option value="${s.symbol}">${s.symbol} - ${s.name} (${priceText})</option>`;
             }).join('');
 
-        console.log(`✅ Loaded ${stocks.length} stocks to simulator select`);
+        console.log(`✅ Loaded ${stocksWithPrices.length} stocks with prices to simulator select`);
     }
 
     // Helper: Find stock from multiple sources
