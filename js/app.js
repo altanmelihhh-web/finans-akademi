@@ -157,13 +157,12 @@ function initMarketData() {
 }
 
 function updateMarketData() {
-    // ⚠️ STATIC DATA REMOVED!
-    // unified-market-data.js now handles ALL market data with real APIs
-    // DO NOT add static data here - it will overwrite API data!
+    // market-data-pro.js handles all market data including TEFAS/BES from static JSON
+    // This function is kept for compatibility but does minimal work
 
-    console.log('ℹ️ updateMarketData() - Skipping static data (using API data from unified-market-data.js)');
+    console.log('ℹ️ updateMarketData() - Delegating to market-data-pro.js');
 
-    // Update winners and losers
+    // Update winners and losers (this will be updated by market-data-pro.js)
     updateWinnersLosers();
 }
 
