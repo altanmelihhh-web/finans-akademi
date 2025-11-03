@@ -6,43 +6,24 @@
 
 window.FINANS_CONFIG = {
     /**
-     * TEFAS API Configuration
-     *
-     * Option 1: Direct API (CORS sorunu olabilir)
-     * url: 'https://ws.tefas.gov.tr/bultenapi/PortfolioInfo'
-     *
-     * Option 2: Cloudflare Worker Proxy (Önerilen)
-     * url: 'https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev/tefas'
-     *
-     * Cloudflare Worker nasıl deploy edilir:
-     * cloudflare-workers/README.md dosyasına bakın
+     * Market Data Source
+     * GitHub Actions her 15 dakikada bir TEFAS/BES verilerini günceller
      */
-    tefas: {
-        // CORS olmadan çalışması için Cloudflare Worker kullan
-        useProxy: true, // Cloudflare Worker kullanılıyor
-        directUrl: 'https://ws.tefas.gov.tr/bultenapi/PortfolioInfo',
-        proxyUrl: 'https://finans-akademi-api.altanmelihhh.workers.dev/tefas',
+    marketData: {
+        // Statik JSON dosyası (GitHub Actions tarafından güncellenir)
+        useStaticJson: true,
+        jsonUrl: './data/market-data.json',
 
-        // Rate limiting (ms between requests)
-        requestDelay: 100
-    },
-
-    /**
-     * BES API Configuration
-     * BES fonları Cloudflare Worker üzerinden çalışıyor
-     */
-    bes: {
-        enabled: true,
-        proxyUrl: 'https://finans-akademi-api.altanmelihhh.workers.dev/bes',
-        message: 'BES fon verileri Cloudflare Worker üzerinden'
+        // Fallback: Eski API yöntemi (devre dışı)
+        useLegacyApi: false
     },
 
     /**
      * Feature Flags - Hangi varlık sınıflarını gösterelim?
      */
     features: {
-        showTEFAS: false,  // TEFAS fonlarını göster - TEFAS API Worker'ı blokluyor (HTTP 530)
-        showBES: false,    // BES fonlarını göster - Geçici olarak kapalı
+        showTEFAS: true,   // TEFAS fonlarını göster - Statik JSON'dan
+        showBES: true,     // BES fonlarını göster - Statik JSON'dan
         showUS: true,      // US hisselerini göster
         showBIST: true     // BIST hisselerini göster
     },

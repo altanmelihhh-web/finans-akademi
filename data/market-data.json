@@ -1,0 +1,341 @@
+{
+  "lastUpdate": "2025-11-03T20:30:12.246628",
+  "nextUpdate": "2025-11-03T20:45:12.246636",
+  "tefas": [
+    {
+      "code": "AFH",
+      "price": 127.54,
+      "previousPrice": 125.45,
+      "change": 1.67,
+      "name": "AFH Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "GAH",
+      "price": 99.61,
+      "previousPrice": 98.32,
+      "change": 1.32,
+      "name": "GAH Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "IAH",
+      "price": 110.96,
+      "previousPrice": 112.78,
+      "change": -1.61,
+      "name": "IAH Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "VAH",
+      "price": 89.45,
+      "previousPrice": 89.67,
+      "change": -0.24,
+      "name": "VAH Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "YAH",
+      "price": 131.61,
+      "previousPrice": 134.21,
+      "change": -1.93,
+      "name": "YAH Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "ZAH",
+      "price": 99.94,
+      "previousPrice": 101.56,
+      "change": -1.59,
+      "name": "ZAH Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "ADE",
+      "price": 45.85,
+      "previousPrice": 45.23,
+      "change": 1.36,
+      "name": "ADE Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "ADN",
+      "price": 53.9,
+      "previousPrice": 52.89,
+      "change": 1.91,
+      "name": "ADN Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "GDE",
+      "price": 49.38,
+      "previousPrice": 48.76,
+      "change": 1.27,
+      "name": "GDE Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "IDE",
+      "price": 51.26,
+      "previousPrice": 51.34,
+      "change": -0.15,
+      "name": "IDE Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "VDE",
+      "price": 48.48,
+      "previousPrice": 49.12,
+      "change": -1.3,
+      "name": "VDE Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "YDE",
+      "price": 46.24,
+      "previousPrice": 46.78,
+      "change": -1.16,
+      "name": "YDE Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "ZDE",
+      "price": 50.45,
+      "previousPrice": 50.45,
+      "change": -0.01,
+      "name": "ZDE Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "APR",
+      "price": 76.93,
+      "previousPrice": 78.34,
+      "change": -1.8,
+      "name": "APR Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "GPR",
+      "price": 82.2,
+      "previousPrice": 82.45,
+      "change": -0.3,
+      "name": "GPR Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "IPR",
+      "price": 77.1,
+      "previousPrice": 75.89,
+      "change": 1.59,
+      "name": "IPR Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "VPR",
+      "price": 79.24,
+      "previousPrice": 80.23,
+      "change": -1.23,
+      "name": "VPR Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "YPR",
+      "price": 78.28,
+      "previousPrice": 79.67,
+      "change": -1.75,
+      "name": "YPR Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "ZPR",
+      "price": 81.48,
+      "previousPrice": 81.12,
+      "change": 0.45,
+      "name": "ZPR Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "APY",
+      "price": 156.4,
+      "previousPrice": 156.78,
+      "change": -0.24,
+      "name": "APY Fon",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "GPY",
+      "price": 140.25,
+      "previousPrice": 142.34,
+      "change": -1.47,
+      "name": "GPY Fon",
+      "date": "2025-11-03"
+    }
+  ],
+  "bes": [
+    {
+      "code": "AAK",
+      "price": 0.1835,
+      "previousPrice": 0.1834,
+      "change": 0.04,
+      "name": "AAK Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "AEG",
+      "price": 0.2159,
+      "previousPrice": 0.2145,
+      "change": 0.63,
+      "name": "AEG Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "GAG",
+      "price": 0.1937,
+      "previousPrice": 0.1956,
+      "change": -0.98,
+      "name": "GAG Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "HEM",
+      "price": 0.2231,
+      "previousPrice": 0.2234,
+      "change": -0.14,
+      "name": "HEM Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "IAG",
+      "price": 0.1778,
+      "previousPrice": 0.1789,
+      "change": -0.59,
+      "name": "IAG Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "VAG",
+      "price": 0.1992,
+      "previousPrice": 0.2012,
+      "change": -0.98,
+      "name": "VAG Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "YAG",
+      "price": 0.1907,
+      "previousPrice": 0.1923,
+      "change": -0.83,
+      "name": "YAG Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "ZAG",
+      "price": 0.2066,
+      "previousPrice": 0.2087,
+      "change": -0.99,
+      "name": "ZAG Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "AHD",
+      "price": 0.1635,
+      "previousPrice": 0.1645,
+      "change": -0.58,
+      "name": "AHD Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "AYE",
+      "price": 0.1527,
+      "previousPrice": 0.1534,
+      "change": -0.43,
+      "name": "AYE Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "AKD",
+      "price": 0.1714,
+      "previousPrice": 0.1723,
+      "change": -0.5,
+      "name": "AKD Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "GDN",
+      "price": 0.1621,
+      "previousPrice": 0.1612,
+      "change": 0.55,
+      "name": "GDN Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "HDN",
+      "price": 0.158,
+      "previousPrice": 0.1567,
+      "change": 0.81,
+      "name": "HDN Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "IDN",
+      "price": 0.1709,
+      "previousPrice": 0.1698,
+      "change": 0.64,
+      "name": "IDN Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "VDN",
+      "price": 0.1575,
+      "previousPrice": 0.1589,
+      "change": -0.9,
+      "name": "VDN Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "YDE",
+      "price": 0.1645,
+      "previousPrice": 0.1634,
+      "change": 0.66,
+      "name": "YDE Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "ZDE",
+      "price": 0.1693,
+      "previousPrice": 0.1701,
+      "change": -0.46,
+      "name": "ZDE Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "AKH",
+      "price": 0.2351,
+      "previousPrice": 0.2345,
+      "change": 0.26,
+      "name": "AKH Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "GHH",
+      "price": 0.2438,
+      "previousPrice": 0.2456,
+      "change": -0.72,
+      "name": "GHH Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    },
+    {
+      "code": "IHE",
+      "price": 0.2113,
+      "previousPrice": 0.2123,
+      "change": -0.46,
+      "name": "IHE Emeklilik Yatırım Fonu",
+      "date": "2025-11-03"
+    }
+  ],
+  "stats": {
+    "tefasCount": 21,
+    "besCount": 20,
+    "totalCount": 41
+  }
+}
