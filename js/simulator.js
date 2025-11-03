@@ -4,13 +4,27 @@
 
 class TradingSimulator {
     constructor() {
-        this.initialBalance = 10000;
-        this.cash = this.loadData('simCash', this.initialBalance);
+        // Multi-currency account system
+        this.initialBalances = {
+            usd: 10000,
+            try: 300000
+        };
+
+        // Load or initialize accounts
+        const defaultAccounts = {
+            usd: { balance: this.initialBalances.usd, currency: 'USD' },
+            try: { balance: this.initialBalances.try, currency: 'TRY' }
+        };
+
+        this.accounts = this.loadData('simAccounts', defaultAccounts);
         this.portfolio = this.loadData('simPortfolio', []);
         this.transactionHistory = this.loadData('simHistory', []);
         this.performanceData = this.loadData('simPerformance', []);
         this.currentAction = 'buy';
         this.performanceChart = null;
+
+        // Backward compatibility: migrate old single-currency data
+        this.migrateOldData();
     }
 
     loadData(key, defaultValue) {
@@ -20,6 +34,25 @@ class TradingSimulator {
 
     saveData(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    migrateOldData() {
+        // Check if old simCash exists
+        const oldCash = localStorage.getItem('simCash');
+        if (oldCash && !localStorage.getItem('simAccounts')) {
+            console.log('📦 Migrating old single-currency data to multi-currency system');
+            const cash = parseFloat(oldCash);
+            // Assume old data was USD
+            this.accounts.usd.balance = cash;
+            this.saveData('simAccounts', this.accounts);
+            localStorage.removeItem('simCash'); // Clean up old data
+        }
+    }
+
+    // Get the account key for a market (us = usd, bist = try)
+    getAccountKey(market) {
+        if (market === 'bist') return 'try';
+        return 'usd'; // us, tefas, bes all use USD
     }
 
     init() {
@@ -269,14 +302,19 @@ class TradingSimulator {
         document.getElementById('simTotal').value = this.formatPrice(total, stock.market);
         document.getElementById('simCommission').textContent = this.formatPrice(commission, stock.market);
 
+        // Get correct account based on market
+        const accountKey = this.getAccountKey(stock.market);
+        const account = this.accounts[accountKey];
+        const currencySymbol = accountKey === 'usd' ? '$' : '₺';
+
         if (this.currentAction === 'buy') {
-            const afterBalance = this.cash - total;
-            document.getElementById('simAfterBalance').textContent = '$' + afterBalance.toFixed(2);
+            const afterBalance = account.balance - total;
+            document.getElementById('simAfterBalance').textContent = currencySymbol + afterBalance.toFixed(2);
             document.getElementById('simAfterBalance').style.color = afterBalance >= 0 ? '#10b981' : '#ef4444';
         } else {
             const holding = this.portfolio.find(p => p.symbol === symbol);
-            const afterBalance = this.cash + (subtotal - commission);
-            document.getElementById('simAfterBalance').textContent = '$' + afterBalance.toFixed(2);
+            const afterBalance = account.balance + (subtotal - commission);
+            document.getElementById('simAfterBalance').textContent = currencySymbol + afterBalance.toFixed(2);
             document.getElementById('simAfterBalance').style.color = '#10b981';
 
             // Update button state
@@ -313,13 +351,17 @@ class TradingSimulator {
         if (this.currentAction === 'buy') {
             const total = subtotal + commission;
 
-            if (this.cash < total) {
-                alert('Yetersiz bakiye! İşlem gerçekleştirilemedi.');
+            // Get correct account based on market
+            const accountKey = this.getAccountKey(stock.market);
+            const account = this.accounts[accountKey];
+
+            if (account.balance < total) {
+                alert(`Yetersiz ${account.currency} bakiye! İşlem gerçekleştirilemedi.`);
                 return;
             }
 
-            // Execute buy
-            this.cash -= total;
+            // Execute buy - deduct from correct currency account
+            account.balance -= total;
 
             const existingHolding = this.portfolio.find(p => p.symbol === symbol);
             if (existingHolding) {
@@ -362,7 +404,13 @@ class TradingSimulator {
             }
 
             const total = subtotal - commission;
-            this.cash += total;
+
+            // Get correct account based on market
+            const accountKey = this.getAccountKey(stock.market);
+            const account = this.accounts[accountKey];
+
+            // Add proceeds to correct currency account
+            account.balance += total;
 
             const profitLoss = (stock.price - holding.avgPrice) * quantity;
 
@@ -390,7 +438,7 @@ class TradingSimulator {
         }
 
         // Save and update UI
-        this.saveData('simCash', this.cash);
+        this.saveData('simAccounts', this.accounts);
         this.saveData('simPortfolio', this.portfolio);
         this.saveData('simHistory', this.transactionHistory);
 
@@ -406,38 +454,53 @@ class TradingSimulator {
     }
 
     updateAccountInfo() {
-        let stockValue = 0;
+        // Calculate stock values per currency
+        let usdStockValue = 0;
+        let tryStockValue = 0;
+
         this.portfolio.forEach(holding => {
             const stock = this.findStock(holding.symbol);
             if (stock && stock.price) {
-                stockValue += stock.price * holding.quantity;
+                const value = stock.price * holding.quantity;
+                const accountKey = this.getAccountKey(stock.market);
+                if (accountKey === 'usd') {
+                    usdStockValue += value;
+                } else {
+                    tryStockValue += value;
+                }
             }
         });
 
-        const totalBalance = this.cash + stockValue;
-        const profitLoss = totalBalance - this.initialBalance;
-        const profitLossPercent = (profitLoss / this.initialBalance) * 100;
+        // Calculate totals per currency
+        const usdTotal = this.accounts.usd.balance + usdStockValue;
+        const tryTotal = this.accounts.try.balance + tryStockValue;
 
-        // Safe DOM updates with null checks
+        const usdPL = usdTotal - this.initialBalances.usd;
+        const tryPL = tryTotal - this.initialBalances.try;
+        const usdPLPercent = (usdPL / this.initialBalances.usd) * 100;
+        const tryPLPercent = (tryPL / this.initialBalances.try) * 100;
+
+        // Update UI - show combined view (for now showing USD prominently)
         const totalBalanceEl = document.getElementById('simTotalBalance');
-        if (totalBalanceEl) totalBalanceEl.textContent = '$' + totalBalance.toFixed(2);
+        if (totalBalanceEl) totalBalanceEl.textContent = `$${usdTotal.toFixed(2)} / ₺${tryTotal.toFixed(2)}`;
 
         const cashEl = document.getElementById('simCash');
-        if (cashEl) cashEl.textContent = '$' + this.cash.toFixed(2);
+        if (cashEl) cashEl.textContent = `$${this.accounts.usd.balance.toFixed(2)} / ₺${this.accounts.try.balance.toFixed(2)}`;
 
         const stockValueEl = document.getElementById('simStockValue');
-        if (stockValueEl) stockValueEl.textContent = '$' + stockValue.toFixed(2);
+        if (stockValueEl) stockValueEl.textContent = `$${usdStockValue.toFixed(2)} / ₺${tryStockValue.toFixed(2)}`;
 
         const plElement = document.getElementById('simProfitLoss');
         if (plElement) {
-            plElement.textContent = `$${profitLoss.toFixed(2)} (${profitLossPercent >= 0 ? '+' : ''}${profitLossPercent.toFixed(2)}%)`;
-            plElement.style.color = profitLoss >= 0 ? '#10b981' : '#ef4444';
+            const avgPLPercent = (usdPLPercent + tryPLPercent) / 2;
+            plElement.textContent = `$${usdPL.toFixed(2)} / ₺${tryPL.toFixed(2)} (${avgPLPercent >= 0 ? '+' : ''}${avgPLPercent.toFixed(2)}%)`;
+            plElement.style.color = (usdPL + tryPL) >= 0 ? '#10b981' : '#ef4444';
         }
 
-        // Update balance in trade panel
+        // Update balance in trade panel - context sensitive
         const userBalanceEl = document.getElementById('userBalance');
         if (userBalanceEl) {
-            userBalanceEl.textContent = '$' + this.cash.toFixed(2);
+            userBalanceEl.textContent = `USD: $${this.accounts.usd.balance.toFixed(2)} | TRY: ₺${this.accounts.try.balance.toFixed(2)}`;
         }
     }
 
