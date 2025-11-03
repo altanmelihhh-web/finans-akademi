@@ -1415,7 +1415,20 @@ class TradingSimulator {
             return;
         }
 
-        this.selectedStock = window.marketsManager.stocks[symbol];
+        // Find stock - marketsManager.stocks can be array or object
+        const stocksArray = Array.isArray(window.marketsManager.stocks)
+            ? window.marketsManager.stocks
+            : Object.values(window.marketsManager.stocks);
+
+        this.selectedStock = stocksArray.find(s => s.symbol === symbol);
+
+        if (!this.selectedStock) {
+            console.warn('⚠️ Stock not found:', symbol);
+            this.selectedStock = null;
+        } else {
+            console.log('✅ Stock selected:', this.selectedStock.symbol, this.selectedStock.name, Utils.formatCurrency(this.selectedStock.price, this.accountManager.getCurrencyForMarket(this.selectedStock.market)));
+        }
+
         this.updateTradeInfo();
     }
 
@@ -1678,7 +1691,12 @@ class TradingSimulator {
         const holding = this.portfolioManager.getHolding(symbol);
         if (!holding) return;
 
-        const stock = window.marketsManager?.stocks[symbol];
+        // Find stock - marketsManager.stocks can be array or object
+        const stocksArray = Array.isArray(window.marketsManager?.stocks)
+            ? window.marketsManager.stocks
+            : Object.values(window.marketsManager?.stocks || {});
+
+        const stock = stocksArray.find(s => s.symbol === symbol);
         if (!stock) {
             alert('❌ Hisse bilgisi bulunamadı');
             return;
