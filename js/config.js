@@ -41,10 +41,10 @@ window.FINANS_CONFIG = {
      * Feature Flags - Hangi varlık sınıflarını gösterelim?
      */
     features: {
-        showTEFAS: true,  // TEFAS fonlarını göster - Cloudflare Worker aktif!
-        showBES: true,    // BES fonlarını göster - Cloudflare Worker aktif!
-        showUS: true,     // US hisselerini göster
-        showBIST: true    // BIST hisselerini göster
+        showTEFAS: false,  // TEFAS fonlarını göster - TEFAS API Worker'ı blokluyor (HTTP 530)
+        showBES: false,    // BES fonlarını göster - Geçici olarak kapalı
+        showUS: true,      // US hisselerini göster
+        showBIST: true     // BIST hisselerini göster
     },
 
     /**
