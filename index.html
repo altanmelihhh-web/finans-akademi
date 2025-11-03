@@ -1493,9 +1493,11 @@
                                 <span>Çoklu Hisse</span>
                             </label>
                         </div>
-                        <div class="stock-selector">
-                            <input type="text" id="stockSearchInput" placeholder="Hisse ara (örn: AAPL, THYAO)..." class="filter-input">
-                            <div id="selectedStocks" class="selected-stocks"></div>
+                        <button id="openStockPickerBtn" class="btn-secondary" style="margin: 10px 0; width: 100%;">
+                            <i class="fas fa-list"></i> Hisse Seç
+                        </button>
+                        <div id="selectedStocks" class="selected-stocks" style="margin-top: 10px;">
+                            <p style="color: rgba(255,255,255,0.5); font-size: 14px;">Henüz hisse seçilmedi</p>
                         </div>
                     </div>
 
@@ -1585,6 +1587,38 @@
                         <div class="ai-response-content"></div>
                         <div class="ai-disclaimer">
                             <i class="fas fa-info-circle"></i> Bu analiz AI tarafından üretilmiştir ve yatırım tavsiyesi değildir.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock Picker Modal -->
+                <div id="stockPickerModal" class="stock-picker-modal" style="display: none;">
+                    <div class="stock-picker-content">
+                        <div class="stock-picker-header">
+                            <h3><i class="fas fa-list"></i> Hisse Seç</h3>
+                            <button id="closeStockPicker" class="close-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div class="stock-picker-search">
+                            <input type="text" id="stockPickerSearch" placeholder="Hisse ara..." class="filter-input">
+                        </div>
+
+                        <div class="stock-picker-tabs">
+                            <button class="picker-tab active" data-market="all">Tümü</button>
+                            <button class="picker-tab" data-market="us">ABD</button>
+                            <button class="picker-tab" data-market="bist">BIST</button>
+                        </div>
+
+                        <div id="stockPickerList" class="stock-picker-list">
+                            <!-- Stocks will be rendered here -->
+                        </div>
+
+                        <div class="stock-picker-footer">
+                            <button id="confirmStockSelection" class="btn-primary">
+                                <i class="fas fa-check"></i> Seçimi Onayla
+                            </button>
                         </div>
                     </div>
                 </div>

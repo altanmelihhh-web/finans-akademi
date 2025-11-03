@@ -16,6 +16,7 @@ class ReportsManager {
         this.reportHistory = [];
         this.autoRefreshInterval = null;
         this.selectedStocks = []; // For custom reports
+        this.tempSelectedStocks = []; // Temporary selection in picker
         this.customFilters = {}; // For custom report preferences
 
         this.init();
@@ -104,14 +105,39 @@ class ReportsManager {
             saveTemplateBtn.addEventListener('click', () => this.saveCustomTemplate());
         }
 
-        // Stock search input
-        const stockSearchInput = document.getElementById('stockSearchInput');
-        if (stockSearchInput) {
-            stockSearchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    this.addStockToSelection(e.target.value.trim().toUpperCase());
-                    e.target.value = '';
-                }
+        // Open stock picker modal
+        const openPickerBtn = document.getElementById('openStockPickerBtn');
+        if (openPickerBtn) {
+            openPickerBtn.addEventListener('click', () => this.openStockPicker());
+        }
+
+        // Close stock picker modal
+        const closePickerBtn = document.getElementById('closeStockPicker');
+        if (closePickerBtn) {
+            closePickerBtn.addEventListener('click', () => this.closeStockPicker());
+        }
+
+        // Confirm stock selection
+        const confirmBtn = document.getElementById('confirmStockSelection');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', () => this.confirmStockSelection());
+        }
+
+        // Stock picker tabs
+        document.querySelectorAll('.picker-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                document.querySelectorAll('.picker-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                const market = e.target.dataset.market;
+                this.filterStocksByMarket(market);
+            });
+        });
+
+        // Stock picker search
+        const pickerSearch = document.getElementById('stockPickerSearch');
+        if (pickerSearch) {
+            pickerSearch.addEventListener('input', (e) => {
+                this.searchStocksInPicker(e.target.value);
             });
         }
 
@@ -1768,6 +1794,166 @@ class ReportsManager {
     hideCustomFilters() {
         const filters = document.getElementById('customReportFilters');
         if (filters) filters.style.display = 'none';
+    }
+
+    /**
+     * Open stock picker modal
+     */
+    openStockPicker() {
+        const modal = document.getElementById('stockPickerModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            this.tempSelectedStocks = [...this.selectedStocks]; // Save current selection
+            this.renderStockPicker();
+        }
+    }
+
+    /**
+     * Close stock picker modal
+     */
+    closeStockPicker() {
+        const modal = document.getElementById('stockPickerModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    /**
+     * Render stock picker list
+     */
+    renderStockPicker(filteredStocks = null) {
+        const container = document.getElementById('stockPickerList');
+        if (!container) return;
+
+        let stocks = filteredStocks;
+        if (!stocks) {
+            if (window.STOCKS_DATA) {
+                stocks = [
+                    ...window.STOCKS_DATA.us_stocks,
+                    ...window.STOCKS_DATA.bist_stocks
+                ];
+            } else {
+                container.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center;">Hisse verileri yükleniyor...</p>';
+                return;
+            }
+        }
+
+        if (stocks.length === 0) {
+            container.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center;">Hisse bulunamadı</p>';
+            return;
+        }
+
+        container.innerHTML = stocks.map(stock => {
+            const isSelected = this.tempSelectedStocks.includes(stock.symbol);
+            const changeClass = stock.change >= 0 ? 'positive' : 'negative';
+            const currency = stock.market === 'bist' ? '₺' : '$';
+
+            return `
+                <div class="stock-picker-item ${isSelected ? 'selected' : ''}" data-symbol="${stock.symbol}">
+                    <div class="stock-picker-item-info">
+                        <div class="stock-picker-item-symbol">${stock.symbol}</div>
+                        <div class="stock-picker-item-name">${stock.name}</div>
+                    </div>
+                    <div class="stock-picker-item-price">
+                        <div class="stock-picker-item-value">${currency}${stock.price?.toFixed(2) || '0.00'}</div>
+                        <div class="stock-picker-item-change ${changeClass}">
+                            ${stock.change >= 0 ? '+' : ''}${stock.change?.toFixed(2) || '0.00'}%
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Add click listeners
+        container.querySelectorAll('.stock-picker-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const symbol = e.currentTarget.dataset.symbol;
+                this.toggleStockInPicker(symbol);
+            });
+        });
+    }
+
+    /**
+     * Toggle stock selection in picker
+     */
+    toggleStockInPicker(symbol) {
+        const mode = document.querySelector('input[name="stockSelectionMode"]:checked')?.value || 'single';
+
+        if (mode === 'single') {
+            // Single mode: only one stock
+            this.tempSelectedStocks = [symbol];
+        } else {
+            // Multiple mode: toggle
+            const index = this.tempSelectedStocks.indexOf(symbol);
+            if (index > -1) {
+                this.tempSelectedStocks.splice(index, 1);
+            } else {
+                this.tempSelectedStocks.push(symbol);
+            }
+        }
+
+        // Re-render to update UI
+        this.renderStockPicker();
+    }
+
+    /**
+     * Confirm stock selection
+     */
+    confirmStockSelection() {
+        if (this.tempSelectedStocks.length === 0) {
+            alert('Lütfen en az bir hisse seçin!');
+            return;
+        }
+
+        this.selectedStocks = [...this.tempSelectedStocks];
+        this.renderSelectedStocks();
+        this.closeStockPicker();
+    }
+
+    /**
+     * Filter stocks by market
+     */
+    filterStocksByMarket(market) {
+        if (!window.STOCKS_DATA) return;
+
+        let stocks;
+        if (market === 'all') {
+            stocks = [
+                ...window.STOCKS_DATA.us_stocks,
+                ...window.STOCKS_DATA.bist_stocks
+            ];
+        } else if (market === 'us') {
+            stocks = window.STOCKS_DATA.us_stocks;
+        } else if (market === 'bist') {
+            stocks = window.STOCKS_DATA.bist_stocks;
+        }
+
+        this.renderStockPicker(stocks);
+    }
+
+    /**
+     * Search stocks in picker
+     */
+    searchStocksInPicker(query) {
+        if (!window.STOCKS_DATA) return;
+
+        const allStocks = [
+            ...window.STOCKS_DATA.us_stocks,
+            ...window.STOCKS_DATA.bist_stocks
+        ];
+
+        if (!query || query.trim() === '') {
+            this.renderStockPicker(allStocks);
+            return;
+        }
+
+        const searchTerm = query.toLowerCase();
+        const filtered = allStocks.filter(stock =>
+            stock.symbol.toLowerCase().includes(searchTerm) ||
+            stock.name.toLowerCase().includes(searchTerm)
+        );
+
+        this.renderStockPicker(filtered);
     }
 
     /**
