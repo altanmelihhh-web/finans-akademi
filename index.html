@@ -1483,6 +1483,16 @@
 
                     <div class="filter-section">
                         <label><i class="fas fa-chart-line"></i> Hisse Seçimi:</label>
+                        <div class="selection-mode">
+                            <label class="radio-label">
+                                <input type="radio" name="stockSelectionMode" value="single" checked>
+                                <span>Tek Hisse</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="stockSelectionMode" value="multiple">
+                                <span>Çoklu Hisse</span>
+                            </label>
+                        </div>
                         <div class="stock-selector">
                             <input type="text" id="stockSearchInput" placeholder="Hisse ara (örn: AAPL, THYAO)..." class="filter-input">
                             <div id="selectedStocks" class="selected-stocks"></div>

@@ -166,10 +166,19 @@ class ReportsManager {
         // 3. Kripto Piyasası
         report.sections.push(await this.getCryptoSummary());
 
-        // 4. Beklenen Ekonomik Veriler
+        // 4. Emtia Fiyatları (Yeni)
+        report.sections.push(this.getCommoditiesSummary());
+
+        // 5. Beklenen Ekonomik Veriler
         report.sections.push(this.getUpcomingEvents());
 
-        // 5. Günün Tavsiyesi (AI)
+        // 6. Piyasa Volatilitesi (Yeni)
+        report.sections.push(await this.getVolatilityIndex());
+
+        // 7. Sektör Performansı (Yeni)
+        report.sections.push(await this.getSectorPerformance());
+
+        // 8. Günün Tavsiyesi (AI)
         report.sections.push(this.getTodaysTip());
 
         this.currentReport = report;
@@ -364,6 +373,180 @@ class ReportsManager {
     }
 
     /**
+     * Commodities summary (NEW)
+     */
+    getCommoditiesSummary() {
+        const section = {
+            title: '🛢️ Emtia Fiyatları',
+            icon: 'fa-box',
+            content: []
+        };
+
+        // Static data for now - can be enhanced with real API
+        const commodities = [
+            { name: 'Altın (Ons)', symbol: 'XAU', value: 2050, change: 0.8, currency: '$' },
+            { name: 'Gümüş (Ons)', symbol: 'XAG', value: 24.50, change: -0.3, currency: '$' },
+            { name: 'Petrol (Brent)', symbol: 'BRENT', value: 82.50, change: 1.2, currency: '$' },
+            { name: 'Doğalgaz', symbol: 'NG', value: 2.85, change: -1.5, currency: '$' },
+            { name: 'Bakır', symbol: 'HG', value: 3.95, change: 0.4, currency: '$' }
+        ];
+
+        section.content.push({
+            type: 'forex', // Reuse forex card styling
+            data: commodities.map(c => ({
+                pair: c.name,
+                value: `${c.currency}${c.value.toFixed(2)}`,
+                change: c.change
+            }))
+        });
+
+        const goldTrend = commodities[0].change > 0 ? 'yükselişte' : 'düşüşte';
+        section.content.push({
+            type: 'text',
+            text: `💰 **Not:** Altın ${goldTrend}. Güvenli liman arayışı ${commodities[0].change > 0 ? 'güçlü' : 'zayıf'}.`
+        });
+
+        return section;
+    }
+
+    /**
+     * Volatility Index (VIX) (NEW)
+     */
+    async getVolatilityIndex() {
+        const section = {
+            title: '📊 Piyasa Volatilitesi',
+            icon: 'fa-chart-area',
+            content: []
+        };
+
+        // Calculate volatility from market data
+        let vixLevel = 15; // Default baseline
+        let vixChange = 0;
+
+        try {
+            if (window.marketDataPro) {
+                const dashboardData = window.marketDataPro.cache.memory.get('dashboard');
+                if (dashboardData && dashboardData.indices) {
+                    // Estimate VIX-like metric from S&P 500 movements
+                    const sp500Change = Math.abs(dashboardData.indices.sp500?.changePercent || 0);
+                    vixLevel = 12 + (sp500Change * 2); // Simple estimation
+                    vixChange = sp500Change > 1 ? 2.5 : -1.2;
+                }
+            }
+        } catch (error) {
+            console.error('Error calculating volatility:', error);
+        }
+
+        const vixSentiment = vixLevel < 15 ? 'Düşük' : vixLevel < 20 ? 'Normal' : vixLevel < 30 ? 'Yüksek' : 'Çok Yüksek';
+        const vixIcon = vixLevel < 15 ? '🟢' : vixLevel < 20 ? '🟡' : '🔴';
+
+        section.content.push({
+            type: 'indices',
+            data: [{
+                name: 'VIX (Korku Endeksi)',
+                value: vixLevel,
+                change: vixChange,
+                sentiment: vixLevel < 20 ? 'positive' : 'negative'
+            }]
+        });
+
+        section.content.push({
+            type: 'text',
+            text: `${vixIcon} **Volatilite Seviyesi: ${vixSentiment}**`
+        });
+
+        section.content.push({
+            type: 'text',
+            text: vixLevel < 15
+                ? '✅ Piyasalar sakin. Risk iştahı yüksek, yatırımcılar rahat.'
+                : vixLevel < 20
+                ? '📊 Piyasalar normal volatilitede. Dengeli işlem ortamı.'
+                : vixLevel < 30
+                ? '⚠️ Piyasalarda hareketlilik arttı. Dikkatli olun, stop-loss kullanın.'
+                : '🚨 **Yüksek Volatilite!** Piyasalarda panik var. Pozisyonlarınızı gözden geçirin!'
+        });
+
+        return section;
+    }
+
+    /**
+     * Sector Performance (NEW)
+     */
+    async getSectorPerformance() {
+        const section = {
+            title: '🏭 Sektör Performansı',
+            icon: 'fa-industry',
+            content: []
+        };
+
+        // Analyze sector performance from stock data
+        const sectors = {
+            'Teknoloji': { count: 0, totalChange: 0, symbols: ['AAPL', 'MSFT', 'GOOGL', 'NVDA'] },
+            'Finans': { count: 0, totalChange: 0, symbols: ['GARAN', 'AKBNK', 'YKBNK', 'ISCTR'] },
+            'Enerji': { count: 0, totalChange: 0, symbols: ['TUPRS', 'PETKM', 'IPEKE'] },
+            'Sanayi': { count: 0, totalChange: 0, symbols: ['THYAO', 'ARCLK', 'TOASO'] },
+            'Tüketim': { count: 0, totalChange: 0, symbols: ['BIMAS', 'MGROS', 'SOKM'] }
+        };
+
+        try {
+            if (window.STOCKS_DATA) {
+                const allStocks = [
+                    ...window.STOCKS_DATA.us_stocks,
+                    ...window.STOCKS_DATA.bist_stocks
+                ];
+
+                // Calculate sector averages
+                Object.keys(sectors).forEach(sectorName => {
+                    const sector = sectors[sectorName];
+                    sector.symbols.forEach(symbol => {
+                        const stock = allStocks.find(s => s.symbol === symbol);
+                        if (stock && stock.change !== undefined) {
+                            sector.totalChange += stock.change;
+                            sector.count++;
+                        }
+                    });
+                    sector.avgChange = sector.count > 0 ? sector.totalChange / sector.count : 0;
+                });
+
+                // Sort by performance
+                const sortedSectors = Object.entries(sectors)
+                    .map(([name, data]) => ({ name, change: data.avgChange }))
+                    .sort((a, b) => b.change - a.change);
+
+                section.content.push({
+                    type: 'forex', // Reuse forex card styling
+                    data: sortedSectors.map(s => ({
+                        pair: s.name,
+                        value: s.change >= 0 ? `+${s.change.toFixed(2)}%` : `${s.change.toFixed(2)}%`,
+                        trend: s.change >= 0 ? 'positive' : 'negative'
+                    }))
+                });
+
+                const bestSector = sortedSectors[0];
+                const worstSector = sortedSectors[sortedSectors.length - 1];
+
+                section.content.push({
+                    type: 'text',
+                    text: `🏆 **En İyi Sektör:** ${bestSector.name} (${bestSector.change >= 0 ? '+' : ''}${bestSector.change.toFixed(2)}%)`
+                });
+
+                section.content.push({
+                    type: 'text',
+                    text: `📉 **En Kötü Sektör:** ${worstSector.name} (${worstSector.change.toFixed(2)}%)`
+                });
+            }
+        } catch (error) {
+            console.error('Error calculating sector performance:', error);
+            section.content.push({
+                type: 'text',
+                text: '💡 Sektör performans verileri hazırlanıyor...'
+            });
+        }
+
+        return section;
+    }
+
+    /**
      * Upcoming economic events
      */
     getUpcomingEvents() {
@@ -467,19 +650,28 @@ class ReportsManager {
             sections: []
         };
 
-        // 1. Günün Kazananları
+        // 1. Piyasa Özeti (Yeni)
+        report.sections.push(await this.getDailySummary());
+
+        // 2. Günün Kazananları
         report.sections.push(await this.getTodaysWinners());
 
-        // 2. Günün Kaybedenleri
+        // 3. Günün Kaybedenleri
         report.sections.push(await this.getTodaysLosers());
 
-        // 3. Portföy Performansı
+        // 4. Portföy Performansı
         report.sections.push(this.getPortfolioPerformance());
 
-        // 4. En Çok İşlem Görenler
+        // 5. En Çok İşlem Görenler
         report.sections.push(await this.getMostTraded());
 
-        // 5. Yarın İçin Tavsiyeler
+        // 6. Teknik Göstergeler Özeti (Yeni)
+        report.sections.push(await this.getTechnicalSummary());
+
+        // 7. Risk Analizi (Yeni)
+        report.sections.push(this.getRiskAnalysis());
+
+        // 8. Yarın İçin Tavsiyeler
         report.sections.push(this.getTomorrowTips());
 
         this.currentReport = report;
@@ -487,6 +679,69 @@ class ReportsManager {
         this.saveToHistory(report);
 
         return report;
+    }
+
+    /**
+     * Daily Summary (NEW)
+     */
+    async getDailySummary() {
+        const section = {
+            title: '📰 Günün Özeti',
+            icon: 'fa-newspaper',
+            content: []
+        };
+
+        try {
+            if (window.marketDataPro) {
+                const dashboardData = window.marketDataPro.cache.memory.get('dashboard');
+                if (dashboardData && dashboardData.indices) {
+                    const { sp500, nasdaq, dow, bist100 } = dashboardData.indices;
+
+                    const avgUSChange = ((sp500?.changePercent || 0) + (nasdaq?.changePercent || 0) + (dow?.changePercent || 0)) / 3;
+                    const bist100Change = bist100?.changePercent || 0;
+
+                    let summaryText = `📊 **ABD Piyasaları:** `;
+                    if (avgUSChange > 1) {
+                        summaryText += `Güçlü yükseliş (ort. +${avgUSChange.toFixed(2)}%). S&P 500 ve NASDAQ teknoloji hisselerinin desteğiyle yükseldi.`;
+                    } else if (avgUSChange < -1) {
+                        summaryText += `Düşüş yaşandı (ort. ${avgUSChange.toFixed(2)}%). Yatırımcılar risk almaktan kaçındı.`;
+                    } else {
+                        summaryText += `Dengeli seyretti (ort. ${avgUSChange.toFixed(2)}%). Yatırımcılar beklenti içinde.`;
+                    }
+
+                    section.content.push({
+                        type: 'text',
+                        text: summaryText
+                    });
+
+                    summaryText = `🇹🇷 **BIST 100:** `;
+                    if (bist100Change > 1) {
+                        summaryText += `Pozitif kapandı (+${bist100Change.toFixed(2)}%). Yerli yatırımcının alımları etkili oldu.`;
+                    } else if (bist100Change < -1) {
+                        summaryText += `Negatif kapandı (${bist100Change.toFixed(2)}%). Döviz baskısı hissedildi.`;
+                    } else {
+                        summaryText += `Yatay seyiretti (${bist100Change.toFixed(2)}%). Hacim düşük kaldı.`;
+                    }
+
+                    section.content.push({
+                        type: 'text',
+                        text: summaryText
+                    });
+
+                    // Overall market sentiment
+                    const overallSentiment = (avgUSChange + bist100Change) / 2;
+                    const sentimentEmoji = overallSentiment > 0.5 ? '😊' : overallSentiment < -0.5 ? '😟' : '😐';
+                    section.content.push({
+                        type: 'text',
+                        text: `${sentimentEmoji} **Genel Piyasa Havası:** ${overallSentiment > 0.5 ? 'Risk Alma İsteği Yüksek' : overallSentiment < -0.5 ? 'Risk Alma İsteği Düşük' : 'Belirsizlik Hakim'}`
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error generating daily summary:', error);
+        }
+
+        return section;
     }
 
     /**
@@ -669,6 +924,236 @@ class ReportsManager {
             }
         } catch (error) {
             console.error('❌ Error getting most traded:', error);
+        }
+
+        return section;
+    }
+
+    /**
+     * Technical Summary (NEW)
+     */
+    async getTechnicalSummary() {
+        const section = {
+            title: '📈 Teknik Göstergeler',
+            icon: 'fa-chart-line',
+            content: []
+        };
+
+        try {
+            if (window.STOCKS_DATA) {
+                const allStocks = [
+                    ...window.STOCKS_DATA.us_stocks,
+                    ...window.STOCKS_DATA.bist_stocks
+                ];
+
+                // Count stocks by trend
+                let strongBuy = 0, buy = 0, neutral = 0, sell = 0, strongSell = 0;
+
+                allStocks.forEach(stock => {
+                    if (!stock.change) return;
+
+                    if (stock.change > 3) strongBuy++;
+                    else if (stock.change > 1) buy++;
+                    else if (stock.change > -1) neutral++;
+                    else if (stock.change > -3) sell++;
+                    else strongSell++;
+                });
+
+                const total = strongBuy + buy + neutral + sell + strongSell;
+
+                section.content.push({
+                    type: 'text',
+                    text: `📊 **Piyasa Dağılımı (${total} hisse):**`
+                });
+
+                section.content.push({
+                    type: 'forex',
+                    data: [
+                        { pair: '🟢 Güçlü Al', value: `${strongBuy} hisse`, change: 0 },
+                        { pair: '🔵 Al', value: `${buy} hisse`, change: 0 },
+                        { pair: '⚪ Nötr', value: `${neutral} hisse`, change: 0 },
+                        { pair: '🟠 Sat', value: `${sell} hisse`, change: 0 },
+                        { pair: '🔴 Güçlü Sat', value: `${strongSell} hisse`, change: 0 }
+                    ]
+                });
+
+                // Market breadth analysis
+                const bullishPercent = ((strongBuy + buy) / total * 100).toFixed(1);
+                const bearishPercent = ((sell + strongSell) / total * 100).toFixed(1);
+
+                section.content.push({
+                    type: 'text',
+                    text: `🎯 **Piyasa Genişliği:** %${bullishPercent} yükseliş, %${bearishPercent} düşüş eğiliminde.`
+                });
+
+                if (parseFloat(bullishPercent) > 60) {
+                    section.content.push({
+                        type: 'text',
+                        text: '✅ **Yorum:** Piyasa geneli güçlü. Trendin devamı olası.'
+                    });
+                } else if (parseFloat(bearishPercent) > 60) {
+                    section.content.push({
+                        type: 'text',
+                        text: '⚠️ **Yorum:** Piyasa baskı altında. Düşüş devam edebilir.'
+                    });
+                } else {
+                    section.content.push({
+                        type: 'text',
+                        text: '📊 **Yorum:** Piyasa kararsız. Bekleme modunda kalın.'
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error generating technical summary:', error);
+        }
+
+        return section;
+    }
+
+    /**
+     * Risk Analysis (NEW)
+     */
+    getRiskAnalysis() {
+        const section = {
+            title: '⚠️ Risk Analizi',
+            icon: 'fa-exclamation-triangle',
+            content: []
+        };
+
+        try {
+            // Portfolio risk analysis
+            if (window.simulator && window.simulator.portfolio && window.simulator.portfolio.length > 0) {
+                const portfolio = window.simulator.portfolio;
+                const totalValue = window.simulator.cash || 10000;
+
+                // Diversification risk
+                const numStocks = portfolio.length;
+                let diversificationRisk = '';
+                let diversificationIcon = '';
+
+                if (numStocks < 3) {
+                    diversificationRisk = 'Yüksek';
+                    diversificationIcon = '🔴';
+                } else if (numStocks < 5) {
+                    diversificationRisk = 'Orta';
+                    diversificationIcon = '🟡';
+                } else if (numStocks < 10) {
+                    diversificationRisk = 'Düşük';
+                    diversificationIcon = '🟢';
+                } else {
+                    diversificationRisk = 'Çok Düşük (aşırı çeşitlenme)';
+                    diversificationIcon = '🟡';
+                }
+
+                section.content.push({
+                    type: 'text',
+                    text: `${diversificationIcon} **Çeşitlendirme Riski:** ${diversificationRisk} (${numStocks} farklı hisse)`
+                });
+
+                // Concentration risk - largest position
+                let maxPositionPercent = 0;
+                let largestSymbol = '';
+
+                portfolio.forEach(holding => {
+                    const stock = window.simulator.findStock(holding.symbol);
+                    if (stock && stock.price) {
+                        const positionValue = stock.price * holding.quantity;
+                        const positionPercent = (positionValue / totalValue) * 100;
+                        if (positionPercent > maxPositionPercent) {
+                            maxPositionPercent = positionPercent;
+                            largestSymbol = holding.symbol;
+                        }
+                    }
+                });
+
+                let concentrationRisk = '';
+                let concentrationIcon = '';
+
+                if (maxPositionPercent > 30) {
+                    concentrationRisk = 'Yüksek';
+                    concentrationIcon = '🔴';
+                } else if (maxPositionPercent > 20) {
+                    concentrationRisk = 'Orta';
+                    concentrationIcon = '🟡';
+                } else {
+                    concentrationRisk = 'Düşük';
+                    concentrationIcon = '🟢';
+                }
+
+                section.content.push({
+                    type: 'text',
+                    text: `${concentrationIcon} **Konsantrasyon Riski:** ${concentrationRisk} (${largestSymbol}: %${maxPositionPercent.toFixed(1)})`
+                });
+
+                // Volatility risk based on market conditions
+                let volatilityRisk = 'Orta';
+                let volatilityIcon = '🟡';
+
+                if (window.marketDataPro) {
+                    const dashboardData = window.marketDataPro.cache.memory.get('dashboard');
+                    if (dashboardData && dashboardData.indices) {
+                        const sp500Change = Math.abs(dashboardData.indices.sp500?.changePercent || 0);
+                        if (sp500Change > 2) {
+                            volatilityRisk = 'Yüksek';
+                            volatilityIcon = '🔴';
+                        } else if (sp500Change < 0.5) {
+                            volatilityRisk = 'Düşük';
+                            volatilityIcon = '🟢';
+                        }
+                    }
+                }
+
+                section.content.push({
+                    type: 'text',
+                    text: `${volatilityIcon} **Volatilite Riski:** ${volatilityRisk}`
+                });
+
+                // Overall risk score
+                const riskScores = {
+                    'Yüksek': 3,
+                    'Orta': 2,
+                    'Düşük': 1,
+                    'Çok Düşük (aşırı çeşitlenme)': 2
+                };
+
+                const avgRisk = ((riskScores[diversificationRisk] || 2) +
+                               (riskScores[concentrationRisk] || 2) +
+                               (riskScores[volatilityRisk] || 2)) / 3;
+
+                const overallRisk = avgRisk > 2.5 ? 'Yüksek' : avgRisk > 1.5 ? 'Orta' : 'Düşük';
+                const overallIcon = avgRisk > 2.5 ? '🔴' : avgRisk > 1.5 ? '🟡' : '🟢';
+
+                section.content.push({
+                    type: 'text',
+                    text: `\n${overallIcon} **Genel Risk Seviyesi:** ${overallRisk}`
+                });
+
+                // Risk recommendations
+                if (avgRisk > 2.5) {
+                    section.content.push({
+                        type: 'text',
+                        text: '💡 **Öneri:** Portföyünüzü gözden geçirin. Stop-loss kullanın, çeşitlendirmeyi artırın.'
+                    });
+                } else if (avgRisk < 1.5) {
+                    section.content.push({
+                        type: 'text',
+                        text: '💡 **Öneri:** Riskleriniz kontrol altında. Mevcut stratejiyi koruyun.'
+                    });
+                } else {
+                    section.content.push({
+                        type: 'text',
+                        text: '💡 **Öneri:** Dengeli bir risk profili. Piyasa koşullarını takip edin.'
+                    });
+                }
+
+            } else {
+                section.content.push({
+                    type: 'text',
+                    text: '💡 Henüz portföy oluşturmadınız. Risk analizi için sanal işlem yapın!'
+                });
+            }
+        } catch (error) {
+            console.error('Error generating risk analysis:', error);
         }
 
         return section;
@@ -1303,14 +1788,21 @@ class ReportsManager {
             return;
         }
 
-        // Check if already added
-        if (this.selectedStocks.includes(symbol)) {
-            alert(`${symbol} zaten eklendi!`);
-            return;
+        // Check mode: single or multiple?
+        const mode = document.querySelector('input[name="stockSelectionMode"]:checked')?.value || 'single';
+
+        if (mode === 'single') {
+            // Single mode: replace existing selection
+            this.selectedStocks = [symbol];
+        } else {
+            // Multiple mode: add if not already exists
+            if (this.selectedStocks.includes(symbol)) {
+                alert(`${symbol} zaten eklendi!`);
+                return;
+            }
+            this.selectedStocks.push(symbol);
         }
 
-        // Add to selection
-        this.selectedStocks.push(symbol);
         this.renderSelectedStocks();
     }
 
