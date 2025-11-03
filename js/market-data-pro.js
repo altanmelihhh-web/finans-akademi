@@ -671,6 +671,12 @@ class MarketDataPro {
         if (window.marketsManager && typeof window.marketsManager.loadStocks === 'function') {
             console.log('   🔄 Reloading marketsManager with updated TEFAS/BES prices...');
             await window.marketsManager.loadStocks();
+
+            // Re-render the stocks grid/table to show updated prices
+            if (typeof window.marketsManager.renderStocks === 'function') {
+                console.log('   🎨 Re-rendering Markets UI with updated prices...');
+                window.marketsManager.renderStocks();
+            }
         }
     }
 
