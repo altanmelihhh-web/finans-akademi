@@ -458,12 +458,13 @@ class TradingSimulator {
 
         container.innerHTML = this.portfolio.map(holding => {
             const stock = this.findStock(holding.symbol);
-            if (!stock) return '';
 
-            const currentValue = stock.price * holding.quantity;
+            // If stock not found (eg. TEFAS/BES removed), show with warning
+            const currentPrice = stock ? stock.price : 0;
+            const currentValue = currentPrice * holding.quantity;
             const costBasis = holding.avgPrice * holding.quantity;
             const profitLoss = currentValue - costBasis;
-            const profitLossPercent = (profitLoss / costBasis) * 100;
+            const profitLossPercent = costBasis > 0 ? (profitLoss / costBasis) * 100 : 0;
 
             return `
                 <div class="portfolio-card">
@@ -487,7 +488,7 @@ class TradingSimulator {
                         </div>
                         <div class="stat">
                             <span class="label">Güncel Fiyat</span>
-                            <span class="value">${this.formatPrice(stock.price, stock.market)}</span>
+                            <span class="value">${stock ? this.formatPrice(stock.price, stock.market) : '❌ Veri Yok'}</span>
                         </div>
                         <div class="stat">
                             <span class="label">Toplam Değer</span>
