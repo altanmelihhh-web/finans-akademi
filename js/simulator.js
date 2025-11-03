@@ -1323,7 +1323,22 @@ class TradingSimulator {
      */
     populateStockSelect() {
         const select = document.getElementById('simStockSelect');
-        if (!select || !window.marketsManager) return;
+        if (!select) {
+            console.warn('⚠️ Stock select element not found');
+            return;
+        }
+
+        if (!window.marketsManager) {
+            console.warn('⚠️ marketsManager not available');
+            return;
+        }
+
+        if (!window.marketsManager.stocks) {
+            console.warn('⚠️ marketsManager.stocks not available');
+            return;
+        }
+
+        console.log('📊 Loading stocks...', Object.keys(window.marketsManager.stocks).length, 'stocks found');
 
         // Clear existing options (except first)
         select.innerHTML = '<option value="">-- Hisse Seçin --</option>';
@@ -1340,6 +1355,8 @@ class TradingSimulator {
             const stocks = Object.values(window.marketsManager.stocks)
                 .filter(s => s.market && s.market.toUpperCase() === marketKey);
 
+            console.log(`📈 ${marketLabel}:`, stocks.length, 'stocks');
+
             if (stocks.length > 0) {
                 const optgroup = document.createElement('optgroup');
                 optgroup.label = marketLabel;
@@ -1347,13 +1364,16 @@ class TradingSimulator {
                 stocks.forEach(stock => {
                     const option = document.createElement('option');
                     option.value = stock.symbol;
-                    option.textContent = `${stock.symbol} - ${stock.name} (${Utils.formatCurrency(stock.price, this.accountManager.getCurrencyForMarket(stock.market))})`;
+                    const price = stock.price || 0;
+                    option.textContent = `${stock.symbol} - ${stock.name} (${Utils.formatCurrency(price, this.accountManager.getCurrencyForMarket(stock.market))})`;
                     optgroup.appendChild(option);
                 });
 
                 select.appendChild(optgroup);
             }
         });
+
+        console.log('✅ Stock dropdown populated');
     }
 
     /**
