@@ -261,7 +261,7 @@ class MarketDataPro {
         // Check cache first
         if (hasMarketsCache && cacheAge < cacheTimeout) {
             console.log(`⚡ CACHE HIT! Markets loaded from cache (${Math.floor(cacheAge / 1000)}s old)`);
-            this.applyMarketsCache(this.cache.memory.get('markets'));
+            await this.applyMarketsCache(this.cache.memory.get('markets'));
             return;
         }
 
@@ -379,7 +379,7 @@ class MarketDataPro {
     /**
      * Apply cached markets data
      */
-    applyMarketsCache(marketsCache) {
+    async applyMarketsCache(marketsCache) {
         if (!window.STOCKS_DATA || !marketsCache) {
             console.warn('⚠️ Cannot apply cache: STOCKS_DATA or marketsCache missing');
             return;
@@ -460,8 +460,8 @@ class MarketDataPro {
             console.warn('⚠️ marketsManager not found, will render when it initializes');
         }
 
-        // Fetch real TEFAS and BES fund data
-        this.updateFundPrices();
+        // Fetch real TEFAS and BES fund data (AWAIT it!)
+        await this.updateFundPrices();
 
         // Update Winners/Losers after cache is applied
         console.log('   Updating Winners/Losers...');
