@@ -1221,8 +1221,8 @@ class TradingSimulator {
         }
 
         try {
-            // Wait for markets manager
-            await this.waitForMarketsManager();
+            // Wait for markets manager to exist (but not for prices)
+            await this.waitForMarketsManagerBasic();
 
             // Update exchange rate
             await this.accountManager.updateExchangeRate();
@@ -1237,11 +1237,18 @@ class TradingSimulator {
             // Initial render
             this.updateUI();
 
+            // Refresh stock dropdown when prices are loaded
+            setTimeout(() => {
+                this.loadCurrentPrices();
+                this.populateStockSelect();
+                console.log('🔄 Stock dropdown refreshed with latest prices');
+            }, 3000);
+
             // Check pending orders periodically
             setInterval(() => this.checkPendingOrders(), 5000);
 
             this.isInitialized = true;
-            console.log('✅ Trading Simulator v3.0 initialized');
+            console.log('✅ Trading Simulator v3.0 initialized (prices loading in background)');
         } catch (error) {
             console.error('❌ Simulator initialization failed:', error);
         }
@@ -1250,49 +1257,20 @@ class TradingSimulator {
     /**
      * Wait for markets manager to be ready AND prices to be loaded
      */
-    waitForMarketsManager() {
+    /**
+     * Wait for markets manager to exist (but not for prices to load)
+     * This allows instant page load with prices updating in background
+     */
+    waitForMarketsManagerBasic() {
         return new Promise((resolve) => {
-            let attempts = 0;
-            const maxAttempts = 100; // 10 seconds max wait
-
             const check = () => {
-                attempts++;
-
-                // Check if markets manager exists
-                if (!window.marketsManager || !window.marketsManager.stocks) {
-                    if (attempts < maxAttempts) {
-                        setTimeout(check, 100);
-                    } else {
-                        console.warn('⚠️ Markets manager timeout, proceeding anyway');
-                        resolve();
-                    }
-                    return;
-                }
-
-                // Count stocks with valid prices
-                const stocksArray = Array.isArray(window.marketsManager.stocks)
-                    ? window.marketsManager.stocks
-                    : Object.values(window.marketsManager.stocks);
-
-                const stocksWithPrices = stocksArray.filter(s => s && s.price && s.price > 0).length;
-                const totalStocks = stocksArray.length;
-
-                // Debug: Show sample stock
-                if (attempts === 1 && stocksArray.length > 0) {
-                    console.log('📋 Sample stock:', stocksArray[0]);
-                }
-
-                console.log(`⏳ Waiting for prices... ${stocksWithPrices}/${totalStocks} stocks have prices`);
-
-                // Wait until at least 50% of stocks have prices, or timeout
-                if (stocksWithPrices >= totalStocks * 0.5 || attempts >= maxAttempts) {
-                    console.log(`✅ Markets ready! ${stocksWithPrices}/${totalStocks} stocks have prices`);
+                if (window.marketsManager && window.marketsManager.stocks) {
+                    console.log('✅ Markets manager ready (prices loading in background)');
                     resolve();
                 } else {
-                    setTimeout(check, 500); // Check every 500ms for prices
+                    setTimeout(check, 100);
                 }
             };
-
             check();
         });
     }
