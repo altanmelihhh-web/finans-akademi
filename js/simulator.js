@@ -759,12 +759,20 @@ Portföyünüzde: ${holding ? holding.quantity : 0} adet
             return;
         }
 
-        this.cash = this.initialBalance;
+        // Reset multi-currency accounts
+        this.accounts = {
+            usd: { balance: this.initialBalances.usd, currency: 'USD' },
+            try: { balance: this.initialBalances.try, currency: 'TRY' }
+        };
         this.portfolio = [];
         this.transactionHistory = [];
         this.performanceData = [];
 
-        this.saveData('simCash', this.cash);
+        // Clean up old data format
+        localStorage.removeItem('simCash');
+
+        // Save new format
+        this.saveData('simAccounts', this.accounts);
         this.saveData('simPortfolio', this.portfolio);
         this.saveData('simHistory', this.transactionHistory);
         this.saveData('simPerformance', this.performanceData);
@@ -774,7 +782,7 @@ Portföyünüzde: ${holding ? holding.quantity : 0} adet
         this.renderTransactionHistory();
         this.renderPerformanceChart();
 
-        alert('✅ Hesap başarıyla sıfırlandı!');
+        alert('✅ Hesap başarıyla sıfırlandı!\n💵 USD: $10,000\n💴 TRY: ₺300,000');
     }
 
     exportHistory() {
