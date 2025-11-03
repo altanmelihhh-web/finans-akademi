@@ -355,6 +355,9 @@ class MarketDataPro {
             this.state.lastMarketsUpdate = Date.now();
             this.saveCache();
 
+            // Load TEFAS/BES from static JSON
+            await this.updateFundPrices();
+
             // Final render and update of Winners/Losers
             if (window.marketsManager) {
                 if (typeof window.marketsManager.renderStocks === 'function') {
