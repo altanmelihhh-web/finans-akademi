@@ -238,7 +238,7 @@ class MarketDataPro {
     /**
      * Background worker for Markets page - NON-BLOCKING
      */
-    startMarketsWorker() {
+    async startMarketsWorker() {
         if (!window.STOCKS_DATA) {
             console.log('ℹ️ STOCKS_DATA not found, Markets worker skipped');
             return;
