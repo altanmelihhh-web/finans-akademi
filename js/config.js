@@ -38,6 +38,16 @@ window.FINANS_CONFIG = {
     },
 
     /**
+     * Feature Flags - Hangi varlık sınıflarını gösterelim?
+     */
+    features: {
+        showTEFAS: false, // TEFAS fonlarını göster (Cloudflare Worker deploy edilince true yap)
+        showBES: false,   // BES fonlarını göster (API bulununca true yap)
+        showUS: true,     // US hisselerini göster
+        showBIST: true    // BIST hisselerini göster
+    },
+
+    /**
      * Stock Market APIs (mevcut)
      */
     stocks: {

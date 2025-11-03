@@ -29,9 +29,17 @@ class MarketsManager {
                 bes_funds: []
             };
 
-            // Combine US stocks, BIST stocks, TEFAS funds, and BES funds
+            // Check feature flags
+            const features = window.FINANS_CONFIG?.features || {
+                showUS: true,
+                showBIST: true,
+                showTEFAS: false,
+                showBES: false
+            };
+
+            // Combine stocks based on feature flags
             this.stocks = [
-                ...data.us_stocks.map(s => {
+                ...(features.showUS ? data.us_stocks.map(s => {
                     const stock = {
                         ...s,
                         market: 'us',
@@ -46,8 +54,8 @@ class MarketsManager {
                     // Calculate technical score
                     stock.technicalScore = this.calculateTechnicalScore(stock);
                     return stock;
-                }),
-                ...data.bist_stocks.map(s => {
+                }) : []),
+                ...(features.showBIST ? data.bist_stocks.map(s => {
                     const stock = {
                         ...s,
                         market: 'bist',
@@ -61,8 +69,8 @@ class MarketsManager {
                     // Calculate technical score
                     stock.technicalScore = this.calculateTechnicalScore(stock);
                     return stock;
-                }),
-                ...data.tefas_funds.map(s => {
+                }) : []),
+                ...(features.showTEFAS ? data.tefas_funds.map(s => {
                     const stock = {
                         ...s,
                         market: 'tefas',
@@ -76,8 +84,8 @@ class MarketsManager {
                     // Calculate technical score (funds usually less volatile)
                     stock.technicalScore = this.calculateTechnicalScore(stock);
                     return stock;
-                }),
-                ...data.bes_funds.map(s => {
+                }) : []),
+                ...(features.showBES ? data.bes_funds.map(s => {
                     const stock = {
                         ...s,
                         market: 'bes',
@@ -91,7 +99,7 @@ class MarketsManager {
                     // Calculate technical score (pension funds most conservative)
                     stock.technicalScore = this.calculateTechnicalScore(stock);
                     return stock;
-                })
+                }) : [])
             ];
 
             this.filteredStocks = [...this.stocks];
@@ -111,7 +119,40 @@ class MarketsManager {
         }
     }
 
+    initializeMarketFilter() {
+        const marketFilter = document.getElementById('marketFilter');
+        if (!marketFilter) return;
+
+        const features = window.FINANS_CONFIG?.features || {
+            showUS: true,
+            showBIST: true,
+            showTEFAS: false,
+            showBES: false
+        };
+
+        // Build options based on feature flags
+        const options = ['<option value="all">Tüm Piyasalar</option>'];
+
+        if (features.showUS) {
+            options.push('<option value="us">ABD Hisseleri</option>');
+        }
+        if (features.showBIST) {
+            options.push('<option value="bist">BIST Hisseleri</option>');
+        }
+        if (features.showTEFAS) {
+            options.push('<option value="tefas">TEFAS Fonları</option>');
+        }
+        if (features.showBES) {
+            options.push('<option value="bes">BES Fonları</option>');
+        }
+
+        marketFilter.innerHTML = options.join('');
+    }
+
     setupEventListeners() {
+        // Initialize market filter dropdown based on feature flags
+        this.initializeMarketFilter();
+
         // Search
         const searchInput = document.getElementById('stockSearch');
         if (searchInput) {
