@@ -321,28 +321,55 @@ async function loadUserDataFromFirestore(userId) {
 
         if (userDoc.exists()) {
             const userData = userDoc.data();
-            console.log('✅ User data loaded from Firestore');
+            console.log('✅ User data loaded from Firestore:', userData);
 
-            // Restore data to localStorage and app state
+            // Restore SIMULATOR data to localStorage
+            if (userData.sim_accounts) {
+                localStorage.setItem('sim_accounts', JSON.stringify(userData.sim_accounts));
+            }
+            if (userData.sim_portfolio) {
+                localStorage.setItem('sim_portfolio', JSON.stringify(userData.sim_portfolio));
+            }
+            if (userData.sim_history) {
+                localStorage.setItem('sim_history', JSON.stringify(userData.sim_history));
+            }
+            if (userData.sim_pending_orders) {
+                localStorage.setItem('sim_pending_orders', JSON.stringify(userData.sim_pending_orders));
+            }
+            if (userData.sim_performance) {
+                localStorage.setItem('sim_performance', JSON.stringify(userData.sim_performance));
+            }
+            if (userData.sim_settings) {
+                localStorage.setItem('sim_settings', JSON.stringify(userData.sim_settings));
+            }
+
+            // Also restore old keys for backwards compatibility
             if (userData.watchlist) {
                 localStorage.setItem('watchlist', JSON.stringify(userData.watchlist));
-            }
-            if (userData.portfolio) {
-                localStorage.setItem('portfolio', JSON.stringify(userData.portfolio));
-            }
-            if (userData.transactions) {
-                localStorage.setItem('transactions', JSON.stringify(userData.transactions));
-            }
-            if (userData.cash !== undefined) {
-                localStorage.setItem('simulatorCash', userData.cash.toString());
             }
             if (userData.progress) {
                 localStorage.setItem('educationProgress', JSON.stringify(userData.progress));
             }
 
-            // Trigger UI updates
-            if (window.simulator && typeof window.simulator.loadFromStorage === 'function') {
-                window.simulator.loadFromStorage();
+            // Trigger UI updates - reload simulator completely
+            console.log('🔄 Reloading simulator with user data...');
+            if (window.simulator && typeof window.simulator.updateUI === 'function') {
+                // Force reload all managers from localStorage
+                if (window.simulator.accountManager) {
+                    window.simulator.accountManager.accounts = window.simulator.accountManager.loadAccounts();
+                }
+                if (window.simulator.portfolioManager) {
+                    window.simulator.portfolioManager.holdings = window.simulator.portfolioManager.loadPortfolio();
+                }
+                if (window.simulator.historyManager) {
+                    window.simulator.historyManager.transactions = window.simulator.historyManager.loadHistory();
+                }
+                if (window.simulator.performanceTracker) {
+                    window.simulator.performanceTracker.records = window.simulator.performanceTracker.loadPerformance();
+                }
+                // Update the UI
+                window.simulator.updateUI();
+                console.log('✅ Simulator reloaded with user data');
             }
             if (window.progressTracker && typeof window.progressTracker.loadFromLocalStorage === 'function') {
                 window.progressTracker.loadFromLocalStorage();
@@ -364,10 +391,18 @@ async function createUserDocument(userId) {
         const userDocRef = doc(db, 'users', userId);
         await setDoc(userDocRef, {
             createdAt: serverTimestamp(),
+            // Simulator data (new keys)
+            sim_accounts: {
+                USD: { balance: 10000, currency: 'USD', symbol: '$', initialBalance: 10000 },
+                TRY: { balance: 300000, currency: 'TRY', symbol: '₺', initialBalance: 300000 }
+            },
+            sim_portfolio: [],
+            sim_history: [],
+            sim_pending_orders: [],
+            sim_performance: [],
+            sim_settings: {},
+            // Old keys for backwards compatibility
             watchlist: [],
-            portfolio: [],
-            transactions: [],
-            cash: 10000,
             progress: {
                 daysCompleted: {},
                 quizScores: {},
@@ -381,7 +416,7 @@ async function createUserDocument(userId) {
             },
             lastUpdated: serverTimestamp()
         });
-        console.log('✅ User document created with progress tracking');
+        console.log('✅ User document created with simulator data');
     } catch (error) {
         console.error('❌ Error creating user document:', error);
     }
@@ -397,19 +432,39 @@ async function saveUserDataToFirestore() {
     try {
         const userDocRef = doc(db, 'users', currentUser.uid);
 
+        // Collect SIMULATOR data from localStorage
         const userData = {
+            // Simulator data (new keys)
+            sim_accounts: JSON.parse(localStorage.getItem('sim_accounts') || 'null'),
+            sim_portfolio: JSON.parse(localStorage.getItem('sim_portfolio') || '[]'),
+            sim_history: JSON.parse(localStorage.getItem('sim_history') || '[]'),
+            sim_pending_orders: JSON.parse(localStorage.getItem('sim_pending_orders') || '[]'),
+            sim_performance: JSON.parse(localStorage.getItem('sim_performance') || '[]'),
+            sim_settings: JSON.parse(localStorage.getItem('sim_settings') || '{}'),
+            // Old keys for backwards compatibility
             watchlist: JSON.parse(localStorage.getItem('watchlist') || '[]'),
-            portfolio: JSON.parse(localStorage.getItem('portfolio') || '[]'),
-            transactions: JSON.parse(localStorage.getItem('transactions') || '[]'),
-            cash: parseFloat(localStorage.getItem('simulatorCash') || '10000'),
             progress: JSON.parse(localStorage.getItem('educationProgress') || '{}'),
             lastUpdated: serverTimestamp()
         };
 
+        // Remove null values
+        Object.keys(userData).forEach(key => {
+            if (userData[key] === null) {
+                delete userData[key];
+            }
+        });
+
         await updateDoc(userDocRef, userData);
-        console.log('✅ User data saved to Firestore');
+        console.log('✅ Simulator data saved to Firestore:', userData);
     } catch (error) {
         console.error('❌ Error saving user data:', error);
+        // If document doesn't exist, create it
+        if (error.code === 'not-found') {
+            console.log('📝 Creating new user document...');
+            await createUserDocument(currentUser.uid);
+            // Retry save
+            await saveUserDataToFirestore();
+        }
     }
 }
 
@@ -418,37 +473,79 @@ async function migrateLocalStorageToFirestore(userId) {
     if (!db) return;
 
     try {
+        // Get SIMULATOR data from localStorage
+        const sim_accounts = JSON.parse(localStorage.getItem('sim_accounts') || 'null');
+        const sim_portfolio = JSON.parse(localStorage.getItem('sim_portfolio') || '[]');
+        const sim_history = JSON.parse(localStorage.getItem('sim_history') || '[]');
+        const sim_pending_orders = JSON.parse(localStorage.getItem('sim_pending_orders') || '[]');
+        const sim_performance = JSON.parse(localStorage.getItem('sim_performance') || '[]');
+        const sim_settings = JSON.parse(localStorage.getItem('sim_settings') || '{}');
+
+        // Get old data for backwards compatibility
         const watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
-        const portfolio = JSON.parse(localStorage.getItem('portfolio') || '[]');
-        const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-        const cash = parseFloat(localStorage.getItem('simulatorCash') || '10000');
+        const progress = JSON.parse(localStorage.getItem('educationProgress') || '{}');
 
         // Check if user has data in Firestore
         const userDocRef = doc(db, 'users', userId);
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
-            // User exists, merge data
+            // User exists - decide whether to keep cloud data or local data
             const existingData = userDoc.data();
-            await updateDoc(userDocRef, {
-                watchlist: [...new Set([...existingData.watchlist, ...watchlist])],
-                portfolio: mergePortfolios(existingData.portfolio, portfolio),
-                transactions: [...existingData.transactions, ...transactions],
-                cash: cash, // Use local cash if higher?
-                lastUpdated: serverTimestamp()
-            });
-            console.log('✅ Data merged to Firestore');
+
+            console.log('🔄 User exists in Firestore. Checking data...');
+            console.log('  - Cloud portfolio items:', existingData.sim_portfolio?.length || 0);
+            console.log('  - Local portfolio items:', sim_portfolio.length);
+            console.log('  - Cloud history items:', existingData.sim_history?.length || 0);
+            console.log('  - Local history items:', sim_history.length);
+
+            // If local data exists and has more items, ask user or merge
+            const hasLocalData = sim_portfolio.length > 0 || sim_history.length > 0;
+            const hasCloudData = (existingData.sim_portfolio?.length || 0) > 0 || (existingData.sim_history?.length || 0) > 0;
+
+            if (hasLocalData && hasCloudData) {
+                console.log('⚠️ Both local and cloud data exist. Keeping cloud data and discarding local.');
+                // Keep cloud data - reload it to localStorage
+                await loadUserDataFromFirestore(userId);
+            } else if (hasLocalData && !hasCloudData) {
+                // Upload local data to cloud
+                console.log('📤 Uploading local data to cloud...');
+                await updateDoc(userDocRef, {
+                    sim_accounts: sim_accounts || existingData.sim_accounts,
+                    sim_portfolio: sim_portfolio,
+                    sim_history: sim_history,
+                    sim_pending_orders: sim_pending_orders,
+                    sim_performance: sim_performance,
+                    sim_settings: sim_settings,
+                    watchlist: watchlist,
+                    progress: progress,
+                    lastUpdated: serverTimestamp()
+                });
+                console.log('✅ Local data uploaded to Firestore');
+            } else {
+                // No local data, keep cloud data
+                console.log('📥 No local data, loading from cloud...');
+                await loadUserDataFromFirestore(userId);
+            }
         } else {
-            // New user, create document
+            // New user, create document with local data
+            console.log('📝 New user, creating document with local data...');
             await setDoc(userDocRef, {
                 createdAt: serverTimestamp(),
-                watchlist,
-                portfolio,
-                transactions,
-                cash,
+                sim_accounts: sim_accounts || {
+                    USD: { balance: 10000, currency: 'USD', symbol: '$', initialBalance: 10000 },
+                    TRY: { balance: 300000, currency: 'TRY', symbol: '₺', initialBalance: 300000 }
+                },
+                sim_portfolio: sim_portfolio,
+                sim_history: sim_history,
+                sim_pending_orders: sim_pending_orders,
+                sim_performance: sim_performance,
+                sim_settings: sim_settings,
+                watchlist: watchlist,
+                progress: progress,
                 lastUpdated: serverTimestamp()
             });
-            console.log('✅ Data migrated to Firestore');
+            console.log('✅ New user document created with local data');
         }
     } catch (error) {
         console.error('❌ Error migrating data:', error);
@@ -487,13 +584,25 @@ function setupAutoSave() {
     localStorage.setItem = function(key, value) {
         originalSetItem.call(this, key, value);
 
-        // Auto-save to Firestore for specific keys
-        if (['watchlist', 'portfolio', 'transactions', 'simulatorCash', 'educationProgress'].includes(key)) {
+        // Auto-save to Firestore for SIMULATOR keys
+        const simulatorKeys = [
+            'sim_accounts',
+            'sim_portfolio',
+            'sim_history',
+            'sim_pending_orders',
+            'sim_performance',
+            'sim_settings',
+            'watchlist',
+            'educationProgress'
+        ];
+
+        if (simulatorKeys.includes(key)) {
             // Debounce to avoid too many writes
             clearTimeout(window.firestoreSaveTimeout);
             window.firestoreSaveTimeout = setTimeout(() => {
+                console.log('💾 Auto-saving to Firestore after', key, 'changed');
                 saveUserDataToFirestore();
-            }, 1000); // Save after 1 second of inactivity
+            }, 2000); // Save after 2 seconds of inactivity
         }
     };
 }
