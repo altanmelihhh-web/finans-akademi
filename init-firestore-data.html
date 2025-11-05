@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Firestore Data Initializer</title>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKPAl1z_Iv1CU2Evi0pfMYdsfbnztyh7I",
+            authDomain: "finans-akademi.firebaseapp.com",
+            projectId: "finans-akademi",
+            storageBucket: "finans-akademi.firebasestorage.app",
+            messagingSenderId: "1071008879135",
+            appId: "1:1071008879135:web:421383d64df04911e6fb2a",
+            measurementId: "G-0NSZHLJPLT"
+        };
+
+        // Initialize
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Sample market data
+        const marketData = {
+            dashboard: {
+                forex: {
+                    USDTRY: 35.20,
+                    EURTRY: 37.50,
+                    timestamp: Date.now()
+                },
+                crypto: {
+                    BTC: {
+                        price: 101923,
+                        change24h: -2.52
+                    },
+                    ETH: {
+                        price: 3325.33,
+                        change24h: -4.86
+                    }
+                },
+                lastUpdate: new Date().toISOString(),
+                timestamp: Date.now()
+            },
+            'us-stocks': {
+                AAPL: { price: 270.04, change: 2.50, changePercent: 0.93 },
+                MSFT: { price: 514.33, change: -1.20, changePercent: -0.23 },
+                TSLA: { price: 444.26, change: 5.80, changePercent: 1.32 },
+                GOOGL: { price: 277.54, change: -0.85, changePercent: -0.31 },
+                AMZN: { price: 249.32, change: 3.20, changePercent: 1.30 },
+                META: { price: 618.25, change: 8.50, changePercent: 1.39 },
+                NVDA: { price: 145.89, change: -2.10, changePercent: -1.42 },
+                JPM: { price: 248.75, change: 1.25, changePercent: 0.51 },
+                V: { price: 321.40, change: -0.90, changePercent: -0.28 },
+                WMT: { price: 95.20, change: 0.75, changePercent: 0.79 },
+                timestamp: Date.now()
+            },
+            'bist-stocks': {
+                THYAO: { price: 350.50, change: 5.20, changePercent: 1.51 },
+                EREGL: { price: 52.30, change: -0.85, changePercent: -1.60 },
+                SISE: { price: 45.75, change: 1.20, changePercent: 2.69 },
+                TUPRS: { price: 125.40, change: -2.10, changePercent: -1.65 },
+                PETKM: { price: 35.60, change: 0.75, changePercent: 2.15 },
+                KRDMD: { price: 8.90, change: -0.15, changePercent: -1.66 },
+                ARCLK: { price: 156.80, change: 3.45, changePercent: 2.25 },
+                TAVHL: { price: 97.06, change: -1.94, changePercent: -1.96 },
+                ISCTR: { price: 12.35, change: -0.23, changePercent: -1.83 },
+                AKBNK: { price: 62.25, change: 1.05, changePercent: 1.71 },
+                timestamp: Date.now()
+            },
+            crypto: {
+                BTC: { price: 101923, change24h: -2.52, high24h: 104500, low24h: 100800 },
+                ETH: { price: 3325.33, change24h: -4.86, high24h: 3498, low24h: 3290 },
+                BNB: { price: 705.23, change24h: -1.23, high24h: 718, low24h: 698 },
+                ADA: { price: 1.15, change24h: 2.35, high24h: 1.18, low24h: 1.12 },
+                SOL: { price: 245.67, change24h: -3.12, high24h: 253, low24h: 242 },
+                timestamp: Date.now()
+            }
+        };
+
+        // Upload function
+        async function uploadData() {
+            const status = document.getElementById('status');
+            const button = document.getElementById('uploadBtn');
+
+            button.disabled = true;
+            status.innerHTML = '⏳ Uploading data to Firestore...';
+
+            try {
+                // Upload each section
+                for (const [key, value] of Object.entries(marketData)) {
+                    await setDoc(doc(db, 'public/market-data', key), value);
+                    status.innerHTML += `<br>✅ ${key} uploaded`;
+                }
+
+                status.innerHTML += '<br><br><strong>🎉 All data uploaded successfully!</strong>';
+                status.innerHTML += '<br><br>Now check: <a href="https://console.firebase.google.com/project/finans-akademi/firestore/data" target="_blank">Firebase Console</a>';
+                status.style.color = '#10b981';
+            } catch (error) {
+                status.innerHTML = '❌ Error: ' + error.message;
+                status.style.color = '#ef4444';
+                button.disabled = false;
+            }
+        }
+
+        // Make function global
+        window.uploadData = uploadData;
+    </script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+        }
+        .subtitle {
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            min-height: 50px;
+            line-height: 1.6;
+        }
+        .info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 4px solid white;
+        }
+        .data-preview {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        a {
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firestore Data Initializer</h1>
+        <p class="subtitle">Initialize your Firestore with market data in one click!</p>
+
+        <div class="info">
+            <strong>📊 What will be uploaded:</strong>
+            <ul style="margin: 10px 0;">
+                <li>Dashboard data (Forex: USD/TRY, EUR/TRY)</li>
+                <li>Crypto prices (BTC, ETH, BNB, ADA, SOL)</li>
+                <li>US Stocks (AAPL, MSFT, TSLA, GOOGL, etc.)</li>
+                <li>BIST Stocks (THYAO, EREGL, PETKM, KRDMD, etc.)</li>
+            </ul>
+        </div>
+
+        <div class="data-preview">
+            <strong>Preview:</strong><br>
+            /public/market-data/<br>
+            ├── dashboard → {forex, crypto}<br>
+            ├── us-stocks → {AAPL: 270.04, MSFT: 514.33, ...}<br>
+            ├── bist-stocks → {THYAO: 350.50, EREGL: 52.30, ...}<br>
+            └── crypto → {BTC: 101923, ETH: 3325, ...}
+        </div>
+
+        <button id="uploadBtn" onclick="uploadData()">
+            🚀 Upload Data to Firestore
+        </button>
+
+        <div id="status">
+            👆 Click the button above to initialize Firestore with market data
+        </div>
+
+        <div class="info" style="margin-top: 30px;">
+            <strong>⚡ After upload:</strong><br>
+            1. Check Firebase Console to verify data<br>
+            2. Refresh your website<br>
+            3. Market data will load from Firestore!<br>
+            4. Simulator will show correct prices!
+        </div>
+    </div>
+</body>
+</html>
