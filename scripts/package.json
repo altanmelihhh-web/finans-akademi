@@ -1,0 +1,17 @@
+{
+  "name": "finans-akademi-market-updater",
+  "version": "1.0.0",
+  "description": "Market data updater script for Finans Akademi",
+  "type": "module",
+  "scripts": {
+    "update": "node update-market-data.js",
+    "watch": "nodemon update-market-data.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

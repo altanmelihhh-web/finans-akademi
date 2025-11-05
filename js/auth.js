@@ -20,6 +20,7 @@ import {
     updateDoc,
     serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import marketDataService from './market-data-service.js';
 
 // Initialize Firebase (config will be loaded from firebase-config.js)
 let app, auth, db, provider;
@@ -39,6 +40,13 @@ function initFirebase() {
         auth = getAuth(app);
         db = getFirestore(app);
         provider = new GoogleAuthProvider();
+
+        // Initialize Market Data Service
+        marketDataService.init(app).then(success => {
+            if (success) {
+                console.log('📊 Market Data Service ready');
+            }
+        });
 
         // Listen for auth state changes
         onAuthStateChanged(auth, handleAuthStateChange);
