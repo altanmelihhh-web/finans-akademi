@@ -491,7 +491,45 @@ async function migrateLocalStorageToFirestore(userId) {
 
         if (userDoc.exists()) {
             // User exists - decide whether to keep cloud data or local data
-            const existingData = userDoc.data();
+            let existingData = userDoc.data();
+
+            // ⚡ MIGRATION: Convert old data format to new format
+            const needsMigration = existingData.portfolio || existingData.transactions || existingData.cash;
+            if (needsMigration) {
+                console.log('🔄 Migrating old Firestore data to new format...');
+
+                const migratedData = {
+                    sim_accounts: existingData.sim_accounts || {
+                        USD: {
+                            balance: parseFloat(existingData.cash || 10000),
+                            currency: 'USD',
+                            symbol: '$',
+                            initialBalance: 10000
+                        },
+                        TRY: {
+                            balance: 300000,
+                            currency: 'TRY',
+                            symbol: '₺',
+                            initialBalance: 300000
+                        }
+                    },
+                    sim_portfolio: existingData.portfolio || [],
+                    sim_history: existingData.transactions || [],
+                    sim_pending_orders: [],
+                    sim_performance: [],
+                    sim_settings: {},
+                    watchlist: existingData.watchlist || [],
+                    progress: existingData.progress || {},
+                    lastUpdated: serverTimestamp()
+                };
+
+                // Update Firebase with new format
+                await updateDoc(userDocRef, migratedData);
+                console.log('✅ Migration complete - old data converted to new format');
+
+                // Update local reference
+                existingData = migratedData;
+            }
 
             console.log('🔄 User exists in Firestore. Checking data...');
             console.log('  - Cloud portfolio items:', existingData.sim_portfolio?.length || 0);
