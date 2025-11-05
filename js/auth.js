@@ -68,10 +68,32 @@ function handleAuthStateChange(user) {
         console.log('✅ User logged in:', user.email);
         showUserProfile(user);
         loadUserDataFromFirestore(user.uid);
+
+        // Reinitialize simulator with user data
+        if (window.tradingSimulator || window.simulator) {
+            const sim = window.tradingSimulator || window.simulator;
+            sim.isInitialized = false;
+            setTimeout(() => {
+                sim.init();
+            }, 1000); // Wait for Firebase data to load
+        }
     } else {
         console.log('👤 No user logged in');
         showLoginButton();
-        loadUserDataFromLocalStorage();
+
+        // Clear localStorage (don't show data when logged out)
+        localStorage.removeItem('sim_accounts');
+        localStorage.removeItem('sim_portfolio');
+        localStorage.removeItem('sim_history');
+        localStorage.removeItem('sim_performance');
+        localStorage.removeItem('sim_orders');
+
+        // Reinitialize simulator (will show login prompt)
+        if (window.tradingSimulator || window.simulator) {
+            const sim = window.tradingSimulator || window.simulator;
+            sim.isInitialized = false;
+            sim.init();
+        }
     }
 }
 

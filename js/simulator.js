@@ -1221,6 +1221,16 @@ class TradingSimulator {
         }
 
         try {
+            // ⚠️ CHECK AUTH: Only initialize if user is logged in
+            const currentUser = window.getCurrentUser ? window.getCurrentUser() : null;
+            if (!currentUser) {
+                console.log('⚠️ Simulator requires login - showing login prompt');
+                this.showLoginPrompt();
+                return;
+            }
+
+            console.log('✅ User authenticated:', currentUser.email);
+
             // Wait for markets manager to exist (but not for prices)
             await this.waitForMarketsManagerBasic();
 
@@ -1766,6 +1776,42 @@ class TradingSimulator {
         this.showNotification('✅ Simulator sıfırlandı', 'success');
 
         console.log('Simulator reset complete');
+    }
+
+    /**
+     * Show login prompt (when user is not authenticated)
+     */
+    showLoginPrompt() {
+        const container = document.getElementById('portfolioContainer');
+        const emptyState = document.getElementById('emptyPortfolio');
+        const accountInfo = document.querySelector('.account-card');
+
+        // Hide normal UI
+        if (container) container.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'none';
+
+        // Show login prompt in account info area
+        if (accountInfo) {
+            accountInfo.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 64px; margin-bottom: 20px;">🔒</div>
+                    <h2 style="color: var(--text-primary); margin-bottom: 16px;">
+                        Giriş Yapmanız Gerekiyor
+                    </h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 16px;">
+                        Sanal İşlem Simülatörü'nü kullanmak için lütfen Gmail hesabınızla giriş yapın.
+                        <br>Verileriniz güvenli bir şekilde saklanır ve tüm cihazlarınızda senkronize olur.
+                    </p>
+                    <button onclick="document.getElementById('loginBtn')?.click()"
+                            style="background: var(--primary-color); color: white; border: none;
+                                   padding: 16px 48px; border-radius: 12px; font-size: 18px;
+                                   font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+                                   transition: all 0.3s;">
+                        <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                    </button>
+                </div>
+            `;
+        }
     }
 
     /**
