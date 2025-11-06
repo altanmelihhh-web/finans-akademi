@@ -1,0 +1,528 @@
+/**
+ * ================================================================================
+ * SIMULATOR GAMIFICATION STYLES
+ * ================================================================================
+ */
+
+/* ================================================================================
+   ACHIEVEMENT UNLOCK ANIMATION
+   ================================================================================ */
+
+.achievement-unlock {
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-width: 350px;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.achievement-unlock.show {
+    top: 30px;
+}
+
+.achievement-unlock .achievement-icon {
+    font-size: 48px;
+    animation: bounceIcon 0.6s ease-in-out infinite alternate;
+}
+
+.achievement-unlock .achievement-content h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.achievement-unlock .achievement-content p {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.achievement-unlock .achievement-content small {
+    display: block;
+    margin-top: 4px;
+    opacity: 0.8;
+    font-size: 13px;
+}
+
+.achievement-unlock .achievement-points {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+@keyframes bounceIcon {
+    from { transform: scale(1); }
+    to { transform: scale(1.2); }
+}
+
+/* ================================================================================
+   LEVEL UP NOTIFICATION
+   ================================================================================ */
+
+.level-up-notification {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0);
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: background 0.3s;
+}
+
+.level-up-notification.show {
+    background: rgba(0, 0, 0, 0.7);
+    pointer-events: all;
+}
+
+.level-up-content {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 60px 80px;
+    border-radius: 24px;
+    text-align: center;
+    color: white;
+    transform: scale(0);
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.level-up-notification.show .level-up-content {
+    transform: scale(1);
+}
+
+.level-up-icon {
+    font-size: 120px;
+    margin-bottom: 20px;
+    animation: rotateIcon 2s ease-in-out infinite;
+}
+
+.level-up-content h2 {
+    font-size: 42px;
+    margin: 0 0 16px 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.level-up-content .level-name {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 8px 0;
+}
+
+.level-up-content .level-number {
+    font-size: 24px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+@keyframes rotateIcon {
+    0%, 100% { transform: rotate(-10deg) scale(1); }
+    50% { transform: rotate(10deg) scale(1.1); }
+}
+
+/* ================================================================================
+   ACHIEVEMENTS GRID
+   ================================================================================ */
+
+.achievements-section {
+    margin: 40px 0;
+    padding: 30px;
+    background: var(--card-background);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.achievements-section h2 {
+    margin: 0 0 24px 0;
+    font-size: 28px;
+    color: var(--text-primary);
+}
+
+#achievementsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.achievement-card {
+    position: relative;
+    background: var(--background);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s;
+}
+
+.achievement-card.locked {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+.achievement-card.unlocked {
+    border-color: var(--success-color);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+}
+
+.achievement-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.achievement-card .achievement-icon {
+    font-size: 40px;
+}
+
+.achievement-card .achievement-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.achievement-card .achievement-info p {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.achievement-card .achievement-points {
+    display: inline-block;
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.achievement-card .achievement-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    background: var(--success-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* ================================================================================
+   LEVEL DISPLAY
+   ================================================================================ */
+
+.level-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.3);
+}
+
+.level-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.level-info h2 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.level-info p {
+    margin: 4px 0 0 0;
+    opacity: 0.9;
+    font-size: 18px;
+}
+
+.level-stats {
+    text-align: right;
+}
+
+.level-stats .stat {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.level-progress-bar {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    height: 20px;
+    overflow: hidden;
+    position: relative;
+}
+
+.level-progress-fill {
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
+}
+
+.level-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ================================================================================
+   DAILY CHALLENGES
+   ================================================================================ */
+
+.challenges-section {
+    margin: 30px 0;
+    padding: 24px;
+    background: var(--card-background);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.challenges-section h2 {
+    margin: 0 0 20px 0;
+    font-size: 24px;
+    color: var(--text-primary);
+}
+
+#dailyChallengesContainer {
+    display: grid;
+    gap: 12px;
+}
+
+.challenge-card {
+    position: relative;
+    background: var(--background);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.3s;
+}
+
+.challenge-card.completed {
+    border-color: var(--success-color);
+    background: rgba(34, 197, 94, 0.05);
+}
+
+.challenge-card .challenge-icon {
+    font-size: 32px;
+}
+
+.challenge-card .challenge-info {
+    flex: 1;
+}
+
+.challenge-card .challenge-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.challenge-card .challenge-info p {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.challenge-card .challenge-points {
+    background: var(--warning-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.challenge-card .challenge-check {
+    width: 32px;
+    height: 32px;
+    background: var(--success-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+/* ================================================================================
+   SMART NOTIFICATIONS
+   ================================================================================ */
+
+.smart-notification {
+    position: fixed;
+    bottom: -100px;
+    right: 30px;
+    background: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    min-width: 300px;
+    max-width: 400px;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border-left: 4px solid var(--primary-color);
+}
+
+.smart-notification.show {
+    bottom: 30px;
+}
+
+.smart-notification.success {
+    border-left-color: var(--success-color);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+}
+
+.smart-notification.warning {
+    border-left-color: var(--warning-color);
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%);
+}
+
+.smart-notification.info {
+    border-left-color: var(--info-color);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+}
+
+.smart-notification .notification-content p {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ================================================================================
+   STATS DASHBOARD
+   ================================================================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.stat-card {
+    background: var(--card-background);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.stat-card .stat-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.stat-card .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.stat-card .stat-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* ================================================================================
+   RESPONSIVE
+   ================================================================================ */
+
+@media (max-width: 768px) {
+    .achievement-unlock {
+        min-width: 90%;
+        left: 5%;
+        transform: none;
+    }
+
+    .level-up-content {
+        padding: 40px 30px;
+    }
+
+    .level-up-icon {
+        font-size: 80px;
+    }
+
+    .level-up-content h2 {
+        font-size: 32px;
+    }
+
+    #achievementsContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .smart-notification {
+        right: 16px;
+        left: 16px;
+        max-width: none;
+    }
+}
+
+/* ================================================================================
+   ANIMATIONS
+   ================================================================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.animate-fadeInUp {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}

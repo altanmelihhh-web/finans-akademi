@@ -1248,6 +1248,9 @@ class TradingSimulator {
             // Initial render
             this.updateUI();
 
+            // Record initial performance (for chart baseline)
+            this.performanceTracker.recordPerformance(this.currentPrices);
+
             // Refresh stock dropdown when prices are loaded
             setTimeout(() => {
                 this.loadCurrentPrices();
@@ -1257,6 +1260,12 @@ class TradingSimulator {
 
             // Check pending orders periodically
             setInterval(() => this.checkPendingOrders(), 5000);
+
+            // Record performance every 5 minutes for chart
+            setInterval(() => {
+                this.performanceTracker.recordPerformance(this.currentPrices);
+                this.performanceTracker.renderChart();
+            }, 300000); // 5 minutes
 
             this.isInitialized = true;
             console.log('✅ Trading Simulator v3.0 initialized (prices loading in background)');
@@ -1539,6 +1548,30 @@ class TradingSimulator {
 
             // Record performance
             this.performanceTracker.recordPerformance(this.currentPrices);
+
+            // 🎮 GAMIFICATION: Check achievements and provide feedback
+            if (window.gamificationManager) {
+                // Update stats
+                window.gamificationManager.updateStats(transaction);
+
+                // Check achievements
+                window.gamificationManager.checkAchievements(transaction, {
+                    holdings: this.portfolioManager.holdings
+                });
+
+                // Analyze result if it's a sell
+                if (this.currentAction === 'sell' && transaction.realizedPL !== undefined) {
+                    const profitPercent = ((transaction.realizedPL / transaction.total) * 100);
+                    const feedback = window.gamificationManager.analyzeResult({
+                        profitPercent,
+                        holdingDays: 1, // TODO: Calculate actual holding days
+                    });
+
+                    feedback.forEach(f => {
+                        window.gamificationManager.showNotification(f.message, f.type);
+                    });
+                }
+            }
 
             // Update UI
             this.updateUI();

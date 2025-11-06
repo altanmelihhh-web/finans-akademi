@@ -4,6 +4,31 @@
         <h1>🎮 Sanal İşlem Simülatörü</h1>
         <p class="subtitle">Gerçek para kullanmadan, güvenli ortamda alım-satım pratiği yapın!</p>
 
+        <!-- Level & Progress Section -->
+        <div class="level-section">
+            <div class="level-header">
+                <div class="level-info">
+                    <h2 id="currentLevel">🌱 Seviye 1</h2>
+                    <p id="levelName">Yeni Başlayan</p>
+                </div>
+                <div class="level-stats">
+                    <div class="stat" id="levelPoints">0 / 100 XP</div>
+                </div>
+            </div>
+            <div class="level-progress-bar">
+                <div class="level-progress-fill" id="levelProgress" style="width: 0%"></div>
+                <div class="level-progress-text">Seviye 2'ye 100 XP kaldı</div>
+            </div>
+        </div>
+
+        <!-- Daily Challenges -->
+        <div class="challenges-section">
+            <h2>🎯 Günlük Görevler</h2>
+            <div id="dailyChallengesContainer">
+                <!-- Challenges will be loaded here -->
+            </div>
+        </div>
+
         <!-- Account Overview -->
         <div class="simulator-header">
             <div class="account-card">
@@ -187,17 +212,11 @@
             <canvas id="performanceChart"></canvas>
         </div>
 
-        <!-- Leaderboard -->
-        <div class="leaderboard-section">
-            <h2><i class="fas fa-trophy"></i> Liderlik Tablosu (Yerel)</h2>
-            <p class="info-text">En yüksek getiri sağlayan sanal portföyler</p>
-
-            <div class="leaderboard">
-                <div class="leaderboard-item gold">
-                    <span class="rank">🥇 1</span>
-                    <span class="name">Sen</span>
-                    <span class="return">0%</span>
-                </div>
+        <!-- Achievements Section -->
+        <div class="achievements-section">
+            <h2>🏆 Başarımlar</h2>
+            <div id="achievementsContainer">
+                <!-- Achievements will be loaded here -->
             </div>
         </div>
 
