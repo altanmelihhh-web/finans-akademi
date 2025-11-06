@@ -1221,15 +1221,16 @@ class TradingSimulator {
         }
 
         try {
-            // ⚠️ CHECK AUTH: Only initialize if user is logged in
+            // ✅ GUEST MODE SUPPORT: Allow both guest and logged-in users
             const currentUser = window.getCurrentUser ? window.getCurrentUser() : null;
-            if (!currentUser) {
-                console.log('⚠️ Simulator requires login - showing login prompt');
-                this.showLoginPrompt();
-                return;
-            }
 
-            console.log('✅ User authenticated:', currentUser.email);
+            if (currentUser) {
+                console.log('✅ User authenticated:', currentUser.email);
+                this.showUserModeInfo('logged-in', currentUser.email);
+            } else {
+                console.log('👤 Guest mode - data stored locally');
+                this.showUserModeInfo('guest');
+            }
 
             // Wait for markets manager to exist (but not for prices)
             await this.waitForMarketsManagerBasic();
@@ -1779,37 +1780,59 @@ class TradingSimulator {
     }
 
     /**
-     * Show login prompt (when user is not authenticated)
+     * Show user mode info banner
      */
-    showLoginPrompt() {
-        const container = document.getElementById('portfolioContainer');
-        const emptyState = document.getElementById('emptyPortfolio');
-        const accountInfo = document.querySelector('.account-card');
+    showUserModeInfo(mode, email = null) {
+        // Find or create info banner container
+        let banner = document.getElementById('userModeInfoBanner');
 
-        // Hide normal UI
-        if (container) container.style.display = 'none';
-        if (emptyState) emptyState.style.display = 'none';
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'userModeInfoBanner';
+            banner.style.cssText = `
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            `;
 
-        // Show login prompt in account info area
-        if (accountInfo) {
-            accountInfo.innerHTML = `
-                <div style="text-align: center; padding: 60px 20px;">
-                    <div style="font-size: 64px; margin-bottom: 20px;">🔒</div>
-                    <h2 style="color: var(--text-primary); margin-bottom: 16px;">
-                        Giriş Yapmanız Gerekiyor
-                    </h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 16px;">
-                        Sanal İşlem Simülatörü'nü kullanmak için lütfen Gmail hesabınızla giriş yapın.
-                        <br>Verileriniz güvenli bir şekilde saklanır ve tüm cihazlarınızda senkronize olur.
-                    </p>
-                    <button onclick="document.getElementById('loginBtn')?.click()"
-                            style="background: var(--primary-color); color: white; border: none;
-                                   padding: 16px 48px; border-radius: 12px; font-size: 18px;
-                                   font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-                                   transition: all 0.3s;">
-                        <i class="fas fa-sign-in-alt"></i> Giriş Yap
-                    </button>
+            // Insert at top of simulator
+            const tradeCard = document.querySelector('.trade-card');
+            if (tradeCard && tradeCard.parentNode) {
+                tradeCard.parentNode.insertBefore(banner, tradeCard);
+            }
+        }
+
+        if (mode === 'guest') {
+            banner.innerHTML = `
+                <div style="flex: 1;">
+                    <strong>👤 Misafir Modu</strong><br>
+                    <small>Verileriniz bu cihazda saklanıyor. Kalıcı kayıt için giriş yapın.</small>
                 </div>
+                <button onclick="document.getElementById('loginBtn')?.click()"
+                        style="background: white; color: #667eea; border: none;
+                               padding: 8px 20px; border-radius: 6px; font-weight: 600;
+                               cursor: pointer; transition: all 0.2s;">
+                    <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                </button>
+            `;
+        } else {
+            banner.innerHTML = `
+                <div style="flex: 1;">
+                    <strong>✅ Giriş Yapıldı</strong><br>
+                    <small>${email} - Verileriniz bulutta güvenle saklanıyor</small>
+                </div>
+                <button onclick="window.signOut?.()"
+                        style="background: rgba(255,255,255,0.2); color: white; border: 1px solid white;
+                               padding: 8px 20px; border-radius: 6px; font-weight: 600;
+                               cursor: pointer; transition: all 0.2s;">
+                    <i class="fas fa-sign-out-alt"></i> Çıkış
+                </button>
             `;
         }
     }
