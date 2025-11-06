@@ -1564,6 +1564,29 @@ class TradingSimulator {
             afterBalanceEl.textContent = Utils.formatCurrency(afterBalance, currency);
             afterBalanceEl.className = afterBalance < 0 ? 'negative' : 'positive';
         }
+
+        // 🎮 SMART TIPS: Show pre-trade warnings
+        if (window.gamificationManager && this.currentAction === 'buy') {
+            const portfolioValue = this.portfolioManager.getTotalValue(this.currentPrices);
+            const totalBalance = account.balance + portfolioValue.totalUSD;
+
+            const feedback = window.gamificationManager.analyzeTrade({
+                action: this.currentAction,
+                amount: total,
+                totalBalance: totalBalance,
+                portfolioSize: this.portfolioManager.holdings.length,
+                currentPrice: price,
+                avgMarketPrice: price // TODO: Calculate actual average
+            });
+
+            // Show warnings (if any)
+            feedback.forEach(f => {
+                if (f.type === 'warning' || f.type === 'tip') {
+                    // Display as a small inline warning below the form
+                    console.log('💡 Tip:', f.message);
+                }
+            });
+        }
     }
 
     /**
@@ -1617,25 +1640,44 @@ class TradingSimulator {
 
             // 🎮 GAMIFICATION: Check achievements and provide feedback
             if (window.gamificationManager) {
+                console.log('🎮 Gamification: Processing transaction...');
+
                 // Update stats
                 window.gamificationManager.updateStats(transaction);
+                console.log('📊 Stats updated:', window.gamificationManager.stats);
 
                 // Check achievements
                 window.gamificationManager.checkAchievements(transaction, {
                     holdings: this.portfolioManager.holdings
                 });
 
-                // Analyze result if it's a sell
+                // Show feedback for SELL transactions
                 if (this.currentAction === 'sell' && transaction.realizedPL !== undefined) {
                     const profitPercent = ((transaction.realizedPL / transaction.total) * 100);
+                    console.log('💰 Analyzing sell result:', profitPercent.toFixed(2) + '%');
+
                     const feedback = window.gamificationManager.analyzeResult({
                         profitPercent,
                         holdingDays: 1, // TODO: Calculate actual holding days
                     });
 
+                    console.log('📢 Feedback:', feedback);
+
                     feedback.forEach(f => {
-                        window.gamificationManager.showNotification(f.message, f.type);
+                        setTimeout(() => {
+                            window.gamificationManager.showNotification(f.message, f.type);
+                        }, 500);
                     });
+                }
+
+                // Show congratulation for BUY if first trade
+                if (this.currentAction === 'buy' && window.gamificationManager.stats.totalTrades === 1) {
+                    setTimeout(() => {
+                        window.gamificationManager.showNotification(
+                            '🎉 Tebrikler! İlk alımını yaptın. Şimdi fiyat değişimlerini izle!',
+                            'success'
+                        );
+                    }, 1000);
                 }
             }
 
