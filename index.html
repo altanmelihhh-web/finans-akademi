@@ -9869,6 +9869,31 @@ Pasif gelirin: 25.000 TL
                 <h1>🎮 Sanal İşlem Simülatörü</h1>
                 <p class="subtitle">Gerçek para riskisiz, $10,000 USD + ₺300,000 TRY ile trading pratiği yap!</p>
 
+                <!-- Level & Progress Section -->
+                <div class="level-section">
+                    <div class="level-header">
+                        <div class="level-info">
+                            <h2 id="currentLevel">🌱 Seviye 1</h2>
+                            <p id="levelName">Yeni Başlayan</p>
+                        </div>
+                        <div class="level-stats">
+                            <div class="stat" id="levelPoints">0 / 100 XP</div>
+                        </div>
+                    </div>
+                    <div class="level-progress-bar">
+                        <div class="level-progress-fill" id="levelProgress" style="width: 0%"></div>
+                        <div class="level-progress-text">Seviye 2'ye 100 XP kaldı</div>
+                    </div>
+                </div>
+
+                <!-- Daily Challenges -->
+                <div class="challenges-section">
+                    <h2>🎯 Günlük Görevler</h2>
+                    <div id="dailyChallengesContainer">
+                        <!-- Challenges will be loaded here -->
+                    </div>
+                </div>
+
                 <!-- Account Overview -->
                 <div class="simulator-header">
                     <div class="account-card">
@@ -10006,6 +10031,14 @@ Pasif gelirin: 25.000 TL
                 <div class="performance-section">
                     <h2><i class="fas fa-chart-area"></i> Performans</h2>
                     <canvas id="performanceChart"></canvas>
+                </div>
+
+                <!-- Achievements Section -->
+                <div class="achievements-section">
+                    <h2>🏆 Başarımlar</h2>
+                    <div id="achievementsContainer">
+                        <!-- Achievements will be loaded here -->
+                    </div>
                 </div>
             </div>
         </section>
