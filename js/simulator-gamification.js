@@ -706,4 +706,8 @@ if (document.readyState === 'loading') {
     initGamification();
 }
 
-export { GamificationManager, ACHIEVEMENTS, LEVELS, DAILY_CHALLENGES };
+// Export to window for non-module usage
+window.GamificationManager = GamificationManager;
+window.ACHIEVEMENTS = ACHIEVEMENTS;
+window.LEVELS = LEVELS;
+window.DAILY_CHALLENGES = DAILY_CHALLENGES;
