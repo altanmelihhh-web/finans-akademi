@@ -6166,9 +6166,27 @@ footer i {
 }
 
 /* Performance Chart */
+.performance-section {
+    position: relative;
+    min-height: 450px;
+}
+
 .performance-section canvas {
-    max-height: 400px;
+    width: 100% !important;
+    height: 400px !important;
+    max-height: none;
     margin: 0 auto;
+    display: block;
+}
+
+.performance-chart-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: var(--background);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Quick Actions */

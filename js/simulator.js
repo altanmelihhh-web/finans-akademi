@@ -1069,33 +1069,75 @@ class PerformanceTracker {
         const labels = this.records.map(r => Utils.formatDate(r.timestamp));
         const values = this.records.map(r => r.totalValue);
 
+        // Calculate profit/loss gradient colors
+        const initialValue = values[0];
+        const gradientColors = values.map(v => v >= initialValue ? 'rgba(34, 197, 94, 0.5)' : 'rgba(239, 68, 68, 0.5)');
+
         this.chart = new Chart(canvas, {
             type: 'line',
             data: {
                 labels,
                 datasets: [{
-                    label: 'Toplam Değer (USD)',
+                    label: 'Portföy Değeri',
                     data: values,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderColor: '#667eea',
+                    backgroundColor: (context) => {
+                        const ctx = context.chart.ctx;
+                        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                        gradient.addColorStop(0, 'rgba(102, 126, 234, 0.4)');
+                        gradient.addColorStop(1, 'rgba(118, 75, 162, 0.1)');
+                        return gradient;
+                    },
+                    borderWidth: 3,
                     tension: 0.4,
-                    fill: true
+                    fill: true,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#667eea',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverBackgroundColor: '#764ba2',
+                    pointHoverBorderColor: '#fff',
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         display: true,
-                        position: 'top'
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#374151',
+                            padding: 20,
+                            usePointStyle: true
+                        }
                     },
                     tooltip: {
-                        mode: 'index',
-                        intersect: false,
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
                         callbacks: {
                             label: (context) => {
-                                return `Değer: ${Utils.formatCurrency(context.parsed.y)}`;
+                                const value = context.parsed.y;
+                                const change = value - initialValue;
+                                const changePercent = ((change / initialValue) * 100).toFixed(2);
+                                return [
+                                    `Değer: ${Utils.formatCurrency(value)}`,
+                                    `Değişim: ${change >= 0 ? '+' : ''}${Utils.formatCurrency(change)} (${changePercent >= 0 ? '+' : ''}${changePercent}%)`
+                                ];
                             }
                         }
                     }
@@ -1103,16 +1145,40 @@ class PerformanceTracker {
                 scales: {
                     y: {
                         beginAtZero: false,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        },
                         ticks: {
+                            font: {
+                                size: 12,
+                                weight: '500'
+                            },
+                            color: '#6B7280',
+                            padding: 10,
                             callback: (value) => Utils.formatCurrency(value)
                         }
                     },
                     x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
                         ticks: {
+                            font: {
+                                size: 11
+                            },
+                            color: '#6B7280',
                             maxRotation: 45,
-                            minRotation: 45
+                            minRotation: 45,
+                            autoSkip: true,
+                            maxTicksLimit: 10
                         }
                     }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
                 }
             }
         });
