@@ -18,10 +18,8 @@ class NewsManager {
             foreks: 'https://www.foreks.com/rss/haber.xml',
         };
 
-        // Cloudflare Worker URL (DEPLOY THIS FIRST!)
-        // After deploying worker, replace with your URL:
-        // this.workerUrl = 'https://rss-proxy.YOUR-SUBDOMAIN.workers.dev'
-        this.workerUrl = null; // Will be set after deployment
+        // Cloudflare Worker URL
+        this.workerUrl = 'https://rss-proxy.altanmelihhh.workers.dev';
 
         // Fallback: Use simple fetch for testing (may have CORS issues)
         this.useFallback = !this.workerUrl;
