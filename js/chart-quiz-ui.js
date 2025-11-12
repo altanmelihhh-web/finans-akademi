@@ -201,12 +201,12 @@ function enableButtons() {
 // AUTO-INITIALIZE
 // ================================================================================
 
-// Initialize when egitim page is shown
+// Initialize when grafikler page is shown
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if we're on egitim page
+    // Check if we're on grafikler page
     const checkAndInit = () => {
-        const egitimPage = document.getElementById('egitim');
-        if (egitimPage && egitimPage.classList.contains('active')) {
+        const grafiklerPage = document.getElementById('grafikler');
+        if (grafiklerPage && grafiklerPage.classList.contains('active')) {
             if (!quizManager) {
                 initChartQuiz();
             }
