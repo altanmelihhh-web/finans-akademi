@@ -3,8 +3,13 @@
 
 class NewsManager {
     constructor() {
-        this.news = [];
+        this.allNews = [];
+        this.filteredNews = [];
         this.loading = false;
+        this.currentCategory = 'all';
+        this.currentSort = 'time';
+        this.searchQuery = '';
+
         this.sources = {
             // Alpha Vantage News API (Free tier: 25 requests/day)
             alphaVantage: 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&topics=technology,finance&apikey=demo',
@@ -18,11 +23,24 @@ class NewsManager {
 
         // Fallback static Turkish news
         this.turkishNews = this.getTurkishStaticNews();
+
+        // Category definitions
+        this.categories = {
+            all: { name: 'Tüm Haberler', keywords: [] },
+            realtime: { name: 'Güncel', keywords: ['son dakika', 'canlı', 'şimdi', 'bugün'] },
+            turkey: { name: 'Türkiye', keywords: ['TCMB', 'BIST', 'TL', 'Türkiye', 'İstanbul', 'Ankara'] },
+            world: { name: 'Dünya', keywords: ['Fed', 'ECB', 'ABD', 'Avrupa', 'Çin', 'global'] },
+            stocks: { name: 'Hisse', keywords: ['hisse', 'borsa', 'BIST', 'endeks', 'hisse senedi'] },
+            crypto: { name: 'Kripto', keywords: ['Bitcoin', 'kripto', 'Ethereum', 'coin', 'blockchain'] },
+            analysis: { name: 'Analiz', keywords: ['analiz', 'tahmin', 'beklenti', 'görüş', 'strateji'] },
+            currency: { name: 'Döviz', keywords: ['dolar', 'euro', 'döviz', 'kur', 'parite'] },
+            commodity: { name: 'Emtia', keywords: ['altın', 'petrol', 'emtia', 'metal', 'enerji'] }
+        };
     }
 
     async init() {
+        this.setupEventListeners();
         await this.loadNews();
-        this.renderNews();
     }
 
     async loadNews() {
@@ -37,22 +55,146 @@ class NewsManager {
                 const data = await response.json();
 
                 if (data.feed && data.feed.length > 0) {
-                    this.news = this.parseAlphaVantageNews(data.feed);
-                    console.log('✅ Real-time news loaded:', this.news.length);
+                    this.allNews = this.parseAlphaVantageNews(data.feed);
+                    console.log('✅ Real-time news loaded:', this.allNews.length);
                 } else {
                     console.log('⚠️ API limit reached, using Turkish static news');
-                    this.news = this.turkishNews;
+                    this.allNews = this.turkishNews;
                 }
             } else {
                 console.log('⚠️ News API unavailable, using Turkish static news');
-                this.news = this.turkishNews;
+                this.allNews = this.turkishNews;
             }
         } catch (error) {
             console.error('❌ Error fetching news:', error);
-            this.news = this.turkishNews;
+            this.allNews = this.turkishNews;
         }
 
         this.loading = false;
+        this.applyFilters();
+    }
+
+    /**
+     * Search news
+     */
+    search(query) {
+        this.searchQuery = query.toLowerCase().trim();
+        this.applyFilters();
+    }
+
+    /**
+     * Filter by category
+     */
+    filterByCategory(category) {
+        this.currentCategory = category;
+        this.applyFilters();
+    }
+
+    /**
+     * Sort news
+     */
+    sortNews(sortType) {
+        this.currentSort = sortType;
+        this.applyFilters();
+    }
+
+    /**
+     * Apply all filters
+     */
+    applyFilters() {
+        let filtered = [...this.allNews];
+
+        // Apply search filter
+        if (this.searchQuery) {
+            filtered = filtered.filter(news =>
+                news.title.toLowerCase().includes(this.searchQuery) ||
+                news.summary.toLowerCase().includes(this.searchQuery) ||
+                (news.topics && news.topics.some(t => t.toLowerCase().includes(this.searchQuery)))
+            );
+        }
+
+        // Apply category filter
+        if (this.currentCategory !== 'all') {
+            const categoryKeywords = this.categories[this.currentCategory].keywords;
+            filtered = filtered.filter(news => {
+                const text = `${news.title} ${news.summary} ${news.topics ? news.topics.join(' ') : ''}`.toLowerCase();
+                return categoryKeywords.some(keyword => text.includes(keyword.toLowerCase()));
+            });
+        }
+
+        // Apply sorting
+        filtered = this.sortNewsByType(filtered, this.currentSort);
+
+        this.filteredNews = filtered;
+        this.renderNews();
+        this.updateStats();
+    }
+
+    /**
+     * Sort news by type
+     */
+    sortNewsByType(news, sortType) {
+        const sorted = [...news];
+
+        switch (sortType) {
+            case 'time':
+                // Already sorted by time (most recent first)
+                break;
+
+            case 'sentiment-positive':
+                sorted.sort((a, b) => {
+                    const scoreA = this.getSentimentScore(a.sentiment.class);
+                    const scoreB = this.getSentimentScore(b.sentiment.class);
+                    return scoreB - scoreA;
+                });
+                break;
+
+            case 'sentiment-negative':
+                sorted.sort((a, b) => {
+                    const scoreA = this.getSentimentScore(a.sentiment.class);
+                    const scoreB = this.getSentimentScore(b.sentiment.class);
+                    return scoreA - scoreB;
+                });
+                break;
+
+            case 'source':
+                sorted.sort((a, b) => a.source.localeCompare(b.source));
+                break;
+        }
+
+        return sorted;
+    }
+
+    /**
+     * Get sentiment score for sorting
+     */
+    getSentimentScore(sentimentClass) {
+        const scores = {
+            'positive': 2,
+            'slightly-positive': 1,
+            'neutral': 0,
+            'slightly-negative': -1,
+            'negative': -2
+        };
+        return scores[sentimentClass] || 0;
+    }
+
+    /**
+     * Update stats display
+     */
+    updateStats() {
+        const statsEl = document.getElementById('newsStats');
+        if (!statsEl) return;
+
+        const totalCount = this.allNews.length;
+        const filteredCount = this.filteredNews.length;
+
+        let statsText = `${filteredCount} haber`;
+        if (filteredCount !== totalCount) {
+            statsText += ` (${totalCount} haberden)`;
+        }
+
+        statsEl.textContent = statsText;
     }
 
     parseAlphaVantageNews(feed) {
@@ -248,17 +390,26 @@ class NewsManager {
         const newsContainer = document.getElementById('newsContainer');
         if (!newsContainer) return;
 
-        if (this.news.length === 0) {
+        if (this.filteredNews.length === 0) {
+            const emptyMessage = this.searchQuery || this.currentCategory !== 'all'
+                ? 'Arama kriterlerine uygun haber bulunamadı. Filtreleri değiştirmeyi deneyin.'
+                : 'Şu anda haber bulunamadı.';
+
             newsContainer.innerHTML = `
                 <div class="news-empty">
                     <i class="fas fa-newspaper"></i>
-                    <p>Şu anda haber bulunamadı.</p>
+                    <p>${emptyMessage}</p>
+                    ${this.searchQuery || this.currentCategory !== 'all' ? `
+                        <button class="btn btn-secondary" onclick="window.newsManager.clearFilters()">
+                            <i class="fas fa-times"></i> Filtreleri Temizle
+                        </button>
+                    ` : ''}
                 </div>
             `;
             return;
         }
 
-        const newsHTML = this.news.map(item => `
+        const newsHTML = this.filteredNews.map(item => `
             <article class="news-card">
                 ${item.image ? `<img src="${item.image}" alt="${item.title}" class="news-image">` : ''}
                 <div class="news-content">
@@ -284,10 +435,83 @@ class NewsManager {
         newsContainer.innerHTML = newsHTML;
     }
 
-    // Refresh news
+    /**
+     * Clear all filters
+     */
+    clearFilters() {
+        this.searchQuery = '';
+        this.currentCategory = 'all';
+        this.currentSort = 'time';
+
+        // Reset UI
+        const searchInput = document.getElementById('newsSearch');
+        if (searchInput) searchInput.value = '';
+
+        const sortSelect = document.getElementById('newsSort');
+        if (sortSelect) sortSelect.value = 'time';
+
+        // Reset category tabs
+        document.querySelectorAll('.news-tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.dataset.category === 'all') {
+                tab.classList.add('active');
+            }
+        });
+
+        this.applyFilters();
+    }
+
+    /**
+     * Refresh news
+     */
     async refresh() {
         await this.loadNews();
         this.renderNews();
+    }
+
+    /**
+     * Setup event listeners
+     */
+    setupEventListeners() {
+        // Search input
+        const searchInput = document.getElementById('newsSearch');
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    this.search(e.target.value);
+                }, 300);
+            });
+        }
+
+        // Sort select
+        const sortSelect = document.getElementById('newsSort');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', (e) => {
+                this.sortNews(e.target.value);
+            });
+        }
+
+        // Category tabs
+        document.querySelectorAll('.news-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active from all tabs
+                document.querySelectorAll('.news-tab').forEach(t => t.classList.remove('active'));
+
+                // Add active to clicked tab
+                tab.classList.add('active');
+
+                // Filter by category
+                this.filterByCategory(tab.dataset.category);
+            });
+        });
+
+        // Refresh button
+        const refreshBtn = document.getElementById('refreshNews');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.refresh());
+        }
     }
 }
 
