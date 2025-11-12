@@ -669,3 +669,166 @@ class NewsManager {
 
 // Export for use in other modules
 window.NewsManager = NewsManager;
+
+// ===================================
+// MARKET DATA RENDERING
+// ===================================
+
+async function initializeMarketData() {
+    const marketDataManager = new MarketDataManager();
+
+    console.log('📊 Initializing market data displays...');
+
+    // Fetch all market data
+    const data = await marketDataManager.fetchAllMarketData();
+
+    // Render each section
+    renderGlobalMarkets(data.global, marketDataManager);
+    renderTurkeyMarkets(data.turkey, marketDataManager);
+    renderCryptoMarkets(data.crypto, marketDataManager);
+
+    console.log('✅ Market data displays initialized');
+}
+
+function renderGlobalMarkets(data, manager) {
+    const container = document.querySelector('[data-category="global"] .analysis-grid');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="market-cards-grid">
+            ${createMarketCard('S&P 500', data.s_p_500, manager, 'usa')}
+            ${createMarketCard('NASDAQ', data.nasdaq, manager, 'tech')}
+            ${createMarketCard('Dow Jones', data.dow_jones, manager, 'usa')}
+            ${createMarketCard('Dollar Index', data.dollar_index, manager, 'currency')}
+        </div>
+    `;
+}
+
+function renderTurkeyMarkets(data, manager) {
+    const container = document.querySelector('[data-category="turkey"] .analysis-grid');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="market-cards-grid">
+            ${createMarketCard('BIST 100', data.bist_100, manager, 'turkey')}
+            ${createMarketCard('USD/TRY', data.usd_try, manager, 'currency')}
+            ${createMarketCard('EUR/TRY', data.eur_try, manager, 'currency')}
+        </div>
+    `;
+}
+
+function renderCryptoMarkets(data, manager) {
+    const container = document.querySelector('[data-category="crypto"] .analysis-grid');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="market-cards-grid">
+            ${createCryptoCard('Bitcoin', data.bitcoin, manager)}
+            ${createCryptoCard('Ethereum', data.ethereum, manager)}
+            ${createCryptoCard('Solana', data.solana, manager)}
+            ${createCryptoCard('BNB', data.bnb, manager)}
+            ${createCryptoCard('XRP', data.xrp, manager)}
+        </div>
+    `;
+}
+
+function createMarketCard(name, marketData, manager, type) {
+    if (!marketData) return '';
+
+    const change = manager.formatChange(marketData.change, marketData.changePercent);
+    const typeIcon = {
+        'usa': 'fa-flag-usa',
+        'tech': 'fa-microchip',
+        'currency': 'fa-dollar-sign',
+        'turkey': 'fa-lira-sign'
+    }[type] || 'fa-chart-line';
+
+    return `
+        <article class="market-card">
+            <div class="market-header">
+                <div class="market-icon ${type}">
+                    <i class="fas ${typeIcon}"></i>
+                </div>
+                <div class="market-title">
+                    <h3>${name}</h3>
+                    <span class="market-symbol">${marketData.symbol}</span>
+                </div>
+            </div>
+
+            <div class="market-price">
+                <div class="price-value">${manager.formatPrice(marketData.price)}</div>
+                <div class="price-change" style="color: ${change.color}">
+                    <span class="change-icon">${change.icon}</span>
+                    <span class="change-text">${change.text}</span>
+                </div>
+            </div>
+
+            <div class="market-details">
+                <div class="detail-row">
+                    <span class="detail-label">Önceki Kapanış:</span>
+                    <span class="detail-value">${manager.formatPrice(marketData.previousClose)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Değişim:</span>
+                    <span class="detail-value" style="color: ${change.color}">${manager.formatPrice(Math.abs(marketData.change))}</span>
+                </div>
+            </div>
+
+            <div class="market-footer">
+                <i class="fas fa-clock"></i>
+                <span>Canlı Veri</span>
+            </div>
+        </article>
+    `;
+}
+
+function createCryptoCard(name, cryptoData, manager) {
+    if (!cryptoData) return '';
+
+    const change = manager.formatChange(cryptoData.change24h, cryptoData.change24h);
+
+    return `
+        <article class="market-card crypto">
+            <div class="market-header">
+                <div class="market-icon crypto">
+                    <i class="fab fa-bitcoin"></i>
+                </div>
+                <div class="market-title">
+                    <h3>${name}</h3>
+                    <span class="market-symbol">${cryptoData.symbol}</span>
+                </div>
+            </div>
+
+            <div class="market-price">
+                <div class="price-value">$${manager.formatPrice(cryptoData.price)}</div>
+                <div class="price-change" style="color: ${change.color}">
+                    <span class="change-icon">${change.icon}</span>
+                    <span class="change-text">${change.text} (24h)</span>
+                </div>
+            </div>
+
+            <div class="market-details">
+                <div class="detail-row">
+                    <span class="detail-label">Piyasa Değeri:</span>
+                    <span class="detail-value">${manager.formatMarketCap(cryptoData.marketCap)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">24h Hacim:</span>
+                    <span class="detail-value">${manager.formatMarketCap(cryptoData.volume24h)}</span>
+                </div>
+            </div>
+
+            <div class="market-footer">
+                <i class="fas fa-clock"></i>
+                <span>Canlı Veri (CoinGecko)</span>
+            </div>
+        </article>
+    `;
+}
+
+// Initialize market data when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeMarketData);
+} else {
+    initializeMarketData();
+}
