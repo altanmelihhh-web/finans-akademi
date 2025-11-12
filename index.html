@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/chatbot.css">
     <link rel="stylesheet" href="css/simulator-gamification.css">
     <link rel="stylesheet" href="css/viewport-fix.css">
+    <link rel="stylesheet" href="css/chart-quiz.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -2066,6 +2067,120 @@
         <!-- Egitim Page -->
         <section id="egitim" class="page">
             <div class="container">
+                <!-- ===== CHART PATTERN QUIZ ===== -->
+                <div class="chart-pattern-quiz-section">
+                    <h1><i class="fas fa-chart-line"></i> Grafik Pattern Eğitimi</h1>
+                    <p class="section-subtitle">100 gerçek grafik örneği ile Al-Sat-Bekle kararı öğren!</p>
+
+                    <!-- Stats Bar -->
+                    <div class="quiz-stats-bar">
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="quizAccuracy">0%</div>
+                                <div class="stat-label">Doğruluk</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="quizScore">0/0</div>
+                                <div class="stat-label">Puan</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⭐</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="quizLevel">🌱 Yeni</div>
+                                <div class="stat-label">Seviye</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="quizRemaining">100</div>
+                                <div class="stat-label">Kalan</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Card -->
+                    <div class="chart-quiz-card">
+                        <!-- Pattern Display -->
+                        <div class="pattern-display">
+                            <div class="pattern-title" id="patternTitle">
+                                <i class="fas fa-chart-area"></i> Hazır mısın?
+                            </div>
+                            <div class="pattern-image-container">
+                                <img id="patternImage"
+                                     src="https://via.placeholder.com/800x400/667eea/ffffff?text=Başlamak+için+Yeni+Soru+butonuna+tıkla"
+                                     alt="Chart Pattern">
+                                <div class="pattern-difficulty" id="patternDifficulty"></div>
+                            </div>
+                        </div>
+
+                        <!-- Question Section -->
+                        <div class="quiz-question">
+                            <h3>Bu grafikte ne yapardın?</h3>
+                            <div class="quiz-actions">
+                                <button class="quiz-btn quiz-btn-buy" id="btnBuy" onclick="answerQuestion('buy')">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>AL</span>
+                                </button>
+                                <button class="quiz-btn quiz-btn-sell" id="btnSell" onclick="answerQuestion('sell')">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span>SAT</span>
+                                </button>
+                                <button class="quiz-btn quiz-btn-wait" id="btnWait" onclick="answerQuestion('wait')">
+                                    <i class="fas fa-pause"></i>
+                                    <span>BEKLE</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Feedback Section (Hidden by default) -->
+                        <div class="quiz-feedback" id="quizFeedback" style="display: none;">
+                            <div class="feedback-header" id="feedbackHeader">
+                                <!-- Will show correct/incorrect -->
+                            </div>
+                            <div class="feedback-body">
+                                <h4>Açıklama:</h4>
+                                <p id="feedbackExplanation"></p>
+
+                                <h4>Teknik Terimler:</h4>
+                                <div class="technical-terms" id="technicalTerms">
+                                    <!-- Will be populated with badges -->
+                                </div>
+
+                                <div class="feedback-actions">
+                                    <button class="btn btn-primary" onclick="nextQuestion()">
+                                        <i class="fas fa-forward"></i> Sonraki Soru
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Control Buttons -->
+                        <div class="quiz-controls">
+                            <button class="btn btn-secondary" onclick="resetQuiz()">
+                                <i class="fas fa-redo"></i> Sıfırla
+                            </button>
+                            <button class="btn btn-secondary" onclick="changeMode()">
+                                <i class="fas fa-random"></i> <span id="modeText">Sıralı Mod</span>
+                            </button>
+                            <select class="difficulty-select" onchange="changeDifficulty(this.value)">
+                                <option value="all">Tüm Seviyeler</option>
+                                <option value="easy">Kolay</option>
+                                <option value="medium">Orta</option>
+                                <option value="hard">Zor</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="margin: 60px 0; border: none; border-top: 2px solid #e5e7eb;">
+
+                <!-- ===== 30 DAY PLAN (EXISTING) ===== -->
                 <h1>30 Günlük Finans Öğrenme Planı</h1>
 
                 <div class="learning-progress">
@@ -10058,6 +10173,8 @@ Pasif gelirin: 25.000 TL
     <script src="js/markets.js"></script>
     <script src="js/simulator.js"></script>
     <script src="js/simulator-gamification.js"></script>
+    <script src="js/chart-patterns.js"></script>
+    <script src="js/chart-quiz-ui.js"></script>
     <script src="js/news.js"></script>
     <script>
         // Initialize additional modules after DOM is ready
