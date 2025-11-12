@@ -2068,10 +2068,338 @@
         <!-- Grafikler Page -->
         <section id="grafikler" class="page">
             <div class="container">
+                <h1><i class="fas fa-chart-area"></i> Grafik Pattern Eğitimi</h1>
+                <p class="section-subtitle">Teknik analiz pattern'lerini öğren ve pratik yap!</p>
+
+                <!-- ===== THEORY SECTION ===== -->
+                <div class="pattern-theory-section">
+                    <div class="theory-tabs">
+                        <button class="theory-tab active" onclick="showTheoryTab('overview')">
+                            <i class="fas fa-book"></i> Genel Bakış
+                        </button>
+                        <button class="theory-tab" onclick="showTheoryTab('bullish')">
+                            <i class="fas fa-arrow-trend-up"></i> Yükseliş Formasyonları
+                        </button>
+                        <button class="theory-tab" onclick="showTheoryTab('bearish')">
+                            <i class="fas fa-arrow-trend-down"></i> Düşüş Formasyonları
+                        </button>
+                        <button class="theory-tab" onclick="showTheoryTab('neutral')">
+                            <i class="fas fa-equals"></i> Nötr Formasyonlar
+                        </button>
+                        <button class="theory-tab" onclick="showTheoryTab('candles')">
+                            <i class="fas fa-chart-candlestick"></i> Mum Formasyonları
+                        </button>
+                        <button class="theory-tab" onclick="showTheoryTab('indicators')">
+                            <i class="fas fa-chart-line"></i> İndikatörler
+                        </button>
+                    </div>
+
+                    <!-- Overview Tab -->
+                    <div id="theory-overview" class="theory-content active">
+                        <h2>📚 Grafik Pattern'leri Nedir?</h2>
+                        <p class="theory-intro">
+                            Grafik pattern'leri, fiyat hareketlerinin tekrar eden şekilleridir. Bu formasyonlar,
+                            geçmiş piyasa davranışlarını analiz ederek gelecekteki fiyat hareketlerini tahmin etmemize yardımcı olur.
+                        </p>
+
+                        <div class="theory-grid">
+                            <div class="theory-card">
+                                <div class="theory-card-icon">📈</div>
+                                <h3>Yükseliş Formasyonları</h3>
+                                <p>Fiyatın yukarı yönlü hareket edeceğini işaret eden pattern'ler.
+                                Çift Dip, Baş-Omuz Tabanı, Yükselen Üçgen gibi formasyonlar içerir.</p>
+                                <div class="theory-count">25+ Pattern</div>
+                            </div>
+
+                            <div class="theory-card">
+                                <div class="theory-card-icon">📉</div>
+                                <h3>Düşüş Formasyonları</h3>
+                                <p>Fiyatın aşağı yönlü hareket edeceğini gösteren pattern'ler.
+                                Çift Tepe, Baş-Omuz Tepesi, Düşen Üçgen gibi formasyonlar içerir.</p>
+                                <div class="theory-count">25+ Pattern</div>
+                            </div>
+
+                            <div class="theory-card">
+                                <div class="theory-card-icon">⚖️</div>
+                                <h3>Nötr/Bekle Formasyonları</h3>
+                                <p>Yön belirsiz olan veya konsolidasyon gösteren pattern'ler.
+                                Simetrik Üçgen, Dikdörtgen gibi formasyonlar içerir.</p>
+                                <div class="theory-count">15+ Pattern</div>
+                            </div>
+
+                            <div class="theory-card">
+                                <div class="theory-card-icon">🕯️</div>
+                                <h3>Mum Formasyonları</h3>
+                                <p>Tek veya birkaç mum ile oluşan pattern'ler. Japon mum analizi tekniği.
+                                Doji, Hammer, Engulfing gibi formasyonlar içerir.</p>
+                                <div class="theory-count">20+ Pattern</div>
+                            </div>
+
+                            <div class="theory-card">
+                                <div class="theory-card-icon">📊</div>
+                                <h3>Teknik İndikatörler</h3>
+                                <p>Matematiksel hesaplamalarla oluşan sinyaller.
+                                RSI, MACD, Bollinger Bands gibi araçlar içerir.</p>
+                                <div class="theory-count">15+ İndikatör</div>
+                            </div>
+
+                            <div class="theory-card">
+                                <div class="theory-card-icon">🎯</div>
+                                <h3>İleri Seviye Pattern'ler</h3>
+                                <p>Fibonacci, Elliott Wave, Harmonic gibi kompleks analizler.
+                                Gartley, Bat, Butterfly gibi formasyonlar içerir.</p>
+                                <div class="theory-count">15+ Pattern</div>
+                            </div>
+                        </div>
+
+                        <div class="theory-tips">
+                            <h3><i class="fas fa-lightbulb"></i> Önemli İpuçları</h3>
+                            <ul>
+                                <li><strong>Tek pattern'e güvenmeyin:</strong> Birden fazla gösterge kullanın</li>
+                                <li><strong>Hacmi kontrol edin:</strong> Hacim, pattern doğrulamasında kritiktir</li>
+                                <li><strong>Zaman dilimini dikkate alın:</strong> Günlük, haftalık, aylık grafikler farklı sinyaller verir</li>
+                                <li><strong>Risk yönetimi yapın:</strong> Stop-loss kullanmayı unutmayın</li>
+                                <li><strong>Pratik yapın:</strong> Aşağıdaki quiz ile kendinizi test edin</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Bullish Patterns Tab -->
+                    <div id="theory-bullish" class="theory-content">
+                        <h2>📈 Yükseliş Formasyonları</h2>
+                        <p class="theory-intro">
+                            Yükseliş formasyonları, fiyatın yukarı hareket edeceğini işaret eden grafik şekilleridir.
+                            Bu formasyonlar genellikle düşüş trendinin sonunda veya yükseliş trendi sırasında görülür.
+                        </p>
+
+                        <div class="pattern-examples">
+                            <div class="pattern-example-card">
+                                <h3>🔵 Çift Dip (Double Bottom)</h3>
+                                <div class="pattern-diagram">W</div>
+                                <p><strong>Yapı:</strong> İki dip + Yükseliş</p>
+                                <p><strong>Ne zaman görülür:</strong> Düşüş trendinin sonunda</p>
+                                <p><strong>Güvenilirlik:</strong> ⭐⭐⭐⭐ (Yüksek)</p>
+                                <p><strong>İşlem stratejisi:</strong> İkinci dipten sonra boyun çizgisini yukarı kırınca al</p>
+                            </div>
+
+                            <div class="pattern-example-card">
+                                <h3>🔵 Baş-Omuz Tabanı</h3>
+                                <div class="pattern-diagram">∨ ∨∨ ∨</div>
+                                <p><strong>Yapı:</strong> Sol omuz + Baş (derin dip) + Sağ omuz</p>
+                                <p><strong>Ne zaman görülür:</strong> Güçlü düşüş sonrası</p>
+                                <p><strong>Güvenilirlik:</strong> ⭐⭐⭐⭐⭐ (Çok Yüksek)</p>
+                                <p><strong>İşlem stratejisi:</strong> Boyun çizgisi kırılımını bekle</p>
+                            </div>
+
+                            <div class="pattern-example-card">
+                                <h3>🔵 Yükselen Üçgen</h3>
+                                <div class="pattern-diagram">△</div>
+                                <p><strong>Yapı:</strong> Yatay direnç + Yükselen destek</p>
+                                <p><strong>Ne zaman görülür:</strong> Yükseliş trendi sırasında</p>
+                                <p><strong>Güvenilirlik:</strong> ⭐⭐⭐⭐ (Yüksek)</p>
+                                <p><strong>İşlem stratejisi:</strong> Direnç kırılımında al</p>
+                            </div>
+
+                            <div class="pattern-example-card">
+                                <h3>🔵 Boğa Bayrağı</h3>
+                                <div class="pattern-diagram">⚑</div>
+                                <p><strong>Yapı:</strong> Direk (güçlü yükseliş) + Bayrak (konsolidasyon)</p>
+                                <p><strong>Ne zaman görülür:</strong> Güçlü yükseliş sırasında</p>
+                                <p><strong>Güvenilirlik:</strong> ⭐⭐⭐⭐ (Yüksek)</p>
+                                <p><strong>İşlem stratejisi:</strong> Bayrak üst çizgisini kırınca al</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bearish Patterns Tab -->
+                    <div id="theory-bearish" class="theory-content">
+                        <h2>📉 Düşüş Formasyonları</h2>
+                        <p class="theory-intro">
+                            Düşüş formasyonları, fiyatın aşağı hareket edeceğini işaret eden grafik şekilleridir.
+                            Bu formasyonlar yükseliş trendinin sonunda veya düşüş trendi sırasında oluşur.
+                        </p>
+
+                        <div class="pattern-examples">
+                            <div class="pattern-example-card bearish">
+                                <h3>🔴 Çift Tepe (Double Top)</h3>
+                                <div class="pattern-diagram">M</div>
+                                <p><strong>Yapı:</strong> İki tepe + Düşüş</p>
+                                <p><strong>Ne zaman görülür:</strong> Yükseliş trendinin sonunda</p>
+                                <p><strong>Güvenilirlik:</strong> ⭐⭐⭐⭐ (Yüksek)</p>
+                                <p><strong>İşlem stratejisi:</strong> İkinci tepeden sonra boyun çizgisini aşağı kırınca sat</p>
+                            </div>
+
+                            <div class="pattern-example-card bearish">
+                                <h3>🔴 Baş-Omuz Tepesi</h3>
+                                <div class="pattern-diagram">∧ ∧∧ ∧</div>
+                                <p><strong>Yapı:</strong> Sol omuz + Baş (yüksek tepe) + Sağ omuz</p>
+                                <p><strong>Ne zaman görülür:</strong> Güçlü yükseliş sonrası</p>
+                                <p><strong>Güvenilirlik:</strong> ⭐⭐⭐⭐⭐ (Çok Yüksek)</p>
+                                <p><strong>İşlem stratejisi:</strong> Boyun çizgisi aşağı kırılınca sat</p>
+                            </div>
+
+                            <div class="pattern-example-card bearish">
+                                <h3>🔴 Düşen Üçgen</h3>
+                                <div class="pattern-diagram">▽</div>
+                                <p><strong>Yapı:</strong> Yatay destek + Düşen direnç</p>
+                                <p><strong>Ne zaman görülür:</strong> Düşüş trendi sırasında</p>
+                                <p><strong>Güvenilirlik:</strong> ⭐⭐⭐⭐ (Yüksek)</p>
+                                <p><strong>İşlem stratejisi:</strong> Destek kırılımında sat</p>
+                            </div>
+
+                            <div class="pattern-example-card bearish">
+                                <h3>🔴 Ayı Bayrağı</h3>
+                                <div class="pattern-diagram">⚐</div>
+                                <p><strong>Yapı:</strong> Direk (güçlü düşüş) + Bayrak (konsolidasyon)</p>
+                                <p><strong>Ne zaman görülür:</strong> Güçlü düşüş sırasında</p>
+                                <p><strong>Güvenilirlik:</strong> ⭐⭐⭐⭐ (Yüksek)</p>
+                                <p><strong>İşlem stratejisi:</strong> Bayrak alt çizgisini kırınca sat</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neutral Patterns Tab -->
+                    <div id="theory-neutral" class="theory-content">
+                        <h2>⚖️ Nötr/Bekle Formasyonları</h2>
+                        <p class="theory-intro">
+                            Nötr formasyonlar, piyasanın kararsız olduğunu ve yön için netlik beklendiğini gösterir.
+                            Bu durumlarda acele etmeden kırılım yönünü beklemek en doğru stratejidir.
+                        </p>
+
+                        <div class="pattern-examples">
+                            <div class="pattern-example-card neutral">
+                                <h3>🟡 Simetrik Üçgen</h3>
+                                <div class="pattern-diagram">◇</div>
+                                <p><strong>Yapı:</strong> Daralan fiyat aralığı, hem tepeler hem dipler yaklaşıyor</p>
+                                <p><strong>Ne anlama gelir:</strong> Alıcı ve satıcı dengede, netlik yok</p>
+                                <p><strong>Strateji:</strong> Hangi yöne kırılırsa o yönde pozisyon al</p>
+                            </div>
+
+                            <div class="pattern-example-card neutral">
+                                <h3>🟡 Dikdörtgen (Range)</h3>
+                                <div class="pattern-diagram">▭</div>
+                                <p><strong>Yapı:</strong> Yatay destek ve direnç arasında hareket</p>
+                                <p><strong>Ne anlama gelir:</strong> Konsolidasyon, trend yok</p>
+                                <p><strong>Strateji:</strong> Kırılım bekle veya range içinde al-sat</p>
+                            </div>
+
+                            <div class="pattern-example-card neutral">
+                                <h3>🟡 Doji Mumu</h3>
+                                <div class="pattern-diagram">+</div>
+                                <p><strong>Yapı:</strong> Açılış ≈ Kapanış, uzun fitiller</p>
+                                <p><strong>Ne anlama gelir:</strong> Kararsızlık, güç dengesi</p>
+                                <p><strong>Strateji:</strong> Sonraki mumları bekle, doğrulama iste</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Candlestick Patterns Tab -->
+                    <div id="theory-candles" class="theory-content">
+                        <h2>🕯️ Japon Mum Formasyonları</h2>
+                        <p class="theory-intro">
+                            Japon mum analizi, 18. yüzyılda Japonya'da pirinç ticaretinde kullanılan tekniklerden gelir.
+                            Tek mum veya mum kombinasyonları, piyasa psikolojisi hakkında önemli ipuçları verir.
+                        </p>
+
+                        <div class="pattern-examples">
+                            <div class="pattern-example-card">
+                                <h3>🟢 Hammer (Çekiç)</h3>
+                                <div class="pattern-diagram candle">
+                                    <div class="candle-body green-candle">█</div>
+                                    <div class="candle-wick">│</div>
+                                </div>
+                                <p><strong>Yapı:</strong> Uzun alt fitil, küçük gövde, üstte yok/az fitil</p>
+                                <p><strong>Anlamı:</strong> Satıcılar baskı yaptı ama alıcılar geri kazandı</p>
+                                <p><strong>Sonuç:</strong> Yükseliş dönüş sinyali</p>
+                            </div>
+
+                            <div class="pattern-example-card bearish">
+                                <h3>🔴 Shooting Star (Kayan Yıldız)</h3>
+                                <div class="pattern-diagram candle">
+                                    <div class="candle-wick">│</div>
+                                    <div class="candle-body red-candle">█</div>
+                                </div>
+                                <p><strong>Yapı:</strong> Uzun üst fitil, küçük gövde, altta yok/az fitil</p>
+                                <p><strong>Anlamı:</strong> Alıcılar itti ama satıcılar bastırdı</p>
+                                <p><strong>Sonuç:</strong> Düşüş dönüş sinyali</p>
+                            </div>
+
+                            <div class="pattern-example-card">
+                                <h3>🟢 Bullish Engulfing</h3>
+                                <div class="pattern-diagram candle">
+                                    <span class="candle-body red-candle small">█</span>
+                                    <span class="candle-body green-candle large">█</span>
+                                </div>
+                                <p><strong>Yapı:</strong> Küçük düşüş mumu + Büyük yükseliş mumu (yutuyor)</p>
+                                <p><strong>Anlamı:</strong> Alıcılar kontrolü ele aldı</p>
+                                <p><strong>Sonuç:</strong> Güçlü yükseliş sinyali</p>
+                            </div>
+
+                            <div class="pattern-example-card bearish">
+                                <h3>🔴 Bearish Engulfing</h3>
+                                <div class="pattern-diagram candle">
+                                    <span class="candle-body green-candle small">█</span>
+                                    <span class="candle-body red-candle large">█</span>
+                                </div>
+                                <p><strong>Yapı:</strong> Küçük yükseliş mumu + Büyük düşüş mumu (yutuyor)</p>
+                                <p><strong>Anlamı:</strong> Satıcılar kontrolü ele aldı</p>
+                                <p><strong>Sonuç:</strong> Güçlü düşüş sinyali</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Indicators Tab -->
+                    <div id="theory-indicators" class="theory-content">
+                        <h2>📊 Teknik İndikatörler</h2>
+                        <p class="theory-intro">
+                            Teknik indikatörler, fiyat ve hacim verilerini matematiksel formüllerle işleyerek
+                            trend, momentum ve volatilite hakkında bilgi veren araçlardır.
+                        </p>
+
+                        <div class="pattern-examples">
+                            <div class="pattern-example-card indicator">
+                                <h3>📈 RSI (Relative Strength Index)</h3>
+                                <p><strong>Ne işe yarar:</strong> Aşırı alım/satım seviyelerini gösterir</p>
+                                <p><strong>Seviyeler:</strong> 0-100 arası, 30 altı aşırı satım, 70 üstü aşırı alım</p>
+                                <p><strong>Kullanım:</strong> RSI 30'un altındayken al, 70'in üstündeyken sat</p>
+                                <p><strong>Divergence:</strong> Fiyat ve RSI ters yönde hareket ederse dönüş sinyali</p>
+                            </div>
+
+                            <div class="pattern-example-card indicator">
+                                <h3>📊 MACD (Moving Average Convergence Divergence)</h3>
+                                <p><strong>Ne işe yarar:</strong> Trend ve momentum değişimlerini gösterir</p>
+                                <p><strong>Yapı:</strong> MACD çizgisi, Sinyal çizgisi, Histogram</p>
+                                <p><strong>Kullanım:</strong> MACD sinyal çizgisini yukarı keserse al, aşağı keserse sat</p>
+                                <p><strong>Histogram:</strong> Pozitif büyürse güçlü yükseliş, negatif büyürse düşüş</p>
+                            </div>
+
+                            <div class="pattern-example-card indicator">
+                                <h3>📉 Bollinger Bands</h3>
+                                <p><strong>Ne işe yarar:</strong> Volatilite ve fiyat aşırılıklarını ölçer</p>
+                                <p><strong>Yapı:</strong> Orta (20 MA), Üst ve Alt bantlar (±2 std sapma)</p>
+                                <p><strong>Kullanım:</strong> Alt banda değince al, üst banda değince sat</p>
+                                <p><strong>Squeeze:</strong> Bantlar daralınca büyük hareket yakın demektir</p>
+                            </div>
+
+                            <div class="pattern-example-card indicator">
+                                <h3>📊 Hareketli Ortalamalar (MA)</h3>
+                                <p><strong>Ne işe yarar:</strong> Trend yönünü ve destek/direnç seviyelerini gösterir</p>
+                                <p><strong>Tipler:</strong> SMA (Simple), EMA (Exponential - daha hassas)</p>
+                                <p><strong>Golden Cross:</strong> 50 MA, 200 MA'yı yukarı keserse güçlü yükseliş</p>
+                                <p><strong>Death Cross:</strong> 50 MA, 200 MA'yı aşağı keserse güçlü düşüş</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-divider">
+                    <h2><i class="fas fa-gamepad"></i> Şimdi Pratik Yapalım!</h2>
+                    <p>Yukarıdaki teorik bilgileri öğrendiniz. Şimdi 100+ gerçek grafik örneği ile kendinizi test edin!</p>
+                </div>
+
                 <!-- ===== CHART PATTERN QUIZ ===== -->
                 <div class="chart-pattern-quiz-section">
-                    <h1><i class="fas fa-chart-area"></i> Grafik Pattern Eğitimi</h1>
-                    <p class="section-subtitle">100 grafik örneği ile Al-Sat-Bekle kararı öğren!</p>
+                    <h2><i class="fas fa-chart-line"></i> İnteraktif Quiz</h2>
 
                     <!-- Stats Bar -->
                     <div class="quiz-stats-bar">

@@ -2,6 +2,292 @@
  * Chart Pattern Quiz Styles
  */
 
+/* ===== THEORY SECTION ===== */
+.pattern-theory-section {
+    margin-bottom: 60px;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Theory Tabs */
+.theory-tabs {
+    display: flex;
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.theory-tab {
+    flex: 1;
+    min-width: 150px;
+    padding: 18px 24px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+}
+
+.theory-tab:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.theory-tab.active {
+    color: #667eea;
+    background: white;
+    border-bottom-color: #667eea;
+}
+
+.theory-tab i {
+    margin-right: 8px;
+}
+
+/* Theory Content */
+.theory-content {
+    display: none;
+    padding: 40px;
+    animation: fadeIn 0.4s ease;
+}
+
+.theory-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.theory-intro {
+    font-size: 1.1rem;
+    color: #6b7280;
+    line-height: 1.8;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Theory Grid */
+.theory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.theory-card {
+    background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.theory-card:hover {
+    border-color: #667eea;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+}
+
+.theory-card-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.theory-card h3 {
+    color: #374151;
+    margin-bottom: 12px;
+    font-size: 1.2rem;
+}
+
+.theory-card p {
+    color: #6b7280;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.theory-count {
+    margin-top: 16px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+/* Theory Tips */
+.theory-tips {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 24px;
+    border-radius: 8px;
+}
+
+.theory-tips h3 {
+    color: #92400e;
+    margin-bottom: 16px;
+}
+
+.theory-tips ul {
+    list-style: none;
+    padding: 0;
+}
+
+.theory-tips li {
+    color: #78350f;
+    margin-bottom: 12px;
+    padding-left: 24px;
+    position: relative;
+}
+
+.theory-tips li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #f59e0b;
+    font-weight: bold;
+}
+
+/* Pattern Examples */
+.pattern-examples {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 30px;
+}
+
+.pattern-example-card {
+    background: white;
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.3s;
+}
+
+.pattern-example-card:hover {
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+    transform: translateY(-4px);
+}
+
+.pattern-example-card.bearish {
+    border-color: #ef4444;
+}
+
+.pattern-example-card.bearish:hover {
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
+}
+
+.pattern-example-card.neutral {
+    border-color: #f59e0b;
+}
+
+.pattern-example-card.neutral:hover {
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2);
+}
+
+.pattern-example-card.indicator {
+    border-color: #667eea;
+}
+
+.pattern-example-card.indicator:hover {
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+}
+
+.pattern-example-card h3 {
+    color: #374151;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+}
+
+.pattern-example-card p {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+/* Pattern Diagrams */
+.pattern-diagram {
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+    margin: 20px 0;
+    color: #667eea;
+    font-family: 'Courier New', monospace;
+}
+
+.pattern-diagram.candle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    font-size: 2.5rem;
+}
+
+.candle-body {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.green-candle {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.red-candle {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.candle-body.small {
+    font-size: 1.5rem;
+}
+
+.candle-body.large {
+    font-size: 2.5rem;
+}
+
+.candle-wick {
+    color: #9ca3af;
+}
+
+/* Quiz Divider */
+.quiz-divider {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    margin: 60px 0 40px 0;
+    color: white;
+}
+
+.quiz-divider h2 {
+    color: white;
+    margin-bottom: 12px;
+}
+
+.quiz-divider p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+}
+
 /* ===== QUIZ SECTION ===== */
 .chart-pattern-quiz-section {
     margin-bottom: 60px;

@@ -224,4 +224,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+/**
+ * Theory tab switching
+ */
+function showTheoryTab(tabName) {
+    // Hide all theory content
+    document.querySelectorAll('.theory-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    // Remove active from all tabs
+    document.querySelectorAll('.theory-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // Show selected content
+    const selectedContent = document.getElementById(`theory-${tabName}`);
+    if (selectedContent) {
+        selectedContent.classList.add('active');
+    }
+
+    // Activate clicked tab
+    event.target.closest('.theory-tab').classList.add('active');
+}
+
+// Make function globally available
+window.showTheoryTab = showTheoryTab;
+
 console.log('✅ Chart Quiz UI loaded');
