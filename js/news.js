@@ -22,8 +22,26 @@ class NewsManager {
             alphaVantage: 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&topics=finance&apikey=demo'
         };
 
-        // RSS to JSON converter API (free service)
-        this.rssToJsonAPI = 'https://api.rss2json.com/v1/api.json?rss_url=';
+        // Multiple RSS to JSON converter APIs (with fallbacks)
+        this.rssConverters = [
+            // AllOrigins (CORS proxy - unlimited, free)
+            {
+                name: 'AllOrigins',
+                urlTemplate: (rssUrl) => `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`
+            },
+            // RSS2JSON (10k/day limit)
+            {
+                name: 'RSS2JSON',
+                urlTemplate: (rssUrl) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=20`
+            },
+            // Corsproxy.io (free, no limits)
+            {
+                name: 'CorsProxy',
+                urlTemplate: (rssUrl) => `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`
+            }
+        ];
+
+        this.currentConverterIndex = 0;
 
         // Fallback static Turkish news
         this.turkishNews = this.getTurkishStaticNews();
@@ -94,30 +112,124 @@ class NewsManager {
     }
 
     /**
-     * Fetch RSS feed via rss2json API
+     * Fetch RSS feed with multiple converter fallbacks
      */
     async fetchRSS(sourceName, sourceDisplayName) {
-        try {
-            const rssUrl = this.sources[sourceName];
-            const apiUrl = `${this.rssToJsonAPI}${encodeURIComponent(rssUrl)}&api_key=6qvmvxq4l0fuwu37ivhfxvuqdfjxgxdrbimxsrrb&count=20`;
+        const rssUrl = this.sources[sourceName];
 
-            const response = await fetch(apiUrl);
+        // Try each converter
+        for (let i = 0; i < this.rssConverters.length; i++) {
+            const converter = this.rssConverters[i];
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+            try {
+                console.log(`🔄 Trying ${converter.name} for ${sourceName}...`);
+                const apiUrl = converter.urlTemplate(rssUrl);
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    console.warn(`❌ ${converter.name} failed with HTTP ${response.status}`);
+                    continue;
+                }
+
+                const data = await response.json();
+
+                // Parse based on converter type
+                let items = null;
+
+                if (converter.name === 'AllOrigins') {
+                    // AllOrigins wraps content in 'contents'
+                    items = this.parseXMLFromAllOrigins(data.contents);
+                } else if (converter.name === 'RSS2JSON') {
+                    // RSS2JSON returns structured JSON
+                    if (data.status === 'ok' && data.items) {
+                        items = data.items;
+                    }
+                } else if (converter.name === 'CorsProxy') {
+                    // CorsProxy returns raw XML
+                    items = this.parseXMLString(data);
+                }
+
+                if (items && items.length > 0) {
+                    console.log(`✅ ${converter.name} succeeded for ${sourceName}: ${items.length} items`);
+                    return this.parseRSSNews(items, sourceDisplayName);
+                }
+            } catch (error) {
+                console.warn(`❌ ${converter.name} error for ${sourceName}:`, error.message);
+                continue;
             }
-
-            const data = await response.json();
-
-            if (data.status === 'ok' && data.items && data.items.length > 0) {
-                return this.parseRSSNews(data.items, sourceDisplayName);
-            }
-
-            return [];
-        } catch (error) {
-            console.error(`Failed to fetch ${sourceName}:`, error);
-            return [];
         }
+
+        console.error(`❌ All converters failed for ${sourceName}`);
+        return [];
+    }
+
+    /**
+     * Parse XML from AllOrigins response
+     */
+    parseXMLFromAllOrigins(xmlString) {
+        try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+            return this.extractItemsFromXML(xmlDoc);
+        } catch (error) {
+            console.error('XML parse error:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Parse XML string
+     */
+    parseXMLString(xmlString) {
+        try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+            return this.extractItemsFromXML(xmlDoc);
+        } catch (error) {
+            console.error('XML parse error:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Extract items from XML document
+     */
+    extractItemsFromXML(xmlDoc) {
+        const items = [];
+        const itemElements = xmlDoc.querySelectorAll('item');
+
+        itemElements.forEach((item, index) => {
+            if (index >= 20) return; // Limit to 20 items
+
+            const title = item.querySelector('title')?.textContent || '';
+            const link = item.querySelector('link')?.textContent || '';
+            const description = item.querySelector('description')?.textContent || '';
+            const pubDate = item.querySelector('pubDate')?.textContent || '';
+            const content = item.querySelector('content\\:encoded')?.textContent || description;
+
+            // Try to find image
+            let thumbnail = null;
+            const mediaContent = item.querySelector('media\\:content, media\\:thumbnail');
+            if (mediaContent) {
+                thumbnail = mediaContent.getAttribute('url');
+            }
+
+            const enclosure = item.querySelector('enclosure');
+            if (!thumbnail && enclosure) {
+                thumbnail = enclosure.getAttribute('url');
+            }
+
+            items.push({
+                title,
+                link,
+                description: content || description,
+                pubDate,
+                thumbnail,
+                enclosure: thumbnail ? { link: thumbnail } : null
+            });
+        });
+
+        return items;
     }
 
     /**
