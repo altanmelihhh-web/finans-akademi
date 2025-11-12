@@ -11,15 +11,19 @@ class NewsManager {
         this.searchQuery = '';
 
         this.sources = {
-            // Alpha Vantage News API (Free tier: 25 requests/day)
-            alphaVantage: 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&topics=technology,finance&apikey=demo',
+            // Turkish RSS Feeds (Free, no API key needed)
+            bloombergHT: 'https://www.bloomberght.com/rss',
+            investing: 'https://tr.investing.com/rss/news.rss',
+            mynet: 'https://finans.mynet.com/rss/ekonomi',
+            bigpara: 'https://bigpara.hurriyet.com.tr/rss/anasayfa.xml',
+            foreks: 'https://www.foreks.com/rss/haber.xml',
 
-            // NewsAPI.org (Free tier: 100 requests/day)
-            // newsApi: 'https://newsapi.org/v2/everything?q=stock+OR+finance&language=en&sortBy=publishedAt&apiKey=YOUR_KEY',
-
-            // Finnhub (Free tier: 60 calls/minute)
-            // finnhub: 'https://finnhub.io/api/v1/news?category=general&token=YOUR_TOKEN'
+            // Backup: Alpha Vantage (limited)
+            alphaVantage: 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&topics=finance&apikey=demo'
         };
+
+        // RSS to JSON converter API (free service)
+        this.rssToJsonAPI = 'https://api.rss2json.com/v1/api.json?rss_url=';
 
         // Fallback static Turkish news
         this.turkishNews = this.getTurkishStaticNews();
@@ -47,22 +51,37 @@ class NewsManager {
         this.loading = true;
         this.showLoadingState();
 
+        const allFetchedNews = [];
+
         try {
-            // Try to fetch real news from Alpha Vantage (demo)
-            const response = await fetch(this.sources.alphaVantage);
+            // Fetch from multiple Turkish RSS sources
+            const rssPromises = [
+                this.fetchRSS('bloombergHT', 'Bloomberg HT'),
+                this.fetchRSS('investing', 'Investing.com'),
+                this.fetchRSS('bigpara', 'BigPara'),
+                this.fetchRSS('foreks', 'Foreks')
+            ];
 
-            if (response.ok) {
-                const data = await response.json();
+            // Fetch all sources in parallel
+            const results = await Promise.allSettled(rssPromises);
 
-                if (data.feed && data.feed.length > 0) {
-                    this.allNews = this.parseAlphaVantageNews(data.feed);
-                    console.log('✅ Real-time news loaded:', this.allNews.length);
+            results.forEach((result, index) => {
+                if (result.status === 'fulfilled' && result.value) {
+                    allFetchedNews.push(...result.value);
+                    console.log(`✅ Source ${index + 1} loaded:`, result.value.length, 'news');
                 } else {
-                    console.log('⚠️ API limit reached, using Turkish static news');
-                    this.allNews = this.turkishNews;
+                    console.log(`⚠️ Source ${index + 1} failed:`, result.reason);
                 }
+            });
+
+            if (allFetchedNews.length > 0) {
+                // Sort by date (most recent first)
+                this.allNews = allFetchedNews.sort((a, b) => {
+                    return new Date(b.timestamp) - new Date(a.timestamp);
+                });
+                console.log(`✅ Total ${this.allNews.length} real-time Turkish news loaded`);
             } else {
-                console.log('⚠️ News API unavailable, using Turkish static news');
+                console.log('⚠️ No RSS feeds available, using fallback static news');
                 this.allNews = this.turkishNews;
             }
         } catch (error) {
@@ -72,6 +91,121 @@ class NewsManager {
 
         this.loading = false;
         this.applyFilters();
+    }
+
+    /**
+     * Fetch RSS feed via rss2json API
+     */
+    async fetchRSS(sourceName, sourceDisplayName) {
+        try {
+            const rssUrl = this.sources[sourceName];
+            const apiUrl = `${this.rssToJsonAPI}${encodeURIComponent(rssUrl)}&api_key=6qvmvxq4l0fuwu37ivhfxvuqdfjxgxdrbimxsrrb&count=20`;
+
+            const response = await fetch(apiUrl);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.status === 'ok' && data.items && data.items.length > 0) {
+                return this.parseRSSNews(data.items, sourceDisplayName);
+            }
+
+            return [];
+        } catch (error) {
+            console.error(`Failed to fetch ${sourceName}:`, error);
+            return [];
+        }
+    }
+
+    /**
+     * Parse RSS news items
+     */
+    parseRSSNews(items, source) {
+        return items.map(item => {
+            // Extract text from HTML description
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = item.description || item.content || '';
+            const summary = tempDiv.textContent.trim().substring(0, 250) + '...';
+
+            // Detect sentiment from title
+            const sentiment = this.detectSentiment(item.title + ' ' + summary);
+
+            // Extract topics/categories
+            const topics = this.extractTopics(item.title + ' ' + summary);
+
+            return {
+                title: item.title,
+                summary: summary,
+                source: source,
+                url: item.link,
+                image: item.enclosure?.link || item.thumbnail || null,
+                time: this.getTimeAgo(item.pubDate),
+                timestamp: item.pubDate,
+                sentiment: sentiment,
+                topics: topics
+            };
+        });
+    }
+
+    /**
+     * Detect sentiment from text
+     */
+    detectSentiment(text) {
+        const textLower = text.toLowerCase();
+
+        // Positive keywords
+        const positiveWords = ['yükseliş', 'artış', 'kazanç', 'rekor', 'güçlü', 'pozitif', 'başarı', 'yükseldi', 'arttı'];
+        const positiveCount = positiveWords.filter(word => textLower.includes(word)).length;
+
+        // Negative keywords
+        const negativeWords = ['düşüş', 'kayıp', 'risk', 'kriz', 'düştü', 'azaldı', 'negatif', 'tehlike'];
+        const negativeCount = negativeWords.filter(word => textLower.includes(word)).length;
+
+        if (positiveCount > negativeCount + 1) {
+            return { label: 'Pozitif', class: 'positive' };
+        } else if (positiveCount > negativeCount) {
+            return { label: 'Hafif Pozitif', class: 'slightly-positive' };
+        } else if (negativeCount > positiveCount + 1) {
+            return { label: 'Negatif', class: 'negative' };
+        } else if (negativeCount > positiveCount) {
+            return { label: 'Hafif Negatif', class: 'slightly-negative' };
+        }
+
+        return { label: 'Nötr', class: 'neutral' };
+    }
+
+    /**
+     * Extract topics from text
+     */
+    extractTopics(text) {
+        const textLower = text.toLowerCase();
+        const topics = [];
+
+        const topicKeywords = {
+            'BIST': ['bist', 'borsa istanbul', 'endeks'],
+            'Dolar': ['dolar', 'usd', 'dolar/tl'],
+            'Euro': ['euro', 'eur'],
+            'Altın': ['altın', 'gold'],
+            'TCMB': ['tcmb', 'merkez bankası', 'central bank'],
+            'Faiz': ['faiz', 'interest rate'],
+            'Kripto': ['bitcoin', 'kripto', 'ethereum', 'coin'],
+            'Petrol': ['petrol', 'oil', 'brent'],
+            'Hisse': ['hisse', 'stock', 'pay'],
+            'BES': ['bes', 'bireysel emeklilik'],
+            'TEFAS': ['tefas', 'fon'],
+            'Enflasyon': ['enflasyon', 'inflation', 'tüfe']
+        };
+
+        Object.entries(topicKeywords).forEach(([topic, keywords]) => {
+            if (keywords.some(keyword => textLower.includes(keyword))) {
+                topics.push(topic);
+            }
+        });
+
+        return topics.slice(0, 3); // Max 3 topics
     }
 
     /**
@@ -224,26 +358,34 @@ class NewsManager {
     getTimeAgo(timestamp) {
         if (!timestamp) return 'Bilinmiyor';
 
-        // Parse timestamp: 20240131T123000
-        const year = timestamp.substring(0, 4);
-        const month = timestamp.substring(4, 6);
-        const day = timestamp.substring(6, 8);
-        const hour = timestamp.substring(9, 11);
-        const minute = timestamp.substring(11, 13);
+        try {
+            // Try to parse the date (RSS feeds use standard date format)
+            const date = new Date(timestamp);
 
-        const date = new Date(`${year}-${month}-${day}T${hour}:${minute}:00Z`);
-        const now = new Date();
-        const diffMs = now - date;
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMs / 3600000);
-        const diffDays = Math.floor(diffMs / 86400000);
+            if (isNaN(date.getTime())) {
+                return 'Bilinmiyor';
+            }
 
-        if (diffMins < 60) return `${diffMins} dakika önce`;
-        if (diffHours < 24) return `${diffHours} saat önce`;
-        if (diffDays === 1) return 'Dün';
-        if (diffDays < 7) return `${diffDays} gün önce`;
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
 
-        return date.toLocaleDateString('tr-TR');
+            if (diffMins < 1) return 'Şimdi';
+            if (diffMins < 60) return `${diffMins} dakika önce`;
+            if (diffHours < 24) return `${diffHours} saat önce`;
+            if (diffDays === 1) return 'Dün';
+            if (diffDays < 7) return `${diffDays} gün önce`;
+
+            return date.toLocaleDateString('tr-TR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        } catch (error) {
+            return 'Bilinmiyor';
+        }
     }
 
     getTurkishStaticNews() {
