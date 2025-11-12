@@ -131,21 +131,32 @@ class NewsManager {
                     continue;
                 }
 
-                const data = await response.json();
+                let data;
+
+                // Get data based on converter
+                if (converter.name === 'CorsProxy') {
+                    // CorsProxy returns raw text/XML
+                    data = await response.text();
+                } else {
+                    // Others return JSON
+                    data = await response.json();
+                }
 
                 // Parse based on converter type
                 let items = null;
 
                 if (converter.name === 'AllOrigins') {
                     // AllOrigins wraps content in 'contents'
-                    items = this.parseXMLFromAllOrigins(data.contents);
+                    if (data.contents) {
+                        items = this.parseXMLFromAllOrigins(data.contents);
+                    }
                 } else if (converter.name === 'RSS2JSON') {
                     // RSS2JSON returns structured JSON
                     if (data.status === 'ok' && data.items) {
                         items = data.items;
                     }
                 } else if (converter.name === 'CorsProxy') {
-                    // CorsProxy returns raw XML
+                    // CorsProxy returns raw XML string
                     items = this.parseXMLString(data);
                 }
 
