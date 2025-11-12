@@ -10,38 +10,21 @@ class NewsManager {
         this.currentSort = 'time';
         this.searchQuery = '';
 
+        // RSS Feed URLs
         this.sources = {
-            // Turkish RSS Feeds (Free, no API key needed)
             bloombergHT: 'https://www.bloomberght.com/rss',
             investing: 'https://tr.investing.com/rss/news.rss',
-            mynet: 'https://finans.mynet.com/rss/ekonomi',
             bigpara: 'https://bigpara.hurriyet.com.tr/rss/anasayfa.xml',
             foreks: 'https://www.foreks.com/rss/haber.xml',
-
-            // Backup: Alpha Vantage (limited)
-            alphaVantage: 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&topics=finance&apikey=demo'
         };
 
-        // Multiple RSS to JSON converter APIs (with fallbacks)
-        this.rssConverters = [
-            // AllOrigins (CORS proxy - unlimited, free)
-            {
-                name: 'AllOrigins',
-                urlTemplate: (rssUrl) => `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`
-            },
-            // RSS2JSON (10k/day limit)
-            {
-                name: 'RSS2JSON',
-                urlTemplate: (rssUrl) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=20`
-            },
-            // Corsproxy.io (free, no limits)
-            {
-                name: 'CorsProxy',
-                urlTemplate: (rssUrl) => `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`
-            }
-        ];
+        // Cloudflare Worker URL (DEPLOY THIS FIRST!)
+        // After deploying worker, replace with your URL:
+        // this.workerUrl = 'https://rss-proxy.YOUR-SUBDOMAIN.workers.dev'
+        this.workerUrl = null; // Will be set after deployment
 
-        this.currentConverterIndex = 0;
+        // Fallback: Use simple fetch for testing (may have CORS issues)
+        this.useFallback = !this.workerUrl;
 
         // Fallback static Turkish news
         this.turkishNews = this.getTurkishStaticNews();
@@ -112,136 +95,42 @@ class NewsManager {
     }
 
     /**
-     * Fetch RSS feed with multiple converter fallbacks
+     * Fetch RSS feed via Cloudflare Worker
      */
     async fetchRSS(sourceName, sourceDisplayName) {
         const rssUrl = this.sources[sourceName];
 
-        // Try each converter
-        for (let i = 0; i < this.rssConverters.length; i++) {
-            const converter = this.rssConverters[i];
-
-            try {
-                console.log(`🔄 Trying ${converter.name} for ${sourceName}...`);
-                const apiUrl = converter.urlTemplate(rssUrl);
-                const response = await fetch(apiUrl);
-
-                if (!response.ok) {
-                    console.warn(`❌ ${converter.name} failed with HTTP ${response.status}`);
-                    continue;
-                }
-
-                let data;
-
-                // Get data based on converter
-                if (converter.name === 'CorsProxy') {
-                    // CorsProxy returns raw text/XML
-                    data = await response.text();
-                } else {
-                    // Others return JSON
-                    data = await response.json();
-                }
-
-                // Parse based on converter type
-                let items = null;
-
-                if (converter.name === 'AllOrigins') {
-                    // AllOrigins wraps content in 'contents'
-                    if (data.contents) {
-                        items = this.parseXMLFromAllOrigins(data.contents);
-                    }
-                } else if (converter.name === 'RSS2JSON') {
-                    // RSS2JSON returns structured JSON
-                    if (data.status === 'ok' && data.items) {
-                        items = data.items;
-                    }
-                } else if (converter.name === 'CorsProxy') {
-                    // CorsProxy returns raw XML string
-                    items = this.parseXMLString(data);
-                }
-
-                if (items && items.length > 0) {
-                    console.log(`✅ ${converter.name} succeeded for ${sourceName}: ${items.length} items`);
-                    return this.parseRSSNews(items, sourceDisplayName);
-                }
-            } catch (error) {
-                console.warn(`❌ ${converter.name} error for ${sourceName}:`, error.message);
-                continue;
-            }
+        if (!this.workerUrl) {
+            console.warn(`⚠️ Worker URL not set, skipping ${sourceName}`);
+            return [];
         }
 
-        console.error(`❌ All converters failed for ${sourceName}`);
-        return [];
-    }
-
-    /**
-     * Parse XML from AllOrigins response
-     */
-    parseXMLFromAllOrigins(xmlString) {
         try {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
-            return this.extractItemsFromXML(xmlDoc);
+            console.log(`🔄 Fetching ${sourceName} via Worker...`);
+
+            const apiUrl = `${this.workerUrl}?url=${encodeURIComponent(rssUrl)}`;
+            const response = await fetch(apiUrl);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.status === 'ok' && data.items && data.items.length > 0) {
+                console.log(`✅ ${sourceName} loaded: ${data.items.length} items`);
+                return this.parseRSSNews(data.items, sourceDisplayName);
+            } else if (data.error) {
+                throw new Error(data.error);
+            }
+
+            return [];
         } catch (error) {
-            console.error('XML parse error:', error);
-            return null;
+            console.error(`❌ Failed to fetch ${sourceName}:`, error.message);
+            return [];
         }
     }
 
-    /**
-     * Parse XML string
-     */
-    parseXMLString(xmlString) {
-        try {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
-            return this.extractItemsFromXML(xmlDoc);
-        } catch (error) {
-            console.error('XML parse error:', error);
-            return null;
-        }
-    }
-
-    /**
-     * Extract items from XML document
-     */
-    extractItemsFromXML(xmlDoc) {
-        const items = [];
-        const itemElements = xmlDoc.querySelectorAll('item');
-
-        itemElements.forEach((item, index) => {
-            if (index >= 20) return; // Limit to 20 items
-
-            const title = item.querySelector('title')?.textContent || '';
-            const link = item.querySelector('link')?.textContent || '';
-            const description = item.querySelector('description')?.textContent || '';
-            const pubDate = item.querySelector('pubDate')?.textContent || '';
-            const content = item.querySelector('content\\:encoded')?.textContent || description;
-
-            // Try to find image
-            let thumbnail = null;
-            const mediaContent = item.querySelector('media\\:content, media\\:thumbnail');
-            if (mediaContent) {
-                thumbnail = mediaContent.getAttribute('url');
-            }
-
-            const enclosure = item.querySelector('enclosure');
-            if (!thumbnail && enclosure) {
-                thumbnail = enclosure.getAttribute('url');
-            }
-
-            items.push({
-                title,
-                link,
-                description: content || description,
-                pubDate,
-                thumbnail,
-                enclosure: thumbnail ? { link: thumbnail } : null
-            });
-        });
-
-        return items;
-    }
 
     /**
      * Parse RSS news items

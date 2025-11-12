@@ -1,0 +1,11 @@
+name = "rss-proxy"
+main = "rss-proxy.js"
+compatibility_date = "2024-01-01"
+
+# Workers will be available at:
+# https://rss-proxy.YOUR-SUBDOMAIN.workers.dev
+
+# Or use custom route on your domain:
+# routes = [
+#   { pattern = "finans-akademi.com/api/rss", custom_domain = true }
+# ]
