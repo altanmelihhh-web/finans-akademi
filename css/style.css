@@ -1138,7 +1138,8 @@ h3 {
 }
 
 .day-checkbox:checked ~ .day-content {
-    max-height: 3000px; /* Increased for quiz/assignment content */
+    max-height: none; /* Remove height limit - allow full content */
+    overflow: visible; /* Ensure content is fully visible */
     padding: 1.5rem;
     margin-top: 1rem;
     background: rgba(255, 255, 255, 0.03);
@@ -1704,8 +1705,24 @@ footer i {
         margin: 1rem 0;
     }
 
+    .week-card {
+        padding: 1.5rem;
+    }
+
     .day-item {
         padding: 1rem;
+    }
+
+    /* Fix: Ensure day content scrolls properly on mobile */
+    .day-checkbox:checked ~ .day-content {
+        max-height: none !important;
+        overflow: visible !important;
+        height: auto;
+    }
+
+    .day-content {
+        overflow-x: hidden; /* Prevent horizontal scroll */
+        word-wrap: break-word;
     }
 
     /* Trading Simulator */

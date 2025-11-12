@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finans Akademi - Mobil Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .device-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .device {
+            background: #1e1e1e;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .device.iphone {
+            width: 390px;
+            height: 844px;
+        }
+
+        .device.mac {
+            width: 1024px;
+            height: 768px;
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .notch {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #1e1e1e;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mac .screen {
+            border-radius: 8px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .device-label {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        h1 {
+            text-align: center;
+            width: 100%;
+            margin-bottom: 40px;
+            color: #333;
+            font-size: 2rem;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .controls button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .controls button:hover {
+            background: #764ba2;
+        }
+
+        .controls input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 1400px) {
+            .device.mac {
+                width: 800px;
+                height: 600px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .device.mac {
+                display: none;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .device.iphone {
+                width: calc(100vw - 40px);
+                height: 80vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h3 style="margin-bottom: 15px;">🎮 Kontroller</h3>
+        <input type="text" id="urlInput" placeholder="URL değiştir..." value="index.html">
+        <button onclick="updateURL()">🔄 URL Güncelle</button>
+        <button onclick="reloadFrames()">♻️ Yenile</button>
+        <button onclick="toggleDevice()">📱 Cihaz Değiştir</button>
+    </div>
+
+    <h1>📱 Finans Akademi - Mobil & Desktop Önizleme</h1>
+
+    <div class="device-container">
+        <div class="device iphone">
+            <div class="notch"></div>
+            <div class="screen">
+                <iframe id="iphone-frame" src="index.html"></iframe>
+            </div>
+            <div class="device-label">iPhone 15 Pro</div>
+        </div>
+
+        <div class="device mac">
+            <div class="screen">
+                <iframe id="mac-frame" src="index.html"></iframe>
+            </div>
+            <div class="device-label">MacBook Pro 14"</div>
+        </div>
+    </div>
+
+    <script>
+        function updateURL() {
+            const url = document.getElementById('urlInput').value;
+            document.getElementById('iphone-frame').src = url;
+            document.getElementById('mac-frame').src = url;
+        }
+
+        function reloadFrames() {
+            document.getElementById('iphone-frame').contentWindow.location.reload();
+            document.getElementById('mac-frame').contentWindow.location.reload();
+        }
+
+        function toggleDevice() {
+            const mac = document.querySelector('.device.mac');
+            mac.style.display = mac.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Auto-reload on error
+        ['iphone-frame', 'mac-frame'].forEach(id => {
+            document.getElementById(id).addEventListener('error', function() {
+                console.log('Retrying load...');
+                setTimeout(() => this.src = this.src, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
