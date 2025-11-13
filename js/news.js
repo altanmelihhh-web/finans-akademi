@@ -16,6 +16,7 @@ class NewsManager {
             investing: 'https://tr.investing.com/rss/news.rss',
             bigpara: 'https://bigpara.hurriyet.com.tr/rss/anasayfa.xml',
             foreks: 'https://www.foreks.com/rss/haber.xml',
+            kap: 'https://www.kap.org.tr/tr/api/memberDisclosureQuery', // KAP Bildirimler (API)
         };
 
         // Cloudflare Worker URL
@@ -30,6 +31,7 @@ class NewsManager {
         // Category definitions
         this.categories = {
             all: { name: 'Tüm Haberler', keywords: [] },
+            kap: { name: 'KAP Bildirimleri', keywords: ['KAP', 'bildirim', 'THYAO', 'EREGL', 'SISE', 'TUPRS', 'PETKM', 'ARCLK', 'TAVHL', 'ISCTR', 'AKBNK', 'GARAN', 'açıklama', 'finansal tablo', 'halka arz'] },
             realtime: { name: 'Güncel', keywords: ['son dakika', 'canlı', 'şimdi', 'bugün'] },
             turkey: { name: 'Türkiye', keywords: ['TCMB', 'BIST', 'TL', 'Türkiye', 'İstanbul', 'Ankara'] },
             world: { name: 'Dünya', keywords: ['Fed', 'ECB', 'ABD', 'Avrupa', 'Çin', 'global'] },
