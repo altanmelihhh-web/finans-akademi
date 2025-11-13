@@ -303,6 +303,12 @@ window.marketLoader = new DynamicMarketLoader();
 
 // Listen for page navigation to start/stop updates
 document.addEventListener('DOMContentLoaded', () => {
+    // Load market data immediately on page load
+    console.log('📊 Loading market data on page load...');
+    window.marketLoader.loadMarketData().catch(err => {
+        console.warn('⚠️ Initial market data load failed:', err.message);
+    });
+
     // Start updates when on markets page
     const observer = new MutationObserver(() => {
         const marketsPage = document.getElementById('markets');

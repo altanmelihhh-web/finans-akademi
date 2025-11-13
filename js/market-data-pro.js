@@ -151,6 +151,17 @@ class MarketDataPro {
             console.log('⏰ [3/3] Setting up auto-refresh (5 min interval)...');
             this.setupAutoRefresh();
 
+            // Step 4: Listen for dynamic market data updates
+            console.log('📡 [4/4] Setting up dynamic market data listener...');
+            window.addEventListener('marketDataUpdated', (event) => {
+                console.log('📊 Market data updated, refreshing Winners/Losers...');
+                this.updateWinnersLosers();
+                // Also update dashboard if needed
+                if (event.detail) {
+                    this.renderDashboard(event.detail);
+                }
+            });
+
             this.state.isInitialized = true;
 
             console.log('\n' + '═'.repeat(80));
@@ -1491,14 +1502,51 @@ class MarketDataPro {
      * Update Winners and Losers dynamically from real market data
      */
     updateWinnersLosers() {
-        if (!window.STOCKS_DATA) return;
+        // Get dynamic market data from loader
+        const marketData = window.marketLoader?.cache?.data;
 
-        // Combine all stocks (US + BIST)
-        const allStocks = [
-            ...(window.STOCKS_DATA.us_stocks || []),
-            ...(window.STOCKS_DATA.bist_stocks || [])
-        ];
+        if (!marketData || !marketData.stocks) {
+            // Fallback to static data if dynamic not loaded yet
+            if (!window.STOCKS_DATA) {
+                console.log('ℹ️ No market data available for Winners/Losers');
+                return;
+            }
+            // Use static data as fallback
+            const allStocks = [
+                ...(window.STOCKS_DATA.us_stocks || []),
+                ...(window.STOCKS_DATA.bist_stocks || [])
+            ];
+            this.renderWinnersLosers(allStocks);
+            return;
+        }
 
+        // Convert dynamic data to stock array format
+        const usStocks = Object.entries(marketData.stocks.us || {})
+            .filter(([key]) => key !== 'timestamp')
+            .map(([symbol, data]) => ({
+                symbol,
+                price: data.price,
+                change: data.changePercent,
+                name: symbol
+            }));
+
+        const bistStocks = Object.entries(marketData.stocks.bist || {})
+            .filter(([key]) => key !== 'timestamp')
+            .map(([symbol, data]) => ({
+                symbol,
+                price: data.price,
+                change: data.changePercent,
+                name: data.name || symbol
+            }));
+
+        const allStocks = [...usStocks, ...bistStocks];
+        this.renderWinnersLosers(allStocks);
+    }
+
+    /**
+     * Render winners/losers from stock array
+     */
+    renderWinnersLosers(allStocks) {
         // Filter stocks with valid prices and changes
         const validStocks = allStocks.filter(stock =>
             stock.price > 0 &&
