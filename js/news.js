@@ -406,12 +406,52 @@ class NewsManager {
 
         return [
             {
+                title: "THYAO: Türk Hava Yolları 2024 Yılı Finansal Sonuçları Açıklandı - KAP Bildirimi",
+                summary: "THY, 2024 yılı finansal tablolarını KAP'a sundu. Net kâr %15 artışla 2.8 milyar TL olarak gerçekleşti. Yolcu sayısı ve doluluk oranlarında rekor seviyeler görüldü.",
+                source: "KAP",
+                url: "https://www.kap.org.tr",
+                image: null,
+                time: "1 saat önce",
+                sentiment: { label: 'Pozitif', class: 'positive' },
+                topics: ['THYAO', 'KAP', 'Finansal Tablo', 'Bildirim']
+            },
+            {
+                title: "EREGL: Ereğli Demir Çelik Fabrikaları Önemli Açıklama - KAP",
+                summary: "Ereğli Demir Çelik, yeni yatırım planlarını KAP'a bildirdi. 500 milyon TL tutarındaki modernizasyon yatırımı onaylandı. Kapasite artırımı hedefleniyor.",
+                source: "KAP",
+                url: "https://www.kap.org.tr",
+                image: null,
+                time: "2 saat önce",
+                sentiment: { label: 'Pozitif', class: 'positive' },
+                topics: ['EREGL', 'KAP', 'Yatırım', 'Bildirim']
+            },
+            {
+                title: "AKBNK: Akbank Genel Kurul Kararları KAP'ta Yayımlandı",
+                summary: "Akbank'ın olağan genel kurul toplantısı sonuçları açıklandı. Temettü dağıtımı ve yönetim kurulu üyelikleri karara bağlandı. Pay başına 2.5 TL temettü önerildi.",
+                source: "KAP",
+                url: "https://www.kap.org.tr",
+                image: null,
+                time: "3 saat önce",
+                sentiment: { label: 'Pozitif', class: 'positive' },
+                topics: ['AKBNK', 'KAP', 'Genel Kurul', 'Temettü', 'Bildirim']
+            },
+            {
+                title: "SISE: Şişecam Halka Arz İçin SPK'ya Başvuru Yaptı",
+                summary: "Şişecam Topluluğu, yeni bir şirketin halka arzı için Sermaye Piyasası Kurulu'na başvurdu. Halka arz süreci ile ilgili detaylar KAP'ta açıklandı.",
+                source: "KAP",
+                url: "https://www.kap.org.tr",
+                image: null,
+                time: "4 saat önce",
+                sentiment: { label: 'Pozitif', class: 'positive' },
+                topics: ['SISE', 'KAP', 'Halka Arz', 'Bildirim']
+            },
+            {
                 title: "TCMB Faiz Kararı Beklentileri Yükseliyor",
                 summary: "Merkez Bankası'nın bu ay yapacağı toplantıda faiz artırımı beklentileri güçleniyor. Enflasyon verilerinin ardından piyasalar %50 üzeri faiz seviyesine hazırlanıyor.",
                 source: "Bloomberg HT",
                 url: "https://www.bloomberght.com",
                 image: null,
-                time: "2 saat önce",
+                time: "5 saat önce",
                 sentiment: { label: 'Hafif Negatif', class: 'slightly-negative' },
                 topics: ['TCMB', 'Faiz', 'Enflasyon']
             },
